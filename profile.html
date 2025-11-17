@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="mobile-screen">
+        
+        <header class="header">
+            <span class="header-title">โปรไฟล์</span>
+            <a href="profile.html" class="profile-icon"></a>
+        </header>
+        
+        <div class="content">
+            <h2 class="page-title">ข้อมูลของคุณ</h2>
+
+            <div class="form-group">
+                <label for="edit-weight">น้ำหนัก (kg)</label>
+                <input type="text" id="edit-weight">
+            </div>
+            
+            <div class="form-group">
+                <label for="edit-height">ส่วนสูง (cm)</label>
+                <input type="text" id="edit-height">
+            </div>
+
+            <button id="recalcBtn" class="btn">บันทึกและคำนวณใหม่</button>
+            
+            <div class="bmi-result-box" id="profile-bmi-box">
+                <strong>ค่า BMI:</strong> <span id="profile-bmi">--.-</span>
+                <br>
+                <small>(ควรกิน <span id="profile-calories">----</span> แคลอรี่)</small>
+            </div>
+            
+            <table class="bmi-table">
+                <thead>
+                    <tr>
+                        <th>ค่ารูปร่าง</th>
+                        <th>ค่า BMI</th>
+                    </tr>
+                </thead>
+                <tbody id="bmi-table-body">
+                    <tr>
+                        <td>...</td>
+                        <td>...</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <a href="login.html" class="btn btn-secondary-link" style="margin-top: 20px;" id="logoutBtn">ออกจากระบบ</a>
+        </div>
+        <footer class="footer-nav">
+            <a href="home.html" class="footer-icon">⬅️</a>
+            <a href="cart.html" class="footer-icon">🛒</a>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. หาชื่อผู้ใช้ปัจจุบัน
+            const username = localStorage.getItem('currentUser');
+            if (!username) {
+                // ถ้าไม่ login ให้กลับไปหน้า login
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // 2. ดึง Element ที่ต้องใช้
+            const editWeight = document.getElementById('edit-weight');
+            const editHeight = document.getElementById('edit-height');
+            const recalcBtn = document.getElementById('recalcBtn');
+            const profileBmi = document.getElementById('profile-bmi');
+            const profileCalories = document.getElementById('profile-calories');
+            const bmiTableBody = document.getElementById('bmi-table-body');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            // 3. โหลดข้อมูลครั้งแรก
+            loadProfileData();
+
+            // 4. ผูก Event ให้ปุ่มคำนวณใหม่
+            recalcBtn.addEventListener('click', function() {
+                const newWeight = parseFloat(editWeight.value);
+                const newHeight = parseFloat(editHeight.value);
+
+                if (newWeight > 0 && newHeight > 0) {
+                    // คำนวณใหม่
+                    const heightInMeters = newHeight / 100;
+                    const newBmi = (newWeight / (heightInMeters * heightInMeters)).toFixed(2);
+                    const newCalories = (newWeight * 30).toFixed(0); // สูตรสมมติ
+
+                    // สร้าง object ข้อมูลใหม่
+                    const updatedUserData = {
+                        weight: newWeight,
+                        height: newHeight,
+                        bmi: newBmi,
+                        calories: newCalories
+                    };
+
+                    // บันทึกทับ localStorage
+                    localStorage.setItem(username + '_data', JSON.stringify(updatedUserData));
+
+                    // อัปเดตหน้าจอ
+                    updateProfileDisplay(updatedUserData);
+                    alert('บันทึกข้อมูลใหม่แล้ว!');
+                } else {
+                    alert('กรุณากรอกข้อมูลให้ถูกต้อง');
+                }
+            });
+
+            // 5. ฟังก์ชันโหลดข้อมูล
+            function loadProfileData() {
+                const userData = JSON.parse(localStorage.getItem(username + '_data'));
+                
+                if (userData) {
+                    // กรอกข้อมูลลงในช่อง input
+                    editWeight.value = userData.weight;
+                    editHeight.value = userData.height;
+                    // อัปเดตส่วนแสดงผล
+                    updateProfileDisplay(userData);
+                } else {
+                    // กรณีไม่เคยกรอกข้อมูล (มาจากหน้า register แต่ยังไม่กรอก)
+                    document.getElementById('profile-bmi-box').innerHTML = 
+                        'ไม่พบข้อมูล BMI <br> <small>กรุณากลับไปหน้า "ข้อมูลผู้ใช้" เพื่อคำนวณ</small>';
+                    bmiTableBody.innerHTML = '<tr><td>-</td><td>-</td></tr>';
+                }
+            }
+
+            // 6. ฟังก์ชันอัปเดตหน้าจอ (BMI, แคลอรี, ตาราง)
+            function updateProfileDisplay(data) {
+                profileBmi.textContent = data.bmi;
+                profileCalories.textContent = data.calories;
+                
+                // อัปเดตตาราง
+                const category = getBmiCategory(data.bmi);
+                bmiTableBody.innerHTML = `<tr><td>${category.name}</td><td>${category.range}</td></tr>`;
+            }
+
+            // 7. ฟังก์ชันช่วยแปลค่า BMI เป็นข้อความ
+            function getBmiCategory(bmi) {
+                bmi = parseFloat(bmi);
+                if (bmi < 18.5) return { name: 'ผอมเกินไป', range: 'น้อยกว่า 18.5' };
+                if (bmi <= 22.9) return { name: 'น้ำหนักปกติ', range: '18.5 - 22.9' };
+                if (bmi <= 24.9) return { name: 'น้ำหนักเกิน', range: '23.0 - 24.9' };
+                if (bmi <= 29.9) return { name: 'อ้วน', range: '25.0 - 29.9' };
+                if (bmi >= 30) return { name: 'อ้วนมาก', range: '30.0 ขึ้นไป' };
+                return { name: '-', range: '-' };
+            }
+
+            // 8. ล้างข้อมูลเมื่อออกจากระบบ
+            logoutBtn.addEventListener('click', function() {
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('currentUserRole');
+                localStorage.removeItem('cart'); 
+            });
+        });
+    </script>
+</body>
+</html>

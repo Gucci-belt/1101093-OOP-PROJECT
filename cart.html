@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="mobile-screen">
+        
+        <header class="header">
+            <span class="header-title">ตะกร้า</span>
+            <a href="profile.html" class="profile-icon"></a>
+        </header>
+        
+        <div class="content" id="cart-container">
+            
+            <a href="summary.html" class="btn" style="margin-top: 30px;" id="summaryBtn">รวม</a>
+        </div>
+        
+        <footer class="footer-nav" style="justify-content: flex-start;">
+            <a href="home.html" class="footer-icon">⬅️</a>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cartContainer = document.getElementById('cart-container');
+            const summaryBtn = document.getElementById('summaryBtn');
+            
+            loadCart(); // เรียกใช้ฟังก์ชันโหลดตะกร้า
+
+            function loadCart() {
+                // เคลียร์รายการเก่า (ยกเว้นปุ่ม "รวม")
+                cartContainer.querySelectorAll('.menu-item').forEach(item => item.remove());
+                cartContainer.querySelectorAll('.empty-msg').forEach(item => item.remove());
+
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+                if (cart.length === 0) {
+                    // ถ้าตะกร้าว่าง
+                    const emptyMsg = document.createElement('p');
+                    emptyMsg.textContent = 'ตะกร้าของคุณว่างเปล่า';
+                    emptyMsg.className = 'empty-msg'; // ตั้ง class ไว้เผื่อลบ
+                    emptyMsg.style.textAlign = 'center';
+                    emptyMsg.style.marginTop = '30px';
+                    cartContainer.insertBefore(emptyMsg, summaryBtn);
+                } else {
+                    // 2. สร้าง HTML สำหรับแต่ละรายการ
+                    cart.forEach((item, index) => { // index คือลำดับของ item
+                        const menuItemDiv = document.createElement('div');
+                        menuItemDiv.className = 'menu-item';
+                        
+                        menuItemDiv.innerHTML = `
+                            <div class="item-image-placeholder"></div>
+                            <div class="item-text">
+                                <strong>${item.name}</strong>
+                                <span>พลังงาน: ${item.kcal} kcal, ไขมัน: ${item.fat}g</span>
+                            </div>
+                            <button class="remove-btn" data-index="${index}">&times;</button>
+                        `;
+                        
+                        cartContainer.insertBefore(menuItemDiv, summaryBtn);
+                    });
+
+                    // 3. ผูก Event ให้ปุ่มลบ (หลังจากสร้างปุ่มแล้ว)
+                    addRemoveListeners();
+                }
+            }
+
+            function addRemoveListeners() {
+                document.querySelectorAll('.remove-btn').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.stopPropagation(); // หยุดไม่ให้คลิกโดนอย่างอื่น
+                        const indexToRemove = parseInt(e.target.dataset.index, 10);
+                        removeItemFromCart(indexToRemove);
+                    });
+                });
+            }
+
+            function removeItemFromCart(index) {
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                cart.splice(index, 1); // ลบ item ณ ตำแหน่ง index
+                localStorage.setItem('cart', JSON.stringify(cart)); // บันทึกกลับ
+                loadCart(); // โหลดตะกร้าใหม่เพื่ออัปเดตหน้า
+            }
+        });
+    </script>
+</body>
+</html>
