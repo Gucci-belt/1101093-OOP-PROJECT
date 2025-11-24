@@ -1,15 +1,16 @@
 package com.login_oop.oop_backend.repositories; // 1. บอกว่าอยู่ในแพ็คเกจ repositories
 
-// 2. Import เครื่องมือที่เราต้องใช้ (สำหรับ List, File, Scanner)
+// 2. Import เครื่องมือที่เราต้องใช้ (สำหรับ List, File, Scanner, PrintWriter)
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 import org.springframework.stereotype.Repository;
 
-// 3. Import คลาส models ที่เราสร้างไว้
 import com.login_oop.oop_backend.models.Admin;
 import com.login_oop.oop_backend.models.Member;
 import com.login_oop.oop_backend.models.User;
@@ -20,10 +21,14 @@ public class UserRepository {
     
     // 5. นี่คือ "โครงสร้างข้อมูล" (Data Structure) ที่ มคอ.3 ต้องการ
     // เราใช้ List (จาก ArrayList) เพื่อเก็บ User ทั้งหมดที่อ่านมาจากไฟล์
-    private List<User> userDatabase;
+    private final List<User> userDatabase;
     
-    // 6. กำหนดชื่อไฟล์ที่จะอ่าน
-    private String filePath = "users.txt";
+    // Map สำหรับเก็บ password (เนื่องจาก User class ไม่มี getter สำหรับ password)
+    // หมายเหตุ: ในระบบจริงควรใช้ password hashing
+    private final java.util.Map<String, String> passwordStorage = new java.util.HashMap<>();
+    
+    // 6. กำหนดชื่อไฟล์ที่จะอ่าน (อยู่ใน resources folder)
+    private final String filePath = "src/main/resources/users.txt";
 
     // 7. Constructor: จะทำงานทันทีที่คลาสนี้ถูกสร้าง
     public UserRepository() {
@@ -48,6 +53,9 @@ public class UserRepository {
                     String username = parts[0];
                     String password = parts[1];
                     String role = parts[2];
+
+                    // เก็บ password ไว้ใน Map (เพื่อใช้ตอนบันทึกลงไฟล์)
+                    passwordStorage.put(username, password);
 
                     // ใช้ OOP ที่เราสร้างไว้!
                     if (role.equalsIgnoreCase("Admin")) {
@@ -83,13 +91,45 @@ public class UserRepository {
 
     /**
      * เมธอดสำหรับ "บันทึก" ผู้ใช้ใหม่ (สำหรับการสมัครสมาชิก)
-     * (ในโปรเจคจริง คุณต้องเขียนโค้ดเพื่อบันทึกลงไฟล์ .txt ด้วย
-     * แต่วิชานี้ปกติจะเน้นแค่การอ่านไฟล์และการทำงานของ OOP ครับ)
+     * เพิ่มผู้ใช้ใน memory และบันทึกลงไฟล์ users.txt
+     * 
+     * @param user ผู้ใช้ที่ต้องการบันทึก
+     * @param password รหัสผ่านของผู้ใช้ (ต้องส่งมาแยกเพราะ User class ไม่มี getter)
+     */
+    public void save(User user, String password) {
+        userDatabase.add(user);
+        // เก็บ password ไว้ใน Map เพื่อใช้ตอนบันทึกลงไฟล์
+        passwordStorage.put(user.getUsername(), password);
+        System.out.println("ผู้ใช้ใหม่ " + user.getUsername() + " ถูกเพิ่มในระบบ");
+        // บันทึกลงไฟล์ users.txt
+        saveToFile();
+    }
+    
+    /**
+     * เมธอดสำหรับ "บันทึก" ผู้ใช้ใหม่ (overload สำหรับความเข้ากันได้)
+     * หมายเหตุ: วิธีนี้จะไม่สามารถบันทึก password ได้ ควรใช้ save(User, String) แทน
      */
     public void save(User user) {
-        userDatabase.add(user);
-        System.out.println("ผู้ใช้ใหม่ " + user.getUsername() + " ถูกเพิ่มในระบบ (ชั่วคราว)");
-        // หมายเหตุ: การบันทึกนี้จะหายไปเมื่อปิดเซิร์ฟเวอร์
-        // เพราะเรายังไม่ได้เขียนโค้ด "บันทึกกลับลงไฟล์ .txt"
+        // เรียกใช้ save(User, String) โดยใช้ password ที่เก็บไว้ใน Map
+        String password = passwordStorage.getOrDefault(user.getUsername(), "");
+        save(user, password);
+    }
+    
+    /**
+     * 🎯 เมธอดสำหรับบันทึกข้อมูลทั้งหมดลงไฟล์ users.txt
+     * จะเขียนทับไฟล์เดิมด้วยข้อมูลทั้งหมดใน userDatabase
+     */
+    private void saveToFile() {
+        try (FileWriter writer = new FileWriter(filePath)) {
+            for (User user : userDatabase) {
+                // ดึง password จาก Map
+                String password = passwordStorage.getOrDefault(user.getUsername(), "");
+                // เขียนในรูปแบบ: username,password,role
+                writer.write(user.getUsername() + "," + password + "," + user.getRole() + "\n");
+            }
+            System.out.println("... บันทึกข้อมูลลงไฟล์ " + filePath + " สำเร็จ ...");
+        } catch (IOException e) {
+            System.err.println("[ERROR] ไม่สามารถบันทึกไฟล์ " + filePath + " ได้: " + e.getMessage());
+        }
     }
 }

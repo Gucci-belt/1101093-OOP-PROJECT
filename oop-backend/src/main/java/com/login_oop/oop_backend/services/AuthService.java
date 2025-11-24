@@ -1,7 +1,6 @@
 package com.login_oop.oop_backend.services; // 1. บอกว่าอยู่ในแพ็คเกจ services
 
 // 2. Import เครื่องมือและคลาสที่ต้องใช้
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.login_oop.oop_backend.models.Member;
@@ -13,14 +12,13 @@ import com.login_oop.oop_backend.repositories.UserRepository;
 public class AuthService {
 
     // 4. AuthService ต้องคุยกับ "ห้องเก็บของ" (Repository)
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     /**
      * 5. นี่คือ Constructor ที่ใช้เทคนิค "Dependency Injection"
-     * @Autowired บอก Spring ว่า "ช่วยเอา UserRepository ที่คุณสร้างไว้ มาฉีดใส่ในนี้ที"
+     * Spring จะ inject UserRepository อัตโนมัติเมื่อมี constructor เดียว
      * ทำให้ AuthService ของเรามี userRepository พร้อมใช้งานทันที
      */
-    @Autowired
     public AuthService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -55,8 +53,8 @@ public class AuthService {
         // 2. ถ้าชื่อไม่ซ้ำ ให้สร้าง "Member" ใหม่
         User newUser = new Member(username, password);
         
-        // 3. สั่งให้ "ห้องเก็บของ" บันทึกผู้ใช้ใหม่นี้
-        userRepository.save(newUser);
+        // 3. สั่งให้ "ห้องเก็บของ" บันทึกผู้ใช้ใหม่นี้ (ส่ง password ไปด้วยเพื่อบันทึกลงไฟล์)
+        userRepository.save(newUser, password);
         
         System.out.println("[AuthService] " + username + " สมัครสมาชิกสำเร็จ");
         return true; // สมัครสำเร็จ
