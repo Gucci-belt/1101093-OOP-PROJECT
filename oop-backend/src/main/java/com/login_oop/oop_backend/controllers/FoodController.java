@@ -10,26 +10,22 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
-/**
- * 🎯 Controller Class สำหรับจัดการ HTTP Requests เกี่ยวกับอาหาร
- * ใช้ OOP: Class + Methods + REST API
- */
+// Controller สำหรับจัดการข้อมูลอาหาร
 @RestController
 @CrossOrigin(origins = "*")
 public class FoodController {
 
-    // Dependency Injection: FoodController ต้องใช้ FoodService
+    // ต้องใช้ FoodService เพื่อดึงข้อมูลอาหาร
     private final FoodService foodService;
 
-    // Constructor Injection
+    // Constructor รับ FoodService เข้ามา
     public FoodController(FoodService foodService) {
         this.foodService = foodService;
     }
 
     /**
-     * 🎯 API Endpoint: ดึงรายการอาหารทั้งหมด
-     * GET /api/foods
-     * @return List ของ Food objects
+     * API สำหรับดึงรายการอาหารทั้งหมด
+     * เรียกผ่าน GET /api/foods
      */
     @GetMapping("/api/foods")
     public List<Food> getAllFoods() {
@@ -37,10 +33,8 @@ public class FoodController {
     }
 
     /**
-     * 🎯 API Endpoint: ค้นหาอาหารด้วยชื่อ
-     * GET /api/foods/{name}
-     * @param name ชื่ออาหาร
-     * @return Food object หรือ error message
+     * API สำหรับค้นหาอาหารด้วยชื่อ
+     * เรียกผ่าน GET /api/foods/{name}
      */
     @GetMapping("/api/foods/{name}")
     public Object getFoodByName(@PathVariable String name) {
@@ -48,6 +42,7 @@ public class FoodController {
         if (food != null) {
             return food;
         }
+        // ถ้าไม่เจอ ส่ง error message กลับไป
         return Map.of("error", "ไม่พบอาหารที่ชื่อ: " + name);
     }
 }

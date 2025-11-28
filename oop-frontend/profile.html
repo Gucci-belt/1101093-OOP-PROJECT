@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="mobile-screen">
+        
+        <header class="header">
+            <span class="header-title">โปรไฟล์</span>
+            <a href="profile.html" class="profile-icon"></a>
+        </header>
+        
+        <div class="content">
+            <h2 class="page-title">ข้อมูลของคุณ</h2>
+
+            <div class="form-group">
+                <label for="edit-weight">น้ำหนัก (kg)</label>
+                <input type="text" id="edit-weight">
+            </div>
+            
+            <div class="form-group">
+                <label for="edit-height">ส่วนสูง (cm)</label>
+                <input type="text" id="edit-height">
+            </div>
+
+            <button id="recalcBtn" class="btn">บันทึกและคำนวณใหม่</button>
+            
+            <div class="bmi-result-box" id="profile-bmi-box">
+                <strong>น้ำหนัก:</strong> <span id="profile-weight">--</span> kg
+                <br>
+                <strong>ส่วนสูง:</strong> <span id="profile-height">--</span> cm
+                <br><br>
+                <strong>ค่า BMI:</strong> <span id="profile-bmi">--.-</span>
+                <br>
+                <small>(ควรกิน <span id="profile-calories">----</span> แคลอรี่)</small>
+            </div>
+            
+            <table class="bmi-table">
+                <thead>
+                    <tr>
+                        <th>ค่ารูปร่าง</th>
+                        <th>ค่า BMI</th>
+                    </tr>
+                </thead>
+                <tbody id="bmi-table-body">
+                    <tr>
+                        <td>...</td>
+                        <td>...</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <a href="login.html" class="btn btn-secondary-link" style="margin-top: 20px;" id="logoutBtn">ออกจากระบบ</a>
+        </div>
+        <footer class="footer-nav">
+            <a href="home.html" class="footer-icon">⬅️</a>
+            <a href="cart.html" class="footer-icon">🛒</a>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. หาชื่อผู้ใช้ปัจจุบัน
+            const username = localStorage.getItem('currentUser');
+            if (!username) {
+                // ถ้าไม่ login ให้กลับไปหน้า login
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // 2. ดึง Element ที่ต้องใช้
+            const editWeight = document.getElementById('edit-weight');
+            const editHeight = document.getElementById('edit-height');
+            const recalcBtn = document.getElementById('recalcBtn');
+            const profileWeight = document.getElementById('profile-weight');
+            const profileHeight = document.getElementById('profile-height');
+            const profileBmi = document.getElementById('profile-bmi');
+            const profileCalories = document.getElementById('profile-calories');
+            const bmiTableBody = document.getElementById('bmi-table-body');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            // 3. โหลดข้อมูลครั้งแรก
+            loadProfileData();
+
+            // 4. ผูก Event ให้ปุ่มคำนวณใหม่
+            recalcBtn.addEventListener('click', function() {
+                const newWeight = parseFloat(editWeight.value);
+                const newHeight = parseFloat(editHeight.value);
+
+                if (newWeight > 0 && newHeight > 0) {
+                    // เรียก API เพื่อคำนวณ BMI
+                    fetch('http://localhost:8080/api/bmi/calculate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username: username,
+                            weight: newWeight,
+                            height: newHeight
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // อัปเดตหน้าจอ
+                            updateProfileDisplay({
+                                weight: newWeight,
+                                height: newHeight,
+                                bmi: data.bmi,
+                                calories: data.calories,
+                                category: data.category,
+                                categoryRange: data.categoryRange
+                            });
+                            alert('บันทึกข้อมูลใหม่แล้ว!');
+                        } else {
+                            alert('เกิดข้อผิดพลาด: ' + (data.message || 'ไม่สามารถคำนวณได้'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error calculating BMI:', error);
+                        alert('เกิดข้อผิดพลาด: ไม่สามารถเชื่อมต่อกับ server ได้');
+                    });
+                } else {
+                    alert('กรุณากรอกข้อมูลให้ถูกต้อง');
+                }
+            });
+
+            // 5. ฟังก์ชันโหลดข้อมูลน้ำหนักและส่วนสูง
+            function loadUserData() {
+                fetch(`http://localhost:8080/api/bmi/data/${username}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // แสดงข้อมูลใน input fields
+                            editWeight.value = data.weight;
+                            editHeight.value = data.height;
+                            // แสดงข้อมูลในผลลัพธ์
+                            profileWeight.textContent = data.weight;
+                            profileHeight.textContent = data.height;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading user data:', error);
+                        // ไม่แสดง error ถ้ายังไม่มีข้อมูล
+                    });
+            }
+
+            // 6. ฟังก์ชันโหลดข้อมูล BMI จาก API
+            function loadProfileData() {
+                // โหลดข้อมูลน้ำหนักและส่วนสูงก่อน
+                loadUserData();
+                
+                // เรียก API เพื่อดึงข้อมูล BMI
+                fetch(`http://localhost:8080/api/bmi/${username}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // อัปเดตส่วนแสดงผล
+                            const weight = parseFloat(editWeight.value) || 0;
+                            const height = parseFloat(editHeight.value) || 0;
+                            updateProfileDisplay({
+                                weight: weight,
+                                height: height,
+                                bmi: data.bmi,
+                                calories: data.calories,
+                                category: data.category,
+                                categoryRange: data.categoryRange
+                            });
+                        } else {
+                            // กรณีไม่เคยกรอกข้อมูล
+                            document.getElementById('profile-bmi-box').innerHTML = 
+                                'ไม่พบข้อมูล BMI <br> <small>กรุณากลับไปหน้า "ข้อมูลผู้ใช้" เพื่อคำนวณ</small>';
+                            bmiTableBody.innerHTML = '<tr><td>-</td><td>-</td></tr>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading BMI:', error);
+                        document.getElementById('profile-bmi-box').innerHTML = 
+                            'ไม่พบข้อมูล BMI <br> <small>กรุณากลับไปหน้า "ข้อมูลผู้ใช้" เพื่อคำนวณ</small>';
+                        bmiTableBody.innerHTML = '<tr><td>-</td><td>-</td></tr>';
+                    });
+            }
+
+            // 7. ฟังก์ชันอัปเดตหน้าจอ (น้ำหนัก, ส่วนสูง, BMI, แคลอรี, ตาราง)
+            function updateProfileDisplay(data) {
+                // แสดงน้ำหนักและส่วนสูง
+                if (data.weight) {
+                    profileWeight.textContent = data.weight;
+                }
+                if (data.height) {
+                    profileHeight.textContent = data.height;
+                }
+                
+                // แสดง BMI และแคลอรี่
+                profileBmi.textContent = data.bmi;
+                profileCalories.textContent = data.calories;
+                
+                // อัปเดตตาราง (ใช้ข้อมูลจาก API)
+                bmiTableBody.innerHTML = `<tr><td>${data.category}</td><td>${data.categoryRange}</td></tr>`;
+            }
+
+            // 8. ล้างข้อมูลเมื่อออกจากระบบ
+            logoutBtn.addEventListener('click', function() {
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('currentUserRole');
+                localStorage.removeItem('cart'); 
+            });
+        });
+    </script>
+</body>
+</html>

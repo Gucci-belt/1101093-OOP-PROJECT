@@ -7,25 +7,23 @@ import org.springframework.stereotype.Repository;
 
 import com.login_oop.oop_backend.models.Food;
 
-/**
- * 🎯 Repository Class สำหรับจัดการข้อมูลอาหาร
- * ใช้ OOP: Class + Methods + Data Structure (List)
- */
+// Repository สำหรับจัดการข้อมูลอาหาร
+// เก็บข้อมูลอาหารไว้ใน memory
 @Repository
 public class FoodRepository {
     
-    // Data Structure: ใช้ List เพื่อเก็บ Food objects
+    // เก็บอาหารทั้งหมด
     private final List<Food> foodDatabase;
 
-    // Constructor: สร้างข้อมูลอาหารเริ่มต้น
+    // Constructor จะสร้างข้อมูลอาหารเริ่มต้นทันที
     public FoodRepository() {
         this.foodDatabase = new ArrayList<>();
-        initializeFoods(); // เรียกใช้ method เพื่อสร้างข้อมูลเริ่มต้น
+        initializeFoods();
     }
 
     /**
-     * 🎯 Method: สร้างข้อมูลอาหารเริ่มต้น
-     * ใช้ OOP: Method ที่ทำงานภายใน class
+     * สร้างข้อมูลอาหารเริ่มต้น
+     * เพิ่มอาหารต่างๆ ลงใน database
      */
     private void initializeFoods() {
         foodDatabase.add(new Food("ข้าวมันไก่", 600, 25, 5, 700));
@@ -51,26 +49,24 @@ public class FoodRepository {
     }
 
     /**
-     * 🎯 Method: ดึงรายการอาหารทั้งหมด
-     * @return List ของ Food objects
+     * ดึงรายการอาหารทั้งหมด
+     * ส่งคืน copy เพื่อป้องกันการแก้ไขโดยตรง
      */
     public List<Food> findAll() {
-        return new ArrayList<>(foodDatabase); // ส่งคืน copy เพื่อป้องกันการแก้ไขโดยตรง
+        return new ArrayList<>(foodDatabase);
     }
 
     /**
-     * 🎯 Method: ค้นหาอาหารด้วยชื่อ
-     * @param name ชื่ออาหาร
-     * @return Food object หรือ null ถ้าไม่พบ
+     * ค้นหาอาหารด้วยชื่อ
+     * ใช้ linear search วนลูปหา
      */
     public Food findByName(String name) {
-        // Linear Search: วนลูปหา food ที่มีชื่อตรงกัน
         for (Food food : foodDatabase) {
             if (food.getName().equals(name)) {
                 return food;
             }
         }
-        return null;
+        return null; // ไม่เจอ
     }
 }
 

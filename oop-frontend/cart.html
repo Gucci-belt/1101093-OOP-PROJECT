@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="mobile-screen">
+        
+        <header class="header">
+            <span class="header-title">ตะกร้า</span>
+            <a href="profile.html" class="profile-icon"></a>
+        </header>
+        
+        <div class="content" id="cart-container">
+            
+            <a href="summary.html" class="btn" style="margin-top: 30px;" id="summaryBtn">รวม</a>
+        </div>
+        
+        <footer class="footer-nav" style="justify-content: flex-start;">
+            <a href="home.html" class="footer-icon">⬅️</a>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cartContainer = document.getElementById('cart-container');
+            const summaryBtn = document.getElementById('summaryBtn');
+
+            // ตรวจสอบว่าผู้ใช้ login หรือยัง
+            const username = localStorage.getItem('currentUser');
+            if (!username) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            loadCart(); // เรียกใช้ฟังก์ชันโหลดตะกร้า
+
+            // 1. ฟังก์ชันโหลดตะกร้าจาก API
+            function loadCart() {
+                // เคลียร์รายการเก่า (ยกเว้นปุ่ม "รวม")
+                cartContainer.querySelectorAll('.menu-item').forEach(item => item.remove());
+                cartContainer.querySelectorAll('.empty-msg').forEach(item => item.remove());
+
+                fetch(`http://localhost:8080/api/cart/${username}`)
+                    .then(response => response.json())
+                    .then(cart => {
+                        if (cart.length === 0) {
+                            // ถ้าตะกร้าว่าง
+                            const emptyMsg = document.createElement('p');
+                            emptyMsg.textContent = 'ตะกร้าของคุณว่างเปล่า';
+                            emptyMsg.className = 'empty-msg';
+                            emptyMsg.style.textAlign = 'center';
+                            emptyMsg.style.marginTop = '30px';
+                            cartContainer.insertBefore(emptyMsg, summaryBtn);
+                        } else {
+                            // สร้าง HTML สำหรับแต่ละรายการ
+                            cart.forEach((item, index) => {
+                                const menuItemDiv = document.createElement('div');
+                                menuItemDiv.className = 'menu-item';
+                                
+                                menuItemDiv.innerHTML = `
+                                    <div class="item-image-placeholder"></div>
+                                    <div class="item-text">
+                                        <strong>${item.name}</strong>
+                                        <span>พลังงาน: ${item.kcal} kcal, ไขมัน: ${item.fat}g</span>
+                                    </div>
+                                    <button class="remove-btn" data-food-name="${item.name}">&times;</button>
+                                `;
+                                
+                                cartContainer.insertBefore(menuItemDiv, summaryBtn);
+                            });
+
+                            // ผูก Event ให้ปุ่มลบ
+                            addRemoveListeners();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading cart:', error);
+                        const errorMsg = document.createElement('p');
+                        errorMsg.textContent = 'ไม่สามารถโหลดตะกร้าได้ (Backend ปิดอยู่?)';
+                        errorMsg.style.textAlign = 'center';
+                        errorMsg.style.color = 'red';
+                        errorMsg.style.marginTop = '30px';
+                        cartContainer.insertBefore(errorMsg, summaryBtn);
+                    });
+            }
+
+            // 2. ผูก Event Listeners สำหรับปุ่มลบ
+            function addRemoveListeners() {
+                document.querySelectorAll('.remove-btn').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const foodName = e.target.dataset.foodName;
+                        removeItemFromCart(foodName);
+                    });
+                });
+            }
+
+            // 3. ฟังก์ชันลบรายการออกจากตะกร้าผ่าน API
+            function removeItemFromCart(foodName) {
+                const username = localStorage.getItem('currentUser');
+
+                fetch('http://localhost:8080/api/cart/remove', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        foodName: foodName
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        loadCart(); // โหลดตะกร้าใหม่เพื่ออัปเดตหน้า
+                    } else {
+                        alert('เกิดข้อผิดพลาด: ' + (data.message || 'ไม่สามารถลบรายการได้'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error removing from cart:', error);
+                    alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ (Backend ปิดอยู่?)');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Info</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="mobile-screen">
+        <div class="content">
+            <h2 class="page-title">ข้อมูลผู้ใช้</h2>
+
+            <div class="form-group">
+                <label for="weight">น้ำหนัก (kg)</label>
+                <input type="text" id="weight">
+            </div>
+
+            <div class="form-group">
+                <label for="height">ส่วนสูง (cm)</label>
+                <input type="text" id="height">
+            </div>
+
+            <button class="btn" id="calcBtn">คำนวณ</button>
+
+            <div class="bmi-result-box" id="resultBox">
+                
+                ค่า BMI ที่ได้<br>และพร้อมควรกินกี่แคลอรี่
+            </div>
+
+            <table class="bmi-table">
+                <thead>
+                    <tr>
+                        <th>ค่ารูปร่าง</th>
+                        <th>ค่า BMI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ผอมเกินไป</td>
+                        <td>น้อยกว่า 18.5</td>
+                    </tr>
+                    <tr>
+                        <td>น้ำหนักปกติ</td>
+                        <td>18.5 - 22.9</td>
+                    </tr>
+                    <tr>
+                        <td>น้ำหนักเกิน</td>
+                        <td>23.0 - 24.9</td>
+                    </tr>
+                    <tr>
+                        <td>อ้วน</td>
+                        <td>25.0 - 29.9</td>
+                    </tr>
+                    <tr>
+                        <td>อ้วนมาก</td>
+                        <td>30.0 ขึ้นไป</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms">
+                <label for="terms">ยอมรับเงื่อนไขการแจ้งเตือน...</label>
+            </div>
+
+            <a href="home.html" class="btn" id="saveBtn">บันทึกและไปหน้าหลัก</a>
+
+        </div>
+    </div>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const weightInput = document.getElementById('weight');
+            const heightInput = document.getElementById('height');
+            const calcBtn = document.getElementById('calcBtn');
+            const resultBox = document.getElementById('resultBox');
+            
+            // 🌟 (อัปเดต) เพิ่มตัวแปรสำหรับ checkbox และปุ่ม save
+            const termsCheckbox = document.getElementById('terms');
+            const saveBtn = document.getElementById('saveBtn');
+
+            // 🌟 (อัปเดต) ปิดปุ่ม save ไว้ก่อน
+            saveBtn.style.pointerEvents = 'none';
+            saveBtn.style.opacity = '0.5';
+
+            // โหลดข้อมูลน้ำหนักและส่วนสูงที่บันทึกไว้
+            loadUserData();
+
+            // ฟังก์ชันโหลดข้อมูลน้ำหนักและส่วนสูง
+            function loadUserData() {
+                const username = localStorage.getItem('currentUser');
+                if (!username) {
+                    return;
+                }
+
+                fetch(`http://localhost:8080/api/bmi/data/${username}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // แสดงข้อมูลที่บันทึกไว้
+                            weightInput.value = data.weight;
+                            heightInput.value = data.height;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading user data:', error);
+                        // ไม่แสดง error ถ้ายังไม่มีข้อมูล
+                    });
+            }
+
+            // 🌟 (อัปเดต) เพิ่ม Event Listener ให้ checkbox
+            termsCheckbox.addEventListener('change', function() {
+                if (termsCheckbox.checked) {
+                    // ถ้าติ๊กแล้ว ให้ปุ่มทำงาน
+                    saveBtn.style.pointerEvents = 'auto';
+                    saveBtn.style.opacity = '1';
+                } else {
+                    // ถ้าเอาติ๊กออก ให้ปุ่มหยุดทำงาน
+                    saveBtn.style.pointerEvents = 'none';
+                    saveBtn.style.opacity = '0.5';
+                }
+            });
+
+            // ฟังก์ชันคำนวณ BMI ผ่าน API
+            calcBtn.addEventListener('click', function() {
+                const weight = parseFloat(weightInput.value);
+                const height = parseFloat(heightInput.value);
+                const username = localStorage.getItem('currentUser');
+
+                if (!username) {
+                    alert('กรุณาเข้าสู่ระบบก่อน');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                if (weight > 0 && height > 0) {
+                    // เรียก API เพื่อคำนวณ BMI
+                    fetch('http://localhost:8080/api/bmi/calculate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username: username,
+                            weight: weight,
+                            height: height
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            resultBox.innerHTML = `<strong>ค่า BMI:</strong> ${data.bmi}<br><small>(ควรกิน ${data.calories} แคลอรี่)</small>`;
+                        } else {
+                            resultBox.innerHTML = "เกิดข้อผิดพลาด: " + (data.message || 'ไม่สามารถคำนวณได้');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error calculating BMI:', error);
+                        resultBox.innerHTML = "เกิดข้อผิดพลาด: ไม่สามารถเชื่อมต่อกับ server ได้";
+                    });
+                } else {
+                    resultBox.innerHTML = "กรุณากรอกน้ำหนักและส่วนสูงให้ถูกต้อง";
+                }
+            });
+
+            // (เพิ่ม Event Listener ให้ปุ่ม Save เพื่อป้องกันการกดโดยไม่ติ๊ก)
+            saveBtn.addEventListener('click', function(e) {
+                if (!termsCheckbox.checked) {
+                    e.preventDefault(); // หยุดการเปลี่ยนหน้า
+                    alert('กรุณายอมรับเงื่อนไขการแจ้งเตือน');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

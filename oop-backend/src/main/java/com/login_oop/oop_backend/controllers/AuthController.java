@@ -1,70 +1,65 @@
-package com.login_oop.oop_backend.controllers; // 1. อยู่ในแพ็คเกจ controllers
+package com.login_oop.oop_backend.controllers;
 
-// 2. Import เครื่องมือและคลาสที่ต้องใช้
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CrossOrigin; // ⭐️ สำคัญมาก
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.login_oop.oop_backend.dto.LoginRequest;
 import com.login_oop.oop_backend.dto.RegisterRequest;
 import com.login_oop.oop_backend.models.User;
 import com.login_oop.oop_backend.services.AuthService;
 
-import java.util.Map; // สำหรับสร้าง JSON ตอบกลับง่ายๆ
+import java.util.Map;
 
-// 3. @RestController บอก Spring ว่าคลาสนี้คือ "พนักงานต้อนรับ" API
+// Controller สำหรับจัดการ login และ register
+// @CrossOrigin ต้องใส่ไม่งั้น frontend เรียก API ไม่ได้
 @RestController
-// 4. ⭐️ @CrossOrigin อนุญาตให้ JavaScript จาก "ที่อื่น" (เช่นไฟล์ HTML ของคุณ) เรียกเข้ามาได้
-@CrossOrigin(origins = "*") // อนุญาตทุกที่ (เพื่อความง่ายในการทดสอบ)
+@CrossOrigin(origins = "*")
 public class AuthController {
 
-    // 5. "พนักงานต้อนรับ" ต้องคุยกับ "พ่อครัว" (Service)
+    // ใช้ AuthService เพื่อทำงานจริงๆ
     @Autowired
     private AuthService authService;
 
     /**
-     * 🎯 นี่คือ "ช่องทาง" สำหรับการ Login
-     * @PostMapping("/login") บอกว่า:
-     * "ใครก็ตามที่ส่งคำขอแบบ 'POST' มาที่ http://localhost:8080/login ให้เรียกเมธอดนี้"
+     * API สำหรับ login
+     * เรียกผ่าน POST /login
+     * รับ username และ password จาก frontend แล้วเช็คว่าถูกต้องหรือไม่
      */
     @PostMapping("/login")
     public Map<String, String> handleLogin(@RequestBody LoginRequest request) {
-        // 1. รับ "ถาดข้อมูล" (LoginRequest) ที่ JS ส่งมา
-        // 2. ส่ง username/password ไปให้ "พ่อครัว" (AuthService)
+        // ส่ง username และ password ไปให้ service เช็ค
         User user = authService.login(request.getUsername(), request.getPassword());
 
-        // 3. ตอบกลับไปหา JavaScript
+        // ถ้า login สำเร็จ ส่ง role และ username กลับไป
         if (user != null) {
-            // Login สำเร็จ: ส่ง "status" และ "role" กลับไป
             return Map.of(
                 "status", "success",
                 "role", user.getRole(),
                 "username", user.getUsername()
             );
         } else {
-            // Login ล้มเหลว
+            // login ไม่สำเร็จ
             return Map.of("status", "failed");
         }
     }
 
     /**
-     * 🎯 นี่คือ "ช่องทาง" สำหรับการสมัครสมาชิก
-     * @PostMapping("/register") บอกว่า:
-     * "ใครก็ตามที่ส่งคำขอแบบ 'POST' มาที่ http://localhost:8080/register ให้เรียกเมธอดนี้"
+     * API สำหรับสมัครสมาชิก
+     * เรียกผ่าน POST /register
+     * รับ username และ password แล้วสร้าง user ใหม่
      */
     @PostMapping("/register")
     public Map<String, String> handleRegister(@RequestBody RegisterRequest request) {
-        // 1. รับ "ถาดข้อมูล" (RegisterRequest)
-        // 2. ส่งไปให้ "พ่อครัว" (AuthService)
+        // ส่งไปให้ service สร้าง user ใหม่
         boolean isSuccess = authService.register(request.getUsername(), request.getPassword());
 
-        // 3. ตอบกลับไปหา JavaScript
         if (isSuccess) {
             return Map.of("status", "success");
         } else {
-            // สมัครล้มเหลว (เช่น ชื่อซ้ำ)
+            // สมัครไม่สำเร็จ อาจเป็นเพราะ username ซ้ำ
             return Map.of("status", "failed", "message", "Username already taken");
         }
     }

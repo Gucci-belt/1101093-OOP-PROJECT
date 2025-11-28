@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summary</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="mobile-screen">
+        
+        <header class="header">
+            <span class="header-title">เมนูที่เลือกโดยรวม</span>
+            <a href="profile.html" class="profile-icon"></a>
+        </header>
+        
+        <div class="content">
+            
+            <div class="profile-info-box">
+                <strong>เมนูทั้งหมด:</strong> <span id="total-items">0</span>
+            </div>
+            
+            <div class="bmi-result-box" style="color: var(--primary-green);">
+                <strong>รวมพลังงาน (Kcal):</strong> <span id="total-kcal">0</span>
+            </div>
+
+            <div class="profile-info-box">
+                <strong>รวมไขมัน (g):</strong> <span id="total-fat">0</span>
+            </div>
+            
+            <div class="profile-info-box">
+                <strong>รวมน้ำตาล (g):</strong> <span id="total-sugar">0</span>
+            </div>
+
+            <div class="profile-info-box">
+                <strong>รวมโซเดียม (mg):</strong> <span id="total-sodium">0</span>
+            </div>
+
+            <a href="home.html" class="btn" style="margin-top: 50px;">ยืนยัน</a>
+        </div>
+        
+        <footer class="footer-nav">
+            <a href="cart.html" class="footer-icon">⬅️</a>
+            <a href="cart.html" class="footer-icon">🛒</a>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ตรวจสอบว่าผู้ใช้ login หรือยัง
+            const username = localStorage.getItem('currentUser');
+            if (!username) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // 1. โหลดตะกร้าจาก API
+            fetch(`http://localhost:8080/api/cart/${username}`)
+                .then(response => response.json())
+                .then(cart => {
+                    // 2. สร้างตัวแปรสำหรับเก็บผลรวม
+                    let totalKcal = 0;
+                    let totalFat = 0;
+                    let totalSugar = 0;
+                    let totalSodium = 0;
+
+                    // 3. วนลูปในตะกร้าเพื่อบวกค่า
+                    cart.forEach(item => {
+                        totalKcal += item.kcal;
+                        totalFat += item.fat;
+                        totalSugar += item.sugar;
+                        totalSodium += item.sodium;
+                    });
+
+                    // 4. แสดงผลลัพธ์
+                    document.getElementById('total-items').textContent = cart.length;
+                    document.getElementById('total-kcal').textContent = totalKcal.toFixed(0); 
+                    document.getElementById('total-fat').textContent = totalFat.toFixed(1);   
+                    document.getElementById('total-sugar').textContent = totalSugar.toFixed(1);
+                    document.getElementById('total-sodium').textContent = totalSodium.toFixed(0);
+                })
+                .catch(error => {
+                    console.error('Error loading cart:', error);
+                    alert('ไม่สามารถโหลดตะกร้าได้ (Backend ปิดอยู่?)');
+                });
+        });
+    </script>
+</body>
+</html>

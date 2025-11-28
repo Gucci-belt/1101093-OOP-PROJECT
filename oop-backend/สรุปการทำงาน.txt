@@ -1,0 +1,203 @@
+สรุปการทำงานของโปรเจค OOP Backend
+=====================================
+
+โปรเจคนี้เป็น Spring Boot Application ที่ทำหน้าที่เป็น backend API
+สำหรับระบบ login/register และตะกร้าสินค้า
+
+โครงสร้างโปรเจค
+---------------
+แบ่งเป็น 5 ชั้นหลัก:
+
+1. Controllers - รับ request จาก frontend แล้วส่งต่อไปให้ service
+2. Services - จัดการ logic การทำงานจริงๆ
+3. Repositories - เก็บข้อมูล (ใน memory หรือไฟล์)
+4. Models - class สำหรับเก็บข้อมูล
+5. DTOs - รับ/ส่งข้อมูลกับ frontend
+
+Controllers ที่มี:
+- AuthController: จัดการ login และ register
+- FoodController: จัดการข้อมูลอาหาร
+- CartController: จัดการตะกร้าสินค้า
+
+Services ที่มี:
+- AuthService: login/register
+- FoodService: ดึงข้อมูลอาหาร
+- CartService: จัดการตะกร้า
+
+Repositories ที่มี:
+- UserRepository: อ่าน user จากไฟล์ users.txt
+- FoodRepository: เก็บข้อมูลอาหารใน memory (มี 20 รายการ)
+- CartRepository: เก็บตะกร้าใน memory
+
+Models ที่มี:
+- User: ข้อมูล user พื้นฐาน (username, password, role)
+- Member: user ที่เป็นสมาชิก (extends User)
+- Admin: user ที่เป็น admin (extends User)
+- Food: ข้อมูลอาหาร (name, kcal, fat, sugar, sodium)
+- CartItem: รายการในตะกร้า (username + food)
+
+DTOs ที่มี:
+- LoginRequest: รับ username, password สำหรับ login
+- RegisterRequest: รับ username, password สำหรับ register
+- CartRequest: รับ username, foodName สำหรับตะกร้า
+- CartResponse: ส่งข้อมูลตะกร้ากลับไป
+
+การทำงานของแต่ละ Feature
+-------------------------
+
+1. Login
+   - Frontend ส่ง POST /login พร้อม username, password
+   - AuthController รับแล้วเรียก AuthService.login()
+   - AuthService หา user จาก UserRepository
+   - เช็ค password ถ้าถูกต้องส่ง User กลับไป
+   - AuthController ส่ง response กลับ (status, role, username)
+
+2. Register
+   - Frontend ส่ง POST /register พร้อม username, password
+   - AuthController รับแล้วเรียก AuthService.register()
+   - AuthService เช็คว่า username ซ้ำหรือไม่
+   - ถ้าไม่ซ้ำ สร้าง Member ใหม่
+   - บันทึกลง UserRepository (ทั้ง memory และไฟล์ users.txt)
+   - ส่ง response กลับไป
+
+3. ดึงรายการอาหาร
+   - Frontend ส่ง GET /api/foods
+   - FoodController เรียก FoodService.getAllFoods()
+   - FoodService เรียก FoodRepository.findAll()
+   - ส่ง List<Food> กลับไป
+
+4. เพิ่มอาหารลงตะกร้า
+   - Frontend ส่ง POST /api/cart/add พร้อม username, foodName
+   - CartController เช็คข้อมูลก่อน
+   - เรียก CartService.addToCart()
+   - CartService หาอาหารจาก FoodRepository
+   - ถ้าเจอ เพิ่มลง CartRepository
+   - ส่ง response กลับไป
+
+5. ดึงตะกร้า
+   - Frontend ส่ง GET /api/cart/{username}
+   - CartController เรียก CartService.getCart()
+   - CartService เรียก CartRepository.findByUsername()
+   - CartRepository กรองรายการที่ username ตรงกัน
+   - แปลง CartItem เป็น CartResponse
+   - ส่ง List<CartResponse> กลับไป
+
+6. ลบรายการออกจากตะกร้า
+   - Frontend ส่ง DELETE /api/cart/remove พร้อม username, foodName
+   - CartController เรียก CartService.removeFromCart()
+   - CartService เรียก CartRepository.removeFromCart()
+   - CartRepository ค้นหาและลบรายการแรกที่เจอ
+   - ส่ง response กลับไป
+
+7. ล้างตะกร้า
+   - Frontend ส่ง DELETE /api/cart/clear/{username}
+   - CartController เรียก CartService.clearCart()
+   - CartService เรียก CartRepository.clearCart()
+   - CartRepository ลบรายการทั้งหมดที่ username ตรงกัน
+   - ส่ง response กลับไป
+
+OOP Concepts ที่ใช้
+-------------------
+
+1. Encapsulation
+   - ใช้ private fields เพื่อป้องกันการเข้าถึงโดยตรง
+   - ใช้ getter methods เพื่อเข้าถึงข้อมูล
+   - เช่น User class ไม่ให้อ่าน password โดยตรง แต่ให้เช็คได้ผ่าน checkPassword()
+
+2. Inheritance
+   - Member และ Admin extends User
+   - Member และ Admin จะได้ fields และ methods จาก User อัตโนมัติ
+
+3. Polymorphism
+   - UserRepository เก็บ Member และ Admin ได้ (เพราะ extends User)
+   - ใช้ List<User> เพื่อเก็บทั้ง Member และ Admin
+
+Data Structures ที่ใช้
+-----------------------
+
+1. List (ArrayList)
+   - เก็บข้อมูลหลายๆ ตัว (user, food, cartItem)
+   - ใช้ใน Repositories ทั้งหมด
+
+2. Map (HashMap)
+   - เก็บ password ใน UserRepository
+   - Key = username, Value = password
+   - ใช้ตอนบันทึกลงไฟล์
+
+3. Linear Search
+   - ใช้ค้นหาข้อมูลใน List
+   - วนลูปทีละตัวจนเจอ
+   - ใช้ใน UserRepository.findByUsername() และ FoodRepository.findByName()
+
+API Endpoints
+-------------
+
+Authentication:
+- POST /login - Login
+- POST /register - Register
+
+Food:
+- GET /api/foods - ดึงรายการอาหารทั้งหมด
+- GET /api/foods/{name} - ค้นหาอาหารด้วยชื่อ
+
+Cart:
+- POST /api/cart/add - เพิ่มอาหารลงตะกร้า
+- GET /api/cart/{username} - ดึงตะกร้าของผู้ใช้
+- DELETE /api/cart/remove - ลบรายการออกจากตะกร้า
+- DELETE /api/cart/clear/{username} - ล้างตะกร้า
+
+ไฟล์ข้อมูล
+----------
+
+users.txt:
+- เก็บข้อมูล user ทั้งหมด
+- รูปแบบ: username,password,role
+- ตัวอย่าง: admin,admin123,Admin
+- อ่านตอนเริ่มต้น application
+- บันทึกเมื่อมีการ register user ใหม่
+
+ข้อมูลอาหาร:
+- เก็บใน FoodRepository (ใน memory)
+- สร้างตอนเริ่มต้น application
+- มี 20 รายการอาหาร
+- แต่ละรายการมี: name, kcal, fat, sugar, sodium
+
+Dependency Injection
+--------------------
+
+Spring Boot ใช้ Dependency Injection เพื่อเชื่อม components:
+- Controller ต้องใช้ Service
+- Service ต้องใช้ Repository
+- Spring จะ inject dependencies อัตโนมัติผ่าน Constructor
+
+ตัวอย่าง:
+- CartController(CartService cartService) - Spring สร้าง CartService ให้อัตโนมัติ
+- CartService(CartRepository, FoodRepository) - Spring สร้าง Repositories ให้อัตโนมัติ
+
+การทำงานของ Spring Boot
+------------------------
+
+1. เริ่มต้นที่ OopBackendApplication.main()
+2. Spring Boot สร้าง application context
+3. Spring Boot สร้าง beans (Controllers, Services, Repositories)
+4. Spring Boot inject dependencies อัตโนมัติ
+5. UserRepository โหลดข้อมูลจาก users.txt
+6. FoodRepository สร้างข้อมูลอาหารเริ่มต้น
+7. Application พร้อมรับ request จาก frontend
+
+สรุป
+----
+
+โปรเจคนี้เป็น REST API backend ที่ใช้:
+- Spring Boot Framework
+- OOP Principles (Encapsulation, Inheritance, Polymorphism)
+- Data Structures (List, Map)
+- File I/O (อ่าน/เขียน users.txt)
+- REST API (GET, POST, DELETE)
+
+Flow การทำงาน:
+Frontend -> Controller -> Service -> Repository -> Data (Memory/File)
+                ↓
+            Response <- Controller <- Service <- Repository
+
+ทุก component ทำงานแยกกันชัดเจน ทำให้โค้ดอ่านง่าย แก้ไขง่าย และทดสอบง่าย

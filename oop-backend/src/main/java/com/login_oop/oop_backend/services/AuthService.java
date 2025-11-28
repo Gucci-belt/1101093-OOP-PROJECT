@@ -1,62 +1,59 @@
-package com.login_oop.oop_backend.services; // 1. บอกว่าอยู่ในแพ็คเกจ services
+package com.login_oop.oop_backend.services;
 
-// 2. Import เครื่องมือและคลาสที่ต้องใช้
 import org.springframework.stereotype.Service;
 
 import com.login_oop.oop_backend.models.Member;
 import com.login_oop.oop_backend.models.User;
 import com.login_oop.oop_backend.repositories.UserRepository;
 
-// 3. @Service บอก Spring ว่าคลาสนี้คือ "สมอง" หรือ "Service"
+// Service สำหรับจัดการ login และ register
 @Service
 public class AuthService {
 
-    // 4. AuthService ต้องคุยกับ "ห้องเก็บของ" (Repository)
+    // ต้องใช้ UserRepository เพื่อดึงข้อมูล user
     private final UserRepository userRepository;
 
-    /**
-     * 5. นี่คือ Constructor ที่ใช้เทคนิค "Dependency Injection"
-     * Spring จะ inject UserRepository อัตโนมัติเมื่อมี constructor เดียว
-     * ทำให้ AuthService ของเรามี userRepository พร้อมใช้งานทันที
-     */
+    // Constructor รับ UserRepository เข้ามา (Spring จะ inject ให้อัตโนมัติ)
     public AuthService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     /**
-     * 🎯 นี่คือ Logic (เมท็อด) สำหรับการ Login
+     * Method สำหรับ login
+     * รับ username และ password แล้วเช็คว่าถูกต้องหรือไม่
      */
     public User login(String username, String password) {
-        // 1. ไปที่ "ห้องเก็บของ" แล้ว "ค้นหา" (Search) ผู้ใช้ด้วยชื่อ
+        // หา user จาก username
         User foundUser = userRepository.findByUsername(username);
 
-        // 2. ถ้าเจอผู้ใช้ และ รหัสผ่านที่ป้อนมา "ถูกต้อง" (เช็คด้วยเมธอดของ User)
+        // ถ้าเจอ user และ password ถูกต้อง
         if (foundUser != null && foundUser.checkPassword(password)) {
             System.out.println("[AuthService] " + username + " ล็อกอินสำเร็จ");
-            return foundUser; // คืนค่า User ที่ login สำเร็จ
+            return foundUser;
         }
         
         System.out.println("[AuthService] " + username + " ล็อกอินล้มเหลว");
-        return null; // Login ล้มเหลว (ไม่เจอ user หรือ รหัสผิด)
+        return null; // login ไม่สำเร็จ
     }
 
     /**
-     * 🎯 นี่คือ Logic (เมท็อด) สำหรับการสมัครสมาชิก (Register)
+     * Method สำหรับสมัครสมาชิก
+     * รับ username และ password แล้วสร้าง user ใหม่
      */
     public boolean register(String username, String password) {
-        // 1. ไปที่ "ห้องเก็บของ" แล้ว "ค้นหา" ว่ามีชื่อนี้ในระบบหรือยัง
+        // เช็คว่า username ซ้ำหรือยัง
         if (userRepository.findByUsername(username) != null) {
             System.out.println("[AuthService] " + username + " สมัครสมาชิกไม่ได้ (ชื่อซ้ำ)");
-            return false; // สมัครล้มเหลว (ชื่อผู้ใช้นี้ถูกใช้ไปแล้ว)
+            return false; // username ซ้ำ
         }
 
-        // 2. ถ้าชื่อไม่ซ้ำ ให้สร้าง "Member" ใหม่
+        // สร้าง Member ใหม่
         User newUser = new Member(username, password);
         
-        // 3. สั่งให้ "ห้องเก็บของ" บันทึกผู้ใช้ใหม่นี้ (ส่ง password ไปด้วยเพื่อบันทึกลงไฟล์)
+        // บันทึก user ใหม่ลง repository (และบันทึกลงไฟล์ด้วย)
         userRepository.save(newUser, password);
         
         System.out.println("[AuthService] " + username + " สมัครสมาชิกสำเร็จ");
-        return true; // สมัครสำเร็จ
+        return true;
     }
 }

@@ -1,0 +1,198 @@
+UML Class Diagram ที่ตรงกับโค้ดจริง
+=====================================
+
+โครงสร้างที่ควรมีใน UML:
+
+1. MODELS (Entity Classes)
+--------------------------
+User
+  - username: String
+  - password: String
+  - role: String
+  + getUsername(): String
+  + getRole(): String
+  + checkPassword(inputPassword: String): boolean
+
+Admin extends User
+  + performAdminTasks(): void
+
+Member extends User
+
+Food
+  - name: String
+  - kcal: double
+  - fat: double
+  - sugar: double
+  - sodium: double
+  + getName(): String
+  + getKcal(): double
+  + getFat(): double
+  + getSugar(): double
+  + getSodium(): double
+
+CartItem
+  - username: String
+  - food: Food
+  + getUsername(): String
+  + getFood(): Food
+
+UserData
+  - username: String
+  - weight: double
+  - height: double
+  - bmi: double
+  - calories: double
+  + getWeight(): double
+  + getHeight(): double
+  + getBmi(): double
+  + getCalories(): double
+
+2. REPOSITORIES (Data Access Layer)
+------------------------------------
+UserRepository
+  - userDatabase: List<User>
+  - passwordStorage: Map<String, String>
+  - filePath: String
+  + findByUsername(username: String): User
+  + save(user: User, password: String): void
+  - loadUsersFromFile(): void
+  - saveToFile(): void
+
+FoodRepository
+  - foodDatabase: List<Food>
+  + findAll(): List<Food>
+  + findByName(name: String): Food
+  - initializeFoods(): void
+
+CartRepository
+  - cartDatabase: List<CartItem>
+  + addToCart(username: String, food: Food): void
+  + findByUsername(username: String): List<CartItem>
+  + removeFromCart(username: String, foodName: String): boolean
+  + clearCart(username: String): void
+
+UserDataRepository
+  - userDataDatabase: List<UserData>
+  + save(userData: UserData): void
+  + findByUsername(username: String): UserData
+
+3. SERVICES (Business Logic Layer)
+-----------------------------------
+AuthService
+  - userRepository: UserRepository
+  + login(username: String, password: String): User
+  + register(username: String, password: String): boolean
+
+FoodService
+  - foodRepository: FoodRepository
+  + getAllFoods(): List<Food>
+  + getFoodByName(name: String): Food
+
+CartService
+  - cartRepository: CartRepository
+  - foodRepository: FoodRepository
+  + addToCart(username: String, foodName: String): boolean
+  + getCart(username: String): List<CartItem>
+  + removeFromCart(username: String, foodName: String): boolean
+  + clearCart(username: String): void
+
+BMIService
+  - userDataRepository: UserDataRepository
+  + calculateBMI(username: String, weight: double, height: double): BMIResponse
+  + getUserBMI(username: String): BMIResponse
+  + getUserData(username: String): UserData
+  - getBMICategory(bmi: double): String
+  - getBMICategoryRange(bmi: double): String
+
+4. CONTROLLERS (API Layer)
+--------------------------
+AuthController
+  - authService: AuthService
+  + handleLogin(request: LoginRequest): Map<String, String>
+  + handleRegister(request: RegisterRequest): Map<String, String>
+
+FoodController
+  - foodService: FoodService
+  + getAllFoods(): List<Food>
+  + getFoodByName(name: String): Object
+
+CartController
+  - cartService: CartService
+  + addToCart(request: CartRequest): Map<String, String>
+  + getCart(username: String): List<CartResponse>
+  + removeFromCart(request: CartRequest): Map<String, String>
+  + clearCart(username: String): Map<String, String>
+
+BMIController
+  - bmiService: BMIService
+  + calculateBMI(request: BMIRequest): Object
+  + getUserBMI(username: String): Object
+  + getUserData(username: String): Object
+
+5. DTOs (Data Transfer Objects)
+--------------------------------
+LoginRequest
+  - username: String
+  - password: String
+
+RegisterRequest
+  - username: String
+  - password: String
+
+CartRequest
+  - username: String
+  - foodName: String
+
+CartResponse
+  - name: String
+  - kcal: double
+  - fat: double
+  - sugar: double
+  - sodium: double
+  + fromCartItem(cartItem: CartItem): CartResponse
+  + fromCartItems(cartItems: List<CartItem>): List<CartResponse>
+
+BMIRequest
+  - username: String
+  - weight: double
+  - height: double
+
+BMIResponse
+  - bmi: double
+  - calories: double
+  - category: String
+  - categoryRange: String
+
+RELATIONSHIPS (ความสัมพันธ์)
+============================
+
+Inheritance (การสืบทอด):
+- Admin extends User
+- Member extends User
+
+Composition (การประกอบ):
+- CartItem มี Food (1 CartItem มี 1 Food)
+- CartRepository มี List<CartItem> (1 CartRepository มี 0..* CartItem)
+
+Association (ความสัมพันธ์):
+- AuthService ใช้ UserRepository
+- FoodService ใช้ FoodRepository
+- CartService ใช้ CartRepository และ FoodRepository
+- BMIService ใช้ UserDataRepository
+- Controllers ใช้ Services
+
+Dependency (การพึ่งพา):
+- Controllers ใช้ DTOs
+- Services ใช้ Repositories
+- Repositories ใช้ Models
+
+NOTES (หมายเหตุ)
+================
+- ไม่มี DataManager base class (ใช้ Repository pattern โดยตรง)
+- ไม่มี Nutrient class แยก (ข้อมูลอยู่ใน Food class)
+- ไม่มี Cart class (ใช้ CartItem + CartRepository)
+- ไม่มี AppManager (ใช้ Spring Boot framework)
+- ไม่มี SearchService (อาจทำใน frontend)
+- ไม่มี SummaryManager (อาจทำใน frontend)
+- ใช้ Spring Boot annotations (@Service, @Repository, @RestController)
+

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
+    <div class="mobile-screen">
+        <div class="content">
+            <div class="form-container">
+                <h1 class="welcome-title">ขอต้อนรับสู่แอป<br>เพื่อสุขภาพตัวคุณ</h1>
+
+                <form id="registrationForm">
+
+                <div class="form-group">
+                    <label for="username">อีเมลหรือชื่อผู้ใช้</label>
+                    <input type="text" id="username">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">รหัสผ่าน</label>
+                    <input type="password" id="password">
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm-password">ยืนยันรหัสผ่าน</label>
+                    <input type="password" id="confirm-password">
+                </div>
+
+                <p id="errorMsg" style="color: red; text-align: center; margin-top: 15px; display: none;"></p>
+
+               <button type="submit" id="continueBtn" class="btn">ดำเนินการต่อ</button>
+            </div>
+
+            </form>
+        </div>
+    </div>
+    
+    <script src="register.js"></script>
+    
+</body>
+</html>

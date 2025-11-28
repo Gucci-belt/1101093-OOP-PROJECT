@@ -15,44 +15,42 @@ import com.login_oop.oop_backend.dto.CartRequest;
 import com.login_oop.oop_backend.dto.CartResponse;
 import com.login_oop.oop_backend.services.CartService;
 
-/**
- * 🎯 Controller Class สำหรับจัดการ HTTP Requests เกี่ยวกับตะกร้า
- * ใช้ OOP: Class + Methods + REST API
- */
+// Controller สำหรับจัดการตะกร้าสินค้า
+// รับ request จาก frontend แล้วส่งต่อไปให้ service จัดการต่อ
 @RestController
 @CrossOrigin(origins = "*")
 public class CartController {
 
-    // Dependency Injection: CartController ต้องใช้ CartService
+    // ต้องใช้ CartService เพื่อทำงานจริงๆ
     private final CartService cartService;
 
-    // Constructor Injection
+    // Constructor รับ CartService เข้ามา (Spring จะ inject ให้อัตโนมัติ)
     public CartController(CartService cartService) {
         this.cartService = cartService;
     }
 
     /**
-     * 🎯 API Endpoint: เพิ่มอาหารลงตะกร้า
-     * POST /api/cart/add
-     * @param request CartRequest ที่มี username และ foodName
-     * @return success หรือ error message
+     * API สำหรับเพิ่มอาหารลงตะกร้า
+     * เรียกผ่าน POST /api/cart/add
      */
     @PostMapping("/api/cart/add")
     public Map<String, String> addToCart(@RequestBody(required = false) CartRequest request) {
-        // ตรวจสอบว่า request body มีค่าหรือไม่
+        // เช็คว่ามี request body หรือเปล่า
         if (request == null) {
             return Map.of("status", "failed", "message", "Request body is missing");
         }
         
-        // ตรวจสอบว่า username และ foodName มีค่าหรือไม่
+        // เช็ค username ว่ามีค่าหรือเปล่า
         if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
             return Map.of("status", "failed", "message", "Username is required");
         }
         
+        // เช็ค foodName ว่ามีค่าหรือเปล่า
         if (request.getFoodName() == null || request.getFoodName().trim().isEmpty()) {
             return Map.of("status", "failed", "message", "Food name is required");
         }
         
+        // เรียก service เพื่อเพิ่มอาหารลงตะกร้า
         boolean success = cartService.addToCart(request.getUsername(), request.getFoodName());
         if (success) {
             return Map.of("status", "success", "message", "เพิ่มอาหารลงตะกร้าเรียบร้อย");
@@ -61,38 +59,37 @@ public class CartController {
     }
 
     /**
-     * 🎯 API Endpoint: ดึงตะกร้าของผู้ใช้
-     * GET /api/cart/{username}
-     * @param username ชื่อผู้ใช้
-     * @return List ของ CartResponse objects
+     * API สำหรับดึงข้อมูลตะกร้าของผู้ใช้
+     * เรียกผ่าน GET /api/cart/{username}
      */
     @GetMapping("/api/cart/{username}")
     public List<CartResponse> getCart(@PathVariable String username) {
+        // ดึงตะกร้าจาก service แล้วแปลงเป็น CartResponse
         return CartResponse.fromCartItems(cartService.getCart(username));
     }
 
     /**
-     * 🎯 API Endpoint: ลบรายการออกจากตะกร้า
-     * DELETE /api/cart/remove
-     * @param request CartRequest ที่มี username และ foodName
-     * @return success หรือ error message
+     * API สำหรับลบรายการออกจากตะกร้า
+     * เรียกผ่าน DELETE /api/cart/remove
      */
     @DeleteMapping("/api/cart/remove")
     public Map<String, String> removeFromCart(@RequestBody(required = false) CartRequest request) {
-        // ตรวจสอบว่า request body มีค่าหรือไม่
+        // เช็คว่ามี request body หรือเปล่า
         if (request == null) {
             return Map.of("status", "failed", "message", "Request body is missing");
         }
         
-        // ตรวจสอบว่า username และ foodName มีค่าหรือไม่
+        // เช็ค username
         if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
             return Map.of("status", "failed", "message", "Username is required");
         }
         
+        // เช็ค foodName
         if (request.getFoodName() == null || request.getFoodName().trim().isEmpty()) {
             return Map.of("status", "failed", "message", "Food name is required");
         }
         
+        // เรียก service เพื่อลบรายการ
         boolean success = cartService.removeFromCart(request.getUsername(), request.getFoodName());
         if (success) {
             return Map.of("status", "success", "message", "ลบรายการออกจากตะกร้าเรียบร้อย");
@@ -101,10 +98,8 @@ public class CartController {
     }
 
     /**
-     * 🎯 API Endpoint: ล้างตะกร้า
-     * DELETE /api/cart/clear/{username}
-     * @param username ชื่อผู้ใช้
-     * @return success message
+     * API สำหรับล้างตะกร้าทั้งหมด
+     * เรียกผ่าน DELETE /api/cart/clear/{username}
      */
     @DeleteMapping("/api/cart/clear/{username}")
     public Map<String, String> clearCart(@PathVariable String username) {

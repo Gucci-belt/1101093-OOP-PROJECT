@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="mobile-screen">
+        
+        <header class="header">
+            <span class="header-title">หน้าหลัก</span>
+            <a href="profile.html" class="profile-icon"></a>
+        </header>
+        
+        <div class="content">
+            <div class="search-bar-container">
+                <input type="text" placeholder="ค้นหา" id="searchInput">
+                <button class="search-btn">
+                    <i class="fas fa-search"></i> </button>
+            </div>
+
+            <div id="menu-container">
+                <!-- รายการอาหารจะถูกโหลดจาก API ที่นี่ -->
+                <p style="text-align: center; margin-top: 20px;">กำลังโหลดรายการอาหาร...</p>
+            </div>
+
+            </div>
+        
+        <footer class="footer-nav" style="justify-content: flex-end;">
+            <a href="cart.html" class="footer-icon">🛒</a>
+        </footer>
+
+    </div>
+
+    <div id="foodModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title" id="modalTitle">รายละเอียดอาหาร</span>
+                <span class="close-btn" id="closeBtn">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById("foodModal");
+            const modalTitle = document.getElementById("modalTitle");
+            const modalBody = document.getElementById("modalBody");
+            const closeBtn = document.getElementById("closeBtn");
+            const menuContainer = document.getElementById("menu-container");
+            const searchInput = document.getElementById("searchInput");
+
+            // ตรวจสอบว่าผู้ใช้ login หรือยัง
+            const username = localStorage.getItem('currentUser');
+            if (!username) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // 1. โหลดรายการอาหารจาก API
+            loadFoods();
+
+            // 2. ฟังก์ชันโหลดรายการอาหารจาก API
+            function loadFoods() {
+                fetch('http://localhost:8080/api/foods')
+                    .then(response => response.json())
+                    .then(foods => {
+                        displayFoods(foods);
+                    })
+                    .catch(error => {
+                        console.error('Error loading foods:', error);
+                        menuContainer.innerHTML = '<p style="text-align: center; color: red;">ไม่สามารถโหลดรายการอาหารได้ (Backend ปิดอยู่?)</p>';
+                    });
+            }
+
+            // 3. ฟังก์ชันแสดงรายการอาหาร
+            function displayFoods(foods) {
+                menuContainer.innerHTML = '';
+                foods.forEach(food => {
+                    const menuItemDiv = document.createElement('div');
+                    menuItemDiv.className = 'menu-item';
+                    menuItemDiv.dataset.name = food.name;
+                    menuItemDiv.dataset.kcal = food.kcal;
+                    menuItemDiv.dataset.fat = food.fat;
+                    menuItemDiv.dataset.sugar = food.sugar;
+                    menuItemDiv.dataset.sodium = food.sodium;
+                    
+                    menuItemDiv.innerHTML = `
+                        <div class="item-image-placeholder"></div>
+                        <div class="item-text">
+                            <strong>${food.name}</strong>
+                            <span>คุณค่าทางโภชนาการ</span>
+                        </div>
+                        <button class="add-btn">+</button>
+                    `;
+                    
+                    menuContainer.appendChild(menuItemDiv);
+                });
+
+                // ผูก Event listeners หลังจากสร้าง HTML แล้ว
+                attachEventListeners();
+            }
+
+            // 4. ผูก Event Listeners
+            function attachEventListeners() {
+                const menuItems = document.querySelectorAll(".menu-item");
+                const addButtons = document.querySelectorAll(".add-btn");
+
+                menuItems.forEach(item => {
+                    item.addEventListener('click', function(e) {
+                        if (!e.target.classList.contains('add-btn')) {
+                            openModal(item);
+                        }
+                    });
+                });
+
+                addButtons.forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const item = button.closest('.menu-item');
+                        addToCart(item);
+                    });
+                });
+            }
+
+            // 5. ฟังก์ชันเปิด Modal
+            function openModal(item) {
+                const name = item.dataset.name;
+                const kcal = item.dataset.kcal;
+                const fat = item.dataset.fat;
+                const sugar = item.dataset.sugar;
+                const sodium = item.dataset.sodium;
+
+                modalTitle.textContent = name;
+                modalBody.innerHTML = `
+                    <p><strong>ชื่อเมนู:</strong> ${name}</p>
+                    <p><strong>รายละเอียด:</strong></p>
+                    <ul>
+                        <li>พลังงาน: ${kcal} kcal</li>
+                        <li>ไขมัน: ${fat}g</li>
+                        <li>น้ำตาล: ${sugar}g</li>
+                        <li>โซเดียม: ${sodium}mg</li>
+                    </ul>
+                `;
+                modal.style.display = "flex";
+            }
+
+            // 6. ฟังก์ชันปิด Modal
+            function closeModal() {
+                modal.style.display = "none";
+            }
+            
+            closeBtn.onclick = closeModal;
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    closeModal();
+                }
+            }
+
+            // 7. ฟังก์ชันเพิ่มลงตะกร้าผ่าน API
+            function addToCart(item) {
+                const foodName = item.dataset.name;
+                const username = localStorage.getItem('currentUser');
+
+                    // ตรวจสอบว่ามี username หรือไม่
+                if (!username) {
+                    alert('กรุณาเข้าสู่ระบบก่อน');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // ตรวจสอบว่ามี foodName หรือไม่
+                if (!foodName) {
+                    alert('ไม่พบชื่ออาหาร');
+                    return;
+                }
+
+                const requestBody = {
+                    username: username,
+                    foodName: foodName
+                };
+
+                console.log('Sending request:', requestBody); // Debug log
+
+                fetch('http://localhost:8080/api/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.message || 'HTTP error! status: ' + response.status);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(`เพิ่ม "${foodName}" ลงในตะกร้าแล้ว!`);
+                    } else {
+                        alert('เกิดข้อผิดพลาด: ' + (data.message || 'ไม่สามารถเพิ่มลงตะกร้าได้'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding to cart:', error);
+                    alert('เกิดข้อผิดพลาด: ' + error.message);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+รายการทดสอบระบบ OOP Backend
+=============================
+
+สิ่งที่เสร็จแล้ว:
+---------------
+✓ สร้าง API สำหรับคำนวณ BMI
+✓ แก้ไข frontend ให้เรียก API แทนการคำนวณใน JavaScript
+✓ ลบโค้ดการคำนวณ BMI เก่าออกแล้ว
+✓ มี comment ครบทุกไฟล์
+
+สิ่งที่ควรทดสอบ:
+---------------
+
+1. ทดสอบ Backend (Spring Boot)
+   ----------------------------
+   □ Compile โค้ดได้หรือไม่
+     - เปิด terminal ใน oop-backend
+     - รัน: mvn clean compile
+     - ตรวจสอบว่ามี error หรือไม่
+
+   □ รัน Spring Boot ได้หรือไม่
+     - รัน: mvn spring-boot:run
+     - ตรวจสอบว่า server ขึ้นที่ port 8080
+     - ดู log ว่ามี error หรือไม่
+
+   □ ตรวจสอบว่า API endpoints ทำงานได้
+     - เปิด browser ไปที่ http://localhost:8080/api/foods
+     - ควรเห็นรายการอาหาร (JSON)
+
+2. ทดสอบ API BMI
+   --------------
+   □ POST /api/bmi/calculate
+     - ใช้ Postman หรือ curl
+     - ส่ง request:
+       {
+         "username": "testuser",
+         "weight": 70,
+         "height": 170
+       }
+     - ตรวจสอบว่าได้ response:
+       {
+         "status": "success",
+         "bmi": 24.22,
+         "calories": 2100,
+         "category": "น้ำหนักปกติ",
+         "categoryRange": "18.5 - 22.9"
+       }
+
+   □ GET /api/bmi/{username}
+     - เรียก GET /api/bmi/testuser
+     - ตรวจสอบว่าได้ข้อมูล BMI กลับมา
+
+   □ ทดสอบกรณี error
+     - ส่ง weight = 0 → ควรได้ error message
+     - ส่ง height = 0 → ควรได้ error message
+     - ส่ง username ว่าง → ควรได้ error message
+
+3. ทดสอบ Frontend
+   ---------------
+   □ เปิดไฟล์ login.html ใน browser
+   □ ทดสอบ login
+     - ใช้ username/password ที่มีใน users.txt
+     - ตรวจสอบว่า login สำเร็จและ redirect ไปหน้าถัดไป
+
+   □ ทดสอบ register
+     - สมัครสมาชิกใหม่
+     - ตรวจสอบว่า register สำเร็จ
+
+   □ ทดสอบหน้า user-info.html
+     - กรอกน้ำหนักและส่วนสูง
+     - กดปุ่ม "คำนวณ"
+     - ตรวจสอบว่าแสดงค่า BMI และแคลอรี่
+     - ตรวจสอบว่าเรียก API ได้ (ดูใน Network tab)
+
+   □ ทดสอบหน้า profile.html
+     - ตรวจสอบว่าแสดงข้อมูล BMI ที่คำนวณไว้
+     - แก้ไขน้ำหนัก/ส่วนสูงและคำนวณใหม่
+     - ตรวจสอบว่าข้อมูลอัปเดต
+
+   □ ทดสอบหน้า home.html
+     - ตรวจสอบว่าแสดงรายการอาหาร
+     - ทดสอบเพิ่มอาหารลงตะกร้า
+
+   □ ทดสอบหน้า cart.html
+     - ตรวจสอบว่าแสดงรายการในตะกร้า
+     - ทดสอบลบรายการ
+     - ทดสอบล้างตะกร้า
+
+   □ ทดสอบหน้า summary.html
+     - ตรวจสอบว่าแสดงผลรวมแคลอรี่ ไขมัน น้ำตาล โซเดียม
+
+4. ทดสอบ Integration (Backend + Frontend)
+   ---------------------------------------
+   □ เปิด backend (mvn spring-boot:run)
+   □ เปิด frontend (เปิดไฟล์ HTML ใน browser)
+   □ ทดสอบ flow ทั้งหมด:
+     1. Register → สมัครสมาชิกใหม่
+     2. Login → เข้าสู่ระบบ
+     3. User Info → คำนวณ BMI
+     4. Home → ดูรายการอาหาร
+     5. Add to Cart → เพิ่มอาหารลงตะกร้า
+     6. Cart → ดูตะกร้า
+     7. Summary → ดูสรุป
+     8. Profile → ดูข้อมูล BMI
+
+5. ทดสอบ Error Handling
+   ---------------------
+   □ Backend ปิดอยู่ → Frontend ควรแสดง error message
+   □ ส่งข้อมูลผิดรูปแบบ → ควรได้ error message
+   □ Username ไม่มีในระบบ → ควรได้ error message
+
+6. ทดสอบ OOP Concepts
+   ------------------
+   □ Inheritance
+     - Member และ Admin extends User
+     - ทดสอบว่าใช้งานได้ถูกต้อง
+
+   □ Encapsulation
+     - User class ไม่ให้อ่าน password โดยตรง
+     - ใช้ checkPassword() แทน
+
+   □ Polymorphism
+     - UserRepository เก็บ Member และ Admin ได้
+     - ทดสอบว่าใช้งานได้ถูกต้อง
+
+สิ่งที่ควรตรวจสอบเพิ่มเติม:
+--------------------------
+□ ตรวจสอบว่าไม่มีโค้ดที่ใช้ localStorage เก็บข้อมูล BMI แล้ว
+□ ตรวจสอบว่า API ทำงานถูกต้อง
+□ ตรวจสอบว่า frontend เรียก API ถูกต้อง
+□ ตรวจสอบว่าไม่มี console error ใน browser
+
+วิธีทดสอบด้วย Postman หรือ curl:
+--------------------------------
+
+1. ทดสอบคำนวณ BMI:
+   curl -X POST http://localhost:8080/api/bmi/calculate \
+     -H "Content-Type: application/json" \
+     -d '{"username":"testuser","weight":70,"height":170}'
+
+2. ทดสอบดึงข้อมูล BMI:
+   curl http://localhost:8080/api/bmi/testuser
+
+3. ทดสอบ login:
+   curl -X POST http://localhost:8080/login \
+     -H "Content-Type: application/json" \
+     -d '{"username":"admin","password":"admin123"}'
+
+4. ทดสอบดึงรายการอาหาร:
+   curl http://localhost:8080/api/foods
+
+5. ทดสอบเพิ่มอาหารลงตะกร้า:
+   curl -X POST http://localhost:8080/api/cart/add \
+     -H "Content-Type: application/json" \
+     -d '{"username":"testuser","foodName":"ข้าวมันไก่"}'
+
+6. ทดสอบดึงตะกร้า:
+   curl http://localhost:8080/api/cart/testuser
+
+ checklist สำหรับก่อนพรีเซนต์:
+-----------------------------
+□ Backend compile และรันได้
+□ API ทุกตัวทำงานได้
+□ Frontend เรียก API ได้
+□ Flow การทำงานครบถ้วน
+□ ไม่มี error ใน console
+□ ทดสอบทุกหน้าแล้ว
+□ ข้อมูลแสดงผลถูกต้อง
+

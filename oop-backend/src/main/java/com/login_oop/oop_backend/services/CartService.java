@@ -8,60 +8,52 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * 🎯 Service Class สำหรับจัดการ Business Logic ของตะกร้า
- * ใช้ OOP: Class + Methods + Dependency Injection
- */
+// Service สำหรับจัดการตะกร้าสินค้า
 @Service
 public class CartService {
     
-    // Dependency Injection: CartService ต้องใช้ CartRepository และ FoodRepository
+    // ต้องใช้ CartRepository และ FoodRepository
     private final CartRepository cartRepository;
     private final FoodRepository foodRepository;
 
-    // Constructor Injection (OOP: Dependency Injection)
+    // Constructor รับ dependencies เข้ามา
     public CartService(CartRepository cartRepository, FoodRepository foodRepository) {
         this.cartRepository = cartRepository;
         this.foodRepository = foodRepository;
     }
 
     /**
-     * 🎯 Method: เพิ่มอาหารลงตะกร้า
-     * @param username ชื่อผู้ใช้
-     * @param foodName ชื่ออาหาร
-     * @return true ถ้าสำเร็จ, false ถ้าไม่พบอาหาร
+     * เพิ่มอาหารลงตะกร้า
+     * หาอาหารจากชื่อก่อน ถ้าเจอค่อยเพิ่มลงตะกร้า
      */
     public boolean addToCart(String username, String foodName) {
+        // หาอาหารจากชื่อ
         Food food = foodRepository.findByName(foodName);
         if (food != null) {
+            // เจอแล้ว เพิ่มลงตะกร้า
             cartRepository.addToCart(username, food);
             return true;
         }
+        // ไม่เจออาหาร
         return false;
     }
 
     /**
-     * 🎯 Method: ดึงตะกร้าของผู้ใช้
-     * @param username ชื่อผู้ใช้
-     * @return List ของ CartItem objects
+     * ดึงตะกร้าของผู้ใช้
      */
     public List<CartItem> getCart(String username) {
         return cartRepository.findByUsername(username);
     }
 
     /**
-     * 🎯 Method: ลบรายการออกจากตะกร้า
-     * @param username ชื่อผู้ใช้
-     * @param foodName ชื่ออาหาร
-     * @return true ถ้าสำเร็จ, false ถ้าไม่พบ
+     * ลบรายการออกจากตะกร้า
      */
     public boolean removeFromCart(String username, String foodName) {
         return cartRepository.removeFromCart(username, foodName);
     }
 
     /**
-     * 🎯 Method: ล้างตะกร้า
-     * @param username ชื่อผู้ใช้
+     * ล้างตะกร้าทั้งหมด
      */
     public void clearCart(String username) {
         cartRepository.clearCart(username);

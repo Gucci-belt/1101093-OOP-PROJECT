@@ -1,18 +1,15 @@
 package com.login_oop.oop_backend.models;
 
-/**
- * 🎯 Model Class สำหรับอาหาร (Food)
- * ใช้ OOP: Encapsulation (private fields + getters)
- */
+// Class สำหรับเก็บข้อมูลอาหาร
 public class Food {
-    // Fields - Encapsulation: ใช้ private เพื่อป้องกันการเข้าถึงโดยตรง
+    // ข้อมูลของอาหาร
     private final String name;
     private final double kcal;
     private final double fat;
     private final double sugar;
     private final double sodium;
 
-    // Constructor
+    // Constructor สำหรับสร้าง Food
     public Food(String name, double kcal, double fat, double sugar, double sodium) {
         this.name = name;
         this.kcal = kcal;
@@ -21,7 +18,7 @@ public class Food {
         this.sodium = sodium;
     }
 
-    // Getters (Encapsulation: ให้เข้าถึงข้อมูลผ่าน methods)
+    // Getter methods
     public String getName() {
         return name;
     }

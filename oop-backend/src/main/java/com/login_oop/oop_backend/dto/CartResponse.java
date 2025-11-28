@@ -6,10 +6,8 @@ import com.login_oop.oop_backend.models.Food;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * 🎯 DTO Class สำหรับส่งข้อมูลกลับไป Frontend
- * ใช้ OOP: Encapsulation + Method ที่แปลง CartItem เป็น JSON-friendly format
- */
+// DTO สำหรับส่งข้อมูลตะกร้ากลับไป frontend
+// แปลง CartItem เป็นรูปแบบที่ frontend ต้องการ
 public class CartResponse {
     private String name;
     private double kcal;
@@ -48,8 +46,8 @@ public class CartResponse {
     }
 
     /**
-     * 🎯 Static Method: แปลง CartItem เป็น CartResponse
-     * ใช้ OOP: Static method (ไม่ต้องสร้าง object ก็เรียกใช้ได้)
+     * แปลง CartItem เป็น CartResponse
+     * เอาเฉพาะข้อมูลอาหาร ไม่เอา username
      */
     public static CartResponse fromCartItem(CartItem cartItem) {
         Food food = cartItem.getFood();
@@ -63,7 +61,8 @@ public class CartResponse {
     }
 
     /**
-     * 🎯 Static Method: แปลง List<CartItem> เป็น List<CartResponse>
+     * แปลง List<CartItem> เป็น List<CartResponse>
+     * ใช้สำหรับส่งตะกร้าทั้งหมดกลับไป
      */
     public static List<CartResponse> fromCartItems(List<CartItem> cartItems) {
         return cartItems.stream()

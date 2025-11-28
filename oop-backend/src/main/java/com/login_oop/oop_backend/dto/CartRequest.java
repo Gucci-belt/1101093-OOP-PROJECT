@@ -1,9 +1,7 @@
 package com.login_oop.oop_backend.dto;
 
-/**
- * 🎯 DTO Class สำหรับรับข้อมูลจาก Frontend
- * ใช้ OOP: Encapsulation (private fields + getters/setters)
- */
+// DTO สำหรับรับข้อมูลตะกร้าจาก frontend
+// Spring จะแปลง JSON ที่ส่งมาให้เป็น object นี้
 public class CartRequest {
     private String username;
     private String foodName;
@@ -17,7 +15,7 @@ public class CartRequest {
         return foodName;
     }
 
-    // Setters (จำเป็นสำหรับ Spring เพื่อ deserialize JSON)
+    // Setters (Spring ใช้ตอนแปลง JSON)
     public void setUsername(String username) {
         this.username = username;
     }

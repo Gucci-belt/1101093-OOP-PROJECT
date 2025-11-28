@@ -1,0 +1,115 @@
+สรุปการทำงานของระบบ OOP Backend
+สำหรับการพรีเซนต์
+=====================================
+
+ระบบนี้ทำอะไร?
+---------------
+เป็น Backend API สำหรับระบบ login/register และตะกร้าสินค้า
+ใช้ Spring Boot และหลักการ OOP
+
+โครงสร้างระบบ (3 ชั้นหลัก)
+---------------------------
+
+1. Controller (ชั้นรับ request)
+   - รับ request จาก frontend
+   - ตรวจสอบข้อมูล
+   - เรียก Service ทำงาน
+   - ส่ง response กลับ
+
+2. Service (ชั้น logic)
+   - รับคำสั่งจาก Controller
+   - ประมวลผลตาม logic
+   - เรียก Repository ดึงข้อมูล
+   - ส่งผลลัพธ์กลับ
+
+3. Repository (ชั้นข้อมูล)
+   - เก็บข้อมูลใน memory
+   - อ่าน/เขียนไฟล์
+   - ค้นหาข้อมูล
+
+การทำงานของระบบ
+----------------
+
+1. Login
+   Frontend → Controller → Service → Repository → เช็ค user → ส่ง response กลับ
+
+2. Register
+   Frontend → Controller → Service → เช็ค username ซ้ำ → สร้าง user ใหม่ → บันทึกไฟล์
+
+3. ตะกร้าสินค้า
+   - เพิ่ม: หาอาหาร → เพิ่มลงตะกร้า
+   - ดู: ดึงตะกร้าของ user
+   - ลบ: ลบรายการออก
+   - ล้าง: ลบทั้งหมด
+
+OOP ที่ใช้
+----------
+
+1. Encapsulation (การห่อหุ้ม)
+   - ใช้ private fields
+   - ใช้ getter methods
+   - เช่น password ไม่ให้อ่านโดยตรง แต่เช็คได้
+
+2. Inheritance (การสืบทอด)
+   - Member และ Admin extends User
+   - ได้ fields และ methods จาก User อัตโนมัติ
+
+3. Polymorphism (พหุรูป)
+   - เก็บ Member และ Admin ใน List<User> ได้
+
+Data Structures
+---------------
+
+- List: เก็บข้อมูลหลายๆ ตัว (user, food, cart)
+- Map: เก็บ password (key=username, value=password)
+- Linear Search: ค้นหาข้อมูลใน List
+
+API ที่มี
+---------
+
+Authentication:
+- POST /login - เข้าสู่ระบบ
+- POST /register - สมัครสมาชิก
+
+Food:
+- GET /api/foods - ดูรายการอาหารทั้งหมด
+- GET /api/foods/{name} - ค้นหาอาหาร
+
+Cart:
+- POST /api/cart/add - เพิ่มอาหารลงตะกร้า
+- GET /api/cart/{username} - ดูตะกร้า
+- DELETE /api/cart/remove - ลบรายการ
+- DELETE /api/cart/clear/{username} - ล้างตะกร้า
+
+จุดเด่นของระบบ
+--------------
+
+1. แยกหน้าที่ชัดเจน (Controller, Service, Repository)
+2. ใช้ OOP ครบ (Encapsulation, Inheritance, Polymorphism)
+3. ใช้ Data Structures (List, Map, Linear Search)
+4. อ่าน/เขียนไฟล์ (users.txt)
+5. REST API มาตรฐาน
+
+Flow การทำงาน
+-------------
+
+Frontend → Controller → Service → Repository → Data
+                ↓
+            Response ← Controller ← Service ← Repository
+
+สรุป
+----
+
+ระบบนี้เป็น REST API Backend ที่ใช้:
+- Spring Boot Framework
+- OOP Principles
+- Data Structures
+- File I/O
+- REST API
+
+เหมาะสำหรับแสดงความเข้าใจใน:
+- การออกแบบระบบแบบ OOP
+- การแยกหน้าที่ (Separation of Concerns)
+- การใช้ Data Structures
+- การทำงานของ Spring Boot
+

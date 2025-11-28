@@ -8,14 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * 🎯 Repository Class สำหรับจัดการข้อมูลตะกร้า
- * ใช้ OOP: Class + Methods + Data Structure (List)
- */
+// Repository สำหรับจัดการข้อมูลตะกร้า
+// เก็บรายการในตะกร้าไว้ใน memory
 @Repository
 public class CartRepository {
     
-    // Data Structure: ใช้ List เพื่อเก็บ CartItem objects
+    // เก็บรายการในตะกร้าทั้งหมด
     private final List<CartItem> cartDatabase;
 
     // Constructor
@@ -24,9 +22,7 @@ public class CartRepository {
     }
 
     /**
-     * 🎯 Method: เพิ่มรายการลงตะกร้า
-     * @param username ชื่อผู้ใช้
-     * @param food อาหารที่ต้องการเพิ่ม
+     * เพิ่มรายการลงตะกร้า
      */
     public void addToCart(String username, Food food) {
         CartItem cartItem = new CartItem(username, food);
@@ -34,25 +30,20 @@ public class CartRepository {
     }
 
     /**
-     * 🎯 Method: ดึงตะกร้าของผู้ใช้
-     * @param username ชื่อผู้ใช้
-     * @return List ของ CartItem objects
+     * ดึงตะกร้าของผู้ใช้
+     * กรองเฉพาะรายการที่ username ตรงกัน
      */
     public List<CartItem> findByUsername(String username) {
-        // ใช้ Stream API (Java 8+) เพื่อกรองข้อมูล
         return cartDatabase.stream()
                 .filter(item -> item.getUsername().equals(username))
                 .collect(Collectors.toList());
     }
 
     /**
-     * 🎯 Method: ลบรายการออกจากตะกร้า
-     * @param username ชื่อผู้ใช้
-     * @param foodName ชื่ออาหารที่ต้องการลบ
-     * @return true ถ้าลบสำเร็จ, false ถ้าไม่พบ
+     * ลบรายการออกจากตะกร้า
+     * ลบรายการแรกที่เจอ
      */
     public boolean removeFromCart(String username, String foodName) {
-        // ค้นหาและลบรายการแรกที่เจอ
         for (int i = 0; i < cartDatabase.size(); i++) {
             CartItem item = cartDatabase.get(i);
             if (item.getUsername().equals(username) && 
@@ -61,21 +52,19 @@ public class CartRepository {
                 return true;
             }
         }
-        return false;
+        return false; // ไม่เจอ
     }
 
     /**
-     * 🎯 Method: ล้างตะกร้าของผู้ใช้
-     * @param username ชื่อผู้ใช้
+     * ล้างตะกร้าของผู้ใช้
+     * ลบรายการทั้งหมดที่ username ตรงกัน
      */
     public void clearCart(String username) {
         cartDatabase.removeIf(item -> item.getUsername().equals(username));
     }
 
     /**
-     * 🎯 Method: นับจำนวนรายการในตะกร้า
-     * @param username ชื่อผู้ใช้
-     * @return จำนวนรายการ
+     * นับจำนวนรายการในตะกร้า
      */
     public int countByUsername(String username) {
         return (int) cartDatabase.stream()

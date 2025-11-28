@@ -6,33 +6,27 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * 🎯 Service Class สำหรับจัดการ Business Logic ของอาหาร
- * ใช้ OOP: Class + Methods + Dependency Injection
- */
+// Service สำหรับจัดการข้อมูลอาหาร
 @Service
 public class FoodService {
     
-    // Dependency Injection: FoodService ต้องใช้ FoodRepository
+    // ต้องใช้ FoodRepository เพื่อดึงข้อมูลอาหาร
     private final FoodRepository foodRepository;
 
-    // Constructor Injection (OOP: Dependency Injection)
+    // Constructor รับ FoodRepository เข้ามา
     public FoodService(FoodRepository foodRepository) {
         this.foodRepository = foodRepository;
     }
 
     /**
-     * 🎯 Method: ดึงรายการอาหารทั้งหมด
-     * @return List ของ Food objects
+     * ดึงรายการอาหารทั้งหมด
      */
     public List<Food> getAllFoods() {
         return foodRepository.findAll();
     }
 
     /**
-     * 🎯 Method: ค้นหาอาหารด้วยชื่อ
-     * @param name ชื่ออาหาร
-     * @return Food object หรือ null
+     * ค้นหาอาหารด้วยชื่อ
      */
     public Food getFoodByName(String name) {
         return foodRepository.findByName(name);

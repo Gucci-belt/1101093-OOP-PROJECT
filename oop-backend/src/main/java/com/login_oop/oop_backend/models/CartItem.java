@@ -1,21 +1,19 @@
 package com.login_oop.oop_backend.models;
 
-/**
- * 🎯 Model Class สำหรับรายการในตะกร้า (CartItem)
- * ใช้ OOP: Encapsulation + Composition (ใช้ Food object)
- */
+// Class สำหรับเก็บรายการในตะกร้า
+// แต่ละ CartItem จะมี username (ของใคร) และ food (อาหารอะไร)
 public class CartItem {
-    // Fields - Encapsulation
-    private final String username; // เก็บว่าเป็นตะกร้าของใคร
-    private final Food food; // Composition: CartItem มี Food
+    // ข้อมูลของรายการในตะกร้า
+    private final String username;
+    private final Food food;
     
-    // Constructor
+    // Constructor สำหรับสร้าง CartItem
     public CartItem(String username, Food food) {
         this.username = username;
         this.food = food;
     }
 
-    // Getters
+    // Getter methods
     public String getUsername() {
         return username;
     }

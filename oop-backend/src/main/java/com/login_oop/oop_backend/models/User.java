@@ -1,35 +1,33 @@
-package com.login_oop.oop_backend.models; // 1. บอกว่าไฟล์นี้อยู่ในแพ็คเกจ models
+package com.login_oop.oop_backend.models;
 
-// 2. นี่คือ "แบบพิมพ์เขียว" (Class) ของผู้ใช้ทุกคน
+// Class สำหรับเก็บข้อมูล user
+// เป็น base class ที่ Member และ Admin จะสืบทอดไป
 public class User {
     
-    // 3. คุณสมบัติ (Fields) - เป็น private เพื่อ Encapsulation
+    // ข้อมูลของ user
     private String username;
     private String password;
     private String role;
 
-    // 4. นี่คือ "Constructor" (โรงงาน) ที่ใช้สร้าง User
+    // Constructor สำหรับสร้าง user
     public User(String username, String password, String role) {
         this.username = username;
         this.password = password;
         this.role = role;
     }
 
-    // 5. นี่คือ "Methods" (พฤติกรรม)
-    
-    // เมธอดให้คนอื่นมา "อ่าน" username (Getter)
+    // Getter สำหรับ username
     public String getUsername() {
         return this.username;
     }
 
-    // เมธอดให้คนอื่นมา "อ่าน" role (Getter)
+    // Getter สำหรับ role
     public String getRole() {
         return this.role;
     }
 
-    // เมธอดสำหรับ "ตรวจสอบ" รหัสผ่าน
-    // นี่คือ Encapsulation ที่ดี: เราไม่ให้คนอื่น "อ่าน" รหัสผ่าน
-    // แต่เราให้ "ถาม" ได้ว่ารหัสที่ป้อนมาถูกไหม
+    // Method สำหรับเช็ครหัสผ่าน
+    // ไม่ให้อ่าน password โดยตรง แต่ให้เช็คได้ว่าถูกต้องหรือไม่
     public boolean checkPassword(String inputPassword) {
         return this.password.equals(inputPassword);
     }

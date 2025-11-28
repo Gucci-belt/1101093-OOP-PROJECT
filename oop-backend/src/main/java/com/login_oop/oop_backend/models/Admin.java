@@ -1,17 +1,16 @@
-package com.login_oop.oop_backend.models; // 1. อยู่ในแพ็คเกจ models เหมือนกัน
+package com.login_oop.oop_backend.models;
 
-// 2. "extends User" คือการบอกว่า "Admin คือ User รูปแบบหนึ่ง"
-// นี่คือ "Inheritance" (การสืบทอด)
+// Class สำหรับ Admin
+// สืบทอดจาก User และกำหนด role เป็น "Admin" เสมอ
 public class Admin extends User {
 
-    // 3. Constructor ของ Admin
+    // Constructor สำหรับสร้าง Admin
     public Admin(String username, String password) {
-        // 4. "super(...)" คือการวิ่งไปเรียก Constructor ของคลาสแม่ (User)
-        // เราสร้าง Admin โดย "ล็อค" role ให้เป็น "Admin" เสมอ
+        // เรียก constructor ของ User และกำหนด role เป็น "Admin"
         super(username, password, "Admin");
     }
     
-    // 5. Admin อาจมีเมธอดพิเศษของตัวเองก็ได้ เช่น...
+    // Method สำหรับทำงานของ admin (ถ้าต้องการเพิ่มในอนาคต)
     public void performAdminTasks() {
         System.out.println("ผู้ใช้ " + getUsername() + " กำลังทำงานของแอดมิน");
     }
