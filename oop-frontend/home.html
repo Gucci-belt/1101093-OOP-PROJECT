@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,29 +8,138 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body>
     <div class="mobile-screen">
-        
+
         <header class="header">
             <span class="header-title">หน้าหลัก</span>
             <a href="profile.html" class="profile-icon"></a>
         </header>
-        
+
         <div class="content">
-            <div class="search-bar-container">
-                <input type="text" placeholder="ค้นหา" id="searchInput">
-                <button class="search-btn">
-                    <i class="fas fa-search"></i> </button>
+            <!-- Health News Section -->
+            <div class="health-news-section">
+                <div class="news-header">
+                    <h3 class="news-title">📰 ข่าวสารสุขภาพ</h3>
+                    <span class="news-subtitle">อัปเดตล่าสุด</span>
+                </div>
+                <div class="news-container" id="newsContainer">
+                    <!-- News cards will be populated by JavaScript -->
+                </div>
             </div>
 
-            <div id="menu-container">
-                <!-- รายการอาหารจะถูกโหลดจาก API ที่นี่ -->
-                <p style="text-align: center; margin-top: 20px;">กำลังโหลดรายการอาหาร...</p>
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="action-card gacha-card" id="gachaCard">
+                    <div class="action-icon">🎰</div>
+                    <h4>สุ่มเมนู</h4>
+                    <p>เสี่ยงดวง!</p>
+                </div>
+                <a href="food-battle.html" class="action-card battle-card">
+                    <div class="action-icon">⚔️</div>
+                    <h4>Food Battle</h4>
+                    <p>เปรียบเทียบ</p>
+                </a>
             </div>
 
+            <!-- Tracking Section -->
+            <div class="tracking-card">
+                <div class="tracking-header">
+                    <h3 class="tracking-title">📊 ติดตามการทานวันนี้</h3>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="tracking-history.html" class="history-btn" title="ดูประวัติย้อนหลัง">
+                            <i class="fas fa-history"></i>
+                        </a>
+                        <button class="clear-tracking-btn" id="clearTrackingBtn" style="display: none;">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="tracking-summary" id="trackingSummary">
+                    <div class="summary-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">แคลอรี่</span>
+                            <span class="stat-value" id="totalKcal">0</span>
+                            <span class="stat-unit">kcal</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">ไขมัน</span>
+                            <span class="stat-value" id="totalFat">0</span>
+                            <span class="stat-unit">g</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">น้ำตาล</span>
+                            <span class="stat-value" id="totalSugar">0</span>
+                            <span class="stat-unit">g</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">โซเดียม</span>
+                            <span class="stat-value" id="totalSodium">0</span>
+                            <span class="stat-unit">mg</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tracking-list" id="trackingList">
+                    <p class="empty-tracking">ยังไม่มีประวัติการทานอาหารวันนี้</p>
+                </div>
             </div>
-        
-        <footer class="footer-nav" style="justify-content: flex-end;">
+
+            <!-- Mood Section -->
+            <div class="mood-card">
+                <h3 class="card-title">🎭 วันนี้คุณรู้สึกยังไง?</h3>
+                <div class="mood-grid">
+                    <button class="mood-btn" data-mood="เครียด">😰 เครียด</button>
+                    <button class="mood-btn" data-mood="เหนื่อย">😴 เหนื่อย</button>
+                    <button class="mood-btn" data-mood="อยากผอม">💪 อยากผอม</button>
+                    <button class="mood-btn" data-mood="บวมน้ำ">💧 บวมน้ำ</button>
+                    <button class="mood-btn mood-btn-full" data-mood="ทั้งหมด">✨ ทั้งหมด</button>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="search-card">
+                <div class="search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" placeholder="ค้นหาอาหาร..." id="searchInput">
+                </div>
+                <div class="sort-controls">
+                    <span class="sort-label">เรียงตาม:</span>
+                    <select id="sortSelect" class="sort-select">
+                        <option value="none">ทั้งหมด</option>
+                        <optgroup label="แคลอรี่">
+                            <option value="kcal-low">แคลอรี่ (น้อย → มาก)</option>
+                            <option value="kcal-high">แคลอรี่ (มาก → น้อย)</option>
+                        </optgroup>
+                        <optgroup label="ไขมัน">
+                            <option value="fat-low">ไขมัน (น้อย → มาก)</option>
+                            <option value="fat-high">ไขมัน (มาก → น้อย)</option>
+                        </optgroup>
+                        <optgroup label="น้ำตาล">
+                            <option value="sugar-low">น้ำตาล (น้อย → มาก)</option>
+                            <option value="sugar-high">น้ำตาล (มาก → น้อย)</option>
+                        </optgroup>
+                        <optgroup label="โซเดียม">
+                            <option value="sodium-low">โซเดียม (น้อย → มาก)</option>
+                            <option value="sodium-high">โซเดียม (มาก → น้อย)</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Food List -->
+            <div class="food-list-section">
+                <h3 class="section-title">📋 รายการอาหาร</h3>
+                <div id="menu-container">
+                    <p style="text-align: center; margin-top: 20px; color: #777;">กำลังโหลดรายการอาหาร...</p>
+                </div>
+            </div>
+
+        </div>
+
+        <footer class="footer-nav">
+            <a href="home.html" class="footer-icon">🏠</a>
+            <a href="health-dashboard.html" class="footer-icon">📊</a>
             <a href="cart.html" class="footer-icon">🛒</a>
         </footer>
 
@@ -42,12 +152,12 @@
                 <span class="close-btn" id="closeBtn">&times;</span>
             </div>
             <div class="modal-body" id="modalBody">
-                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const modal = document.getElementById("foodModal");
             const modalTitle = document.getElementById("modalTitle");
             const modalBody = document.getElementById("modalBody");
@@ -62,20 +172,447 @@
                 return;
             }
 
-            // 1. โหลดรายการอาหารจาก API
+            // เก็บข้อมูลอาหารทั้งหมด
+            let allFoods = [];
+            let currentMood = 'ทั้งหมด';
+            let currentSort = 'none';
+
+            // 1. โหลดข่าวสารสุขภาพ
+            loadHealthNews();
+
+            // 2. โหลดรายการอาหารจาก API
             loadFoods();
+
+            // 3. โหลดและแสดง tracking
+            loadTrackingData();
+            setupClearTracking();
+
+            // ฟังก์ชันโหลดข่าวสารสุขภาพ
+            function loadHealthNews() {
+                const newsContainer = document.getElementById('newsContainer');
+                
+                // ข้อมูลข่าวสารสุขภาพพร้อมรูปภาพจริง
+                const healthNews = [
+                    {
+                        id: 1,
+                        title: "ดื่มน้ำให้เพียงพอ ช่วยเพิ่มระบบเผาผลาญ",
+                        content: "การดื่มน้ำ 8-10 แก้วต่อวัน ช่วยเพิ่มการเผาผลาญพลังงานได้ 30% และช่วยให้ผิวพรรณชุ่มชื้น",
+                        image: "https://images.unsplash.com/photo-1523362628745-0c100150b504?w=400&h=300&fit=crop&q=80",
+                        category: "สุขภาพทั่วไป",
+                        date: "15 ธ.ค. 2024",
+                        fullContent: "การดื่มน้ำเป็นสิ่งที่สำคัญมากต่อสุขภาพ การดื่มน้ำให้เพียงพอวันละ 8-10 แก้ว (ประมาณ 2-2.5 ลิตร) จะช่วยให้ระบบต่างๆ ในร่างกายทำงานได้ดีขึ้น โดยเฉพาะการเผาผลาญพลังงานที่สามารถเพิ่มขึ้นได้ถึง 30% เมื่อดื่มน้ำเย็น นอกจากนี้การดื่มน้ำยังช่วยให้ผิวพรรณชุ่มชื้น ลดการเกิดริ้วรอย และช่วยให้ระบบไหลเวียนเลือดทำงานได้ดีขึ้น"
+                    },
+                    {
+                        id: 2,
+                        title: "อาหารเช้าสำคัญที่สุดต่อสุขภาพ",
+                        content: "การรับประทานอาหารเช้าที่มีประโยชน์ช่วยเพิ่มสมาธิและพลังงานตลอดทั้งวัน",
+                        image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&h=300&fit=crop",
+                        category: "โภชนาการ",
+                        date: "14 ธ.ค. 2024",
+                        fullContent: "อาหารเช้าเป็นมื้อสำคัญที่สุดของวัน การรับประทานอาหารเช้าที่มีประโยชน์จะช่วยเติมพลังงานให้กับร่างกายและสมอง ทำให้มีสมาธิในการทำงานหรือเรียนได้ดีขึ้น อาหารเช้าที่ดีควรประกอบด้วยโปรตีน คาร์โบไฮเดรตเชิงซ้อน และไฟเบอร์ เช่น ข้าวโอ๊ต ไข่ ผลไม้ และนม หลีกเลี่ยงอาหารหวานจัดหรือไขมันสูงที่ทำให้ง่วงนอน"
+                    },
+                    {
+                        id: 3,
+                        title: "ออกกำลังกาย 30 นาทีต่อวัน ลดความเสี่ยงโรค",
+                        content: "การออกกำลังกายเบาๆ อย่างสม่ำเสมอช่วยลดความเสี่ยงโรคหัวใจและเบาหวานได้มากถึง 50%",
+                        image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=300&fit=crop",
+                        category: "ออกกำลังกาย",
+                        date: "13 ธ.ค. 2024",
+                        fullContent: "การออกกำลังกายเป็นประจำเพียงวันละ 30 นาที สามารถลดความเสี่ยงโรคหัวใจและหลอดเลือดได้มากถึง 50% และลดความเสี่ยงโรคเบาหวานได้มากเช่นกัน การออกกำลังกายไม่จำเป็นต้องหนักมาก แค่การเดินเร็ว ปั่นจักรยาน หรือทำกิจกรรมที่ทำให้หัวใจเต้นเร็วขึ้นเล็กน้อยก็เพียงพอแล้ว สิ่งสำคัญคือต้องทำอย่างสม่ำเสมออย่างน้อย 3-4 วันต่อสัปดาห์"
+                    },
+                    {
+                        id: 4,
+                        title: "การนอนหลับ 7-8 ชั่วโมง ดีต่อสุขภาพจิต",
+                        content: "การนอนหลับที่เพียงพอช่วยให้สมองทำงานได้เต็มประสิทธิภาพและลดความเครียด",
+                        image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=400&h=300&fit=crop",
+                        category: "สุขภาพจิต",
+                        date: "12 ธ.ค. 2024",
+                        fullContent: "การนอนหลับที่เพียงพอเป็นสิ่งสำคัญมากต่อสุขภาพ โดยเฉพาะสุขภาพจิต ผู้ใหญ่ควรนอนหลับประมาณ 7-8 ชั่วโมงต่อคืน การนอนหลับที่เพียงพอจะช่วยให้สมองสามารถทำงานได้เต็มประสิทธิภาพ มีความจำที่ดีขึ้น และลดความเครียดได้ นอกจากนี้การนอนหลับที่เพียงพอยังช่วยให้ระบบภูมิคุ้มกันทำงานได้ดีขึ้น ลดความเสี่ยงการเกิดโรคเรื้อรังต่างๆ"
+                    },
+                    {
+                        id: 5,
+                        title: "ผักผลไม้ 5 สี เพื่อสุขภาพดี",
+                        content: "การรับประทานผักผลไม้หลากสีให้วิตามินและแร่ธาตุที่จำเป็นต่อร่างกายครบถ้วน",
+                        image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=300&fit=crop",
+                        category: "โภชนาการ",
+                        date: "11 ธ.ค. 2024",
+                        fullContent: "การรับประทานผักผลไม้หลากสีทั้ง 5 สีจะช่วยให้ร่างกายได้รับวิตามินและแร่ธาตุที่จำเป็นต่อร่างกายครบถ้วน แต่ละสีมีสารอาหารและสารต้านอนุมูลอิสระที่แตกต่างกัน เช่น ผักผลไม้สีแดงมีไลโคปีน สีเหลืองส้มมีเบต้าแคโรทีน สีเขียวมีคลอโรฟิลล์ สีม่วงมีแอนโธไซยานิน และสีขาวมีอัลลิซิน การรับประทานผักผลไม้ให้ได้อย่างน้อยวันละ 5 ส่วนจะช่วยให้สุขภาพดีขึ้น"
+                    },
+                    {
+                        id: 6,
+                        title: "ลดโซเดียม ป้องกันโรคความดัน",
+                        content: "การลดการบริโภคโซเดียมช่วยลดความเสี่ยงโรคความดันโลหิตสูงและโรคไต",
+                        image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400&h=300&fit=crop",
+                        category: "โรคไม่ติดต่อ",
+                        date: "10 ธ.ค. 2024",
+                        fullContent: "การบริโภคโซเดียมมากเกินไปเป็นสาเหตุหลักของโรคความดันโลหิตสูงและโรคไต ผู้ใหญ่ควรบริโภคโซเดียมไม่เกิน 2,000 มิลลิกรัมต่อวัน (เทียบเท่าเกลือ 1 ช้อนชา) การลดการบริโภคโซเดียมทำได้โดยหลีกเลี่ยงอาหารแปรรูป อาหารกระป๋อง บะหมี่กึ่งสำเร็จรูป และลดการใช้เครื่องปรุงรสต่างๆ เช่น น้ำปลา ซีอิ๊ว ซอส ในการปรุงอาหาร ควรใช้สมุนไพรและเครื่องเทศแทนเพื่อเพิ่มรสชาติ"
+                    }
+                ];
+
+                newsContainer.innerHTML = '';
+                
+                let loadedImages = 0;
+                const totalImages = healthNews.length;
+                
+                healthNews.forEach(news => {
+                    const newsCard = document.createElement('a');
+                    newsCard.className = 'news-card';
+                    newsCard.href = `news-detail.html?id=${news.id}`;
+                    
+                    // สร้างรูปภาพพร้อม fallback
+                    const img = document.createElement('img');
+                    img.src = news.image;
+                    img.alt = news.title;
+                    img.className = 'news-image';
+                    
+                    // เพิ่ม fallback image เมื่อโหลดไม่สำเร็จ
+                    img.onerror = function() {
+                        this.onerror = null; // ป้องกัน infinite loop
+                        // ใช้ placeholder gradient แทน
+                        this.style.display = 'none';
+                        const placeholder = newsCard.querySelector('.news-image-placeholder');
+                        if (placeholder) {
+                            placeholder.style.display = 'flex';
+                            placeholder.innerHTML = `<span class="news-emoji">${getNewsEmoji(news.id)}</span>`;
+                        }
+                        loadedImages++;
+                        if (loadedImages === totalImages) {
+                            // รอให้ DOM อัพเดต
+                            setTimeout(() => startAutoScroll(), 100);
+                        }
+                    };
+                    
+                    img.onload = function() {
+                        loadedImages++;
+                        if (loadedImages === totalImages) {
+                            // รอให้ DOM อัพเดต
+                            setTimeout(() => startAutoScroll(), 100);
+                        }
+                    };
+                    
+                    newsCard.innerHTML = `
+                        <div class="news-card-image">
+                            <div class="news-image-placeholder" style="display: none;">
+                                <span class="news-emoji">${getNewsEmoji(news.id)}</span>
+                            </div>
+                            <div class="news-image-overlay"></div>
+                        </div>
+                        <div class="news-card-content">
+                            <span class="news-category">${news.category}</span>
+                            <h4 class="news-card-title">${news.title}</h4>
+                            <p class="news-card-text">${news.content}</p>
+                            <div class="news-card-footer">
+                                <span class="news-date"><i class="fas fa-calendar-alt"></i> ${news.date}</span>
+                                <span class="news-read-more"><i class="fas fa-arrow-right"></i></span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // เพิ่มรูปภาพเข้าไป
+                    const imageContainer = newsCard.querySelector('.news-card-image');
+                    imageContainer.insertBefore(img, imageContainer.firstChild);
+                    
+                    newsContainer.appendChild(newsCard);
+                });
+                
+                // ฟังก์ชันสำหรับ emoji fallback
+                function getNewsEmoji(id) {
+                    const emojis = {
+                        1: '💧',
+                        2: '🍳',
+                        3: '🏃',
+                        4: '😴',
+                        5: '🥗',
+                        6: '🧂'
+                    };
+                    return emojis[id] || '📰';
+                }
+                
+                // ถ้าไม่มีรูปภาพเลย ให้เริ่ม auto-scroll ทันที
+                if (totalImages === 0) {
+                    setTimeout(() => startAutoScroll(), 100);
+                }
+            }
+
+            // ฟังก์ชัน auto-scroll (แก้ไขใหม่)
+            let autoScrollTimeout = null;
+            let isPaused = false;
+            let hasInitialized = false;
+            let currentIndex = 0;
+            let userInteracting = false;
+
+            function startAutoScroll() {
+                const newsContainer = document.getElementById('newsContainer');
+                if (!newsContainer || hasInitialized) return;
+                
+                const cards = newsContainer.querySelectorAll('.news-card');
+                if (cards.length === 0) {
+                    setTimeout(startAutoScroll, 200);
+                    return;
+                }
+
+                hasInitialized = true;
+                const cardWidth = 296; // 280px card + 16px gap
+                const totalCards = cards.length;
+                const visibleCards = Math.floor(newsContainer.clientWidth / cardWidth);
+                const maxIndex = Math.max(0, totalCards - visibleCards);
+                
+                // หยุดเมื่อผู้ใช้เลื่อนเอง
+                let scrollTimer = null;
+                newsContainer.addEventListener('scroll', function() {
+                    userInteracting = true;
+                    clearTimeout(scrollTimer);
+                    scrollTimer = setTimeout(() => {
+                        userInteracting = false;
+                        currentIndex = Math.round(newsContainer.scrollLeft / cardWidth);
+                    }, 2000);
+                });
+
+                // หยุดเมื่อ hover
+                newsContainer.addEventListener('mouseenter', () => {
+                    isPaused = true;
+                });
+
+                newsContainer.addEventListener('mouseleave', () => {
+                    isPaused = false;
+                    if (!userInteracting) {
+                        autoScroll();
+                    }
+                });
+
+                function autoScroll() {
+                    if (isPaused || userInteracting) return;
+
+                    // ตรวจสอบว่าถึงสุดท้ายหรือยัง
+                    if (currentIndex >= maxIndex) {
+                        currentIndex = 0;
+                        newsContainer.scrollTo({
+                            left: 0,
+                            behavior: 'smooth'
+                        });
+                    } else {
+                        currentIndex++;
+                        newsContainer.scrollTo({
+                            left: currentIndex * cardWidth,
+                            behavior: 'smooth'
+                        });
+                    }
+
+                    // เลื่อนต่อไปหลังจาก 3 วินาที
+                    autoScrollTimeout = setTimeout(autoScroll, 3000);
+                }
+
+                // เริ่มเลื่อนหลังจาก 1.5 วินาที
+                autoScrollTimeout = setTimeout(autoScroll, 1500);
+            }
+
+            // หยุดเมื่อออกจากหน้า
+            window.addEventListener('beforeunload', function() {
+                if (autoScrollTimeout) {
+                    clearTimeout(autoScrollTimeout);
+                }
+            });
 
             // 2. ฟังก์ชันโหลดรายการอาหารจาก API
             function loadFoods() {
                 fetch('http://localhost:8080/api/foods')
                     .then(response => response.json())
                     .then(foods => {
+                        allFoods = foods;
                         displayFoods(foods);
+                        setupMoodButtons();
+                        setupGachaButton();
                     })
                     .catch(error => {
                         console.error('Error loading foods:', error);
                         menuContainer.innerHTML = '<p style="text-align: center; color: red;">ไม่สามารถโหลดรายการอาหารได้ (Backend ปิดอยู่?)</p>';
                     });
+            }
+
+            // 3. ตั้งค่า Mood Buttons
+            function setupMoodButtons() {
+                const moodButtons = document.querySelectorAll('.mood-btn');
+                moodButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        // ลบ active class จากปุ่มอื่น
+                        moodButtons.forEach(b => b.classList.remove('active'));
+                        // เพิ่ม active class ให้ปุ่มที่กด
+                        this.classList.add('active');
+                        
+                        currentMood = this.dataset.mood;
+                        // ล้าง search input เมื่อเลือก mood
+                        searchInput.value = '';
+                        performSearchAndSort();
+                    });
+                });
+            }
+
+            // 4. กรองอาหารตามอารมณ์ (เก็บไว้สำหรับ backward compatibility)
+            function filterFoodsByMood(mood) {
+                currentMood = mood;
+                performSearchAndSort();
+            }
+
+            // 5. ตั้งค่า Gacha Button
+            function setupGachaButton() {
+                const gachaCard = document.getElementById('gachaCard');
+                gachaCard.addEventListener('click', function() {
+                    if (allFoods.length === 0) {
+                        alert('ยังไม่มีรายการอาหาร');
+                        return;
+                    }
+                    
+                    const icon = this.querySelector('.action-icon');
+                    icon.classList.add('spinning');
+                    this.style.pointerEvents = 'none';
+                    
+                    setTimeout(() => {
+                        const randomFood = allFoods[Math.floor(Math.random() * allFoods.length)];
+                        showGachaResult(randomFood);
+                        icon.classList.remove('spinning');
+                        this.style.pointerEvents = 'auto';
+                    }, 1500);
+                });
+            }
+
+            // Search functionality
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    performSearchAndSort();
+                });
+            }
+
+            // Sort functionality
+            const sortSelect = document.getElementById('sortSelect');
+            if (sortSelect) {
+                sortSelect.addEventListener('change', function() {
+                    currentSort = this.value;
+                    performSearchAndSort();
+                });
+            }
+
+            // ฟังก์ชันค้นหาและเรียงลำดับ
+            function performSearchAndSort() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                let filtered = [...allFoods];
+
+                // กรองตามการค้นหา
+                if (searchTerm !== '') {
+                    filtered = filtered.filter(food => 
+                        food.name.toLowerCase().includes(searchTerm)
+                    );
+                }
+
+                // กรองตาม mood (ถ้าไม่ได้ค้นหา)
+                if (searchTerm === '' && currentMood !== 'ทั้งหมด') {
+                    filtered = filterFoodsByMoodData(currentMood);
+                }
+
+                // เรียงลำดับตามที่เลือก
+                if (currentSort === 'kcal-low') {
+                    filtered.sort((a, b) => a.kcal - b.kcal);
+                } else if (currentSort === 'kcal-high') {
+                    filtered.sort((a, b) => b.kcal - a.kcal);
+                } else if (currentSort === 'fat-low') {
+                    filtered.sort((a, b) => a.fat - b.fat);
+                } else if (currentSort === 'fat-high') {
+                    filtered.sort((a, b) => b.fat - a.fat);
+                } else if (currentSort === 'sugar-low') {
+                    filtered.sort((a, b) => a.sugar - b.sugar);
+                } else if (currentSort === 'sugar-high') {
+                    filtered.sort((a, b) => b.sugar - a.sugar);
+                } else if (currentSort === 'sodium-low') {
+                    filtered.sort((a, b) => a.sodium - b.sodium);
+                } else if (currentSort === 'sodium-high') {
+                    filtered.sort((a, b) => b.sodium - a.sodium);
+                }
+
+                displayFoods(filtered);
+            }
+
+            // ฟังก์ชันกรองตาม mood (return array)
+            function filterFoodsByMoodData(mood) {
+                let filtered = [...allFoods];
+                
+                if (mood === 'เครียด') {
+                    filtered = allFoods.filter(food => food.sugar >= 5);
+                    filtered.sort((a, b) => b.sugar - a.sugar);
+                } else if (mood === 'เหนื่อย') {
+                    filtered = allFoods.filter(food => food.kcal >= 400);
+                    filtered.sort((a, b) => b.kcal - a.kcal);
+                } else if (mood === 'อยากผอม') {
+                    filtered = allFoods.filter(food => food.kcal <= 350);
+                    filtered.sort((a, b) => a.kcal - b.kcal);
+                } else if (mood === 'บวมน้ำ') {
+                    filtered = allFoods.filter(food => food.sodium <= 600);
+                    filtered.sort((a, b) => a.sodium - b.sodium);
+                }
+                
+                return filtered;
+            }
+
+            // 6. แสดงผล Gacha
+            function showGachaResult(food) {
+                const modal = document.getElementById("foodModal");
+                const modalTitle = document.getElementById("modalTitle");
+                const modalBody = document.getElementById("modalBody");
+                
+                modalTitle.innerHTML = `🎰 ได้เมนู: ${food.name}`;
+                modalBody.innerHTML = `
+                    <div class="gacha-result">
+                        <div class="gacha-food-card">
+                            <h3>${food.name}</h3>
+                            <ul>
+                                <li>พลังงาน: ${food.kcal} kcal</li>
+                                <li>ไขมัน: ${food.fat}g</li>
+                                <li>น้ำตาล: ${food.sugar}g</li>
+                                <li>โซเดียม: ${food.sodium}mg</li>
+                            </ul>
+                            <button class="btn btn-full-width" onclick="addGachaFoodToCart('${food.name}')" style="margin-top: 15px;">
+                                เพิ่มลงตะกร้า
+                            </button>
+                        </div>
+                    </div>
+                `;
+                modal.style.display = "flex";
+            }
+
+            // 7. เพิ่มอาหารจาก Gacha ลงตะกร้า
+            window.addGachaFoodToCart = function(foodName) {
+                const username = localStorage.getItem('currentUser');
+                if (!username) {
+                    alert('กรุณาเข้าสู่ระบบก่อน');
+                    return;
+                }
+
+                const requestBody = {
+                    username: username,
+                    foodName: foodName
+                };
+
+                fetch('http://localhost:8080/api/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(`เพิ่ม "${foodName}" ลงในตะกร้าแล้ว!`);
+                        document.getElementById("foodModal").style.display = "none";
+                        const updateEvent = new Event('cartUpdated');
+                        window.dispatchEvent(updateEvent);
+                        localStorage.setItem(`cart_updated_${username}_${Date.now()}`, 'true');
+                    } else {
+                        alert('เกิดข้อผิดพลาด: ' + (data.message || 'ไม่สามารถเพิ่มลงตะกร้าได้'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding to cart:', error);
+                    alert('เกิดข้อผิดพลาด: ' + error.message);
+                });
             }
 
             // 3. ฟังก์ชันแสดงรายการอาหาร
@@ -89,16 +626,21 @@
                     menuItemDiv.dataset.fat = food.fat;
                     menuItemDiv.dataset.sugar = food.sugar;
                     menuItemDiv.dataset.sodium = food.sodium;
-                    
+
+                    // กำหนด path รูปภาพ (ถ้ามีรูปให้ใช้รูป ถ้าไม่มีใช้ placeholder)
+                    const imagePath = `images/${food.name.toLowerCase().replace(/\s+/g, '-')}.jpg`;
+
                     menuItemDiv.innerHTML = `
-                        <div class="item-image-placeholder"></div>
+                        <img src="${imagePath}" alt="${food.name}" class="item-image" 
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="item-image-placeholder" style="display: none;"></div>
                         <div class="item-text">
                             <strong>${food.name}</strong>
                             <span>คุณค่าทางโภชนาการ</span>
                         </div>
                         <button class="add-btn">+</button>
                     `;
-                    
+
                     menuContainer.appendChild(menuItemDiv);
                 });
 
@@ -112,7 +654,7 @@
                 const addButtons = document.querySelectorAll(".add-btn");
 
                 menuItems.forEach(item => {
-                    item.addEventListener('click', function(e) {
+                    item.addEventListener('click', function (e) {
                         if (!e.target.classList.contains('add-btn')) {
                             openModal(item);
                         }
@@ -120,13 +662,102 @@
                 });
 
                 addButtons.forEach(button => {
-                    button.addEventListener('click', function(e) {
+                    button.addEventListener('click', function (e) {
                         e.stopPropagation();
                         const item = button.closest('.menu-item');
                         addToCart(item);
                     });
                 });
             }
+
+            // ข้อมูลรายละเอียดเพิ่มเติมของอาหาร
+            const foodDetails = {
+                "ข้าวมันไก่": {
+                    description: "ข้าวมันไก่เป็นอาหารไทยยอดนิยม ประกอบด้วยข้าวหุงกับน้ำมันไก่ เนื้อไก่ต้ม และน้ำจิ้มเต้าเจี้ยว",
+                    benefits: "อุดมด้วยโปรตีนจากไก่ ให้พลังงานสูง เหมาะสำหรับมื้อกลางวัน",
+                    tips: "เลือกกินไก่ลอกหนังเพื่อลดไขมัน ลดการจิ้มน้ำจิ้มหวานเพื่อควบคุมโซเดียม"
+                },
+                "ข้าวผัดกะเพรา": {
+                    description: "ข้าวผัดกะเพราเป็นเมนูที่หอมกรุ่นจากใบกะเพรา ผัดกับเนื้อหมูหรือไก่และพริก",
+                    benefits: "กะเพราช่วยเพิ่มรสชาติและมีสรรพคุณทางยาช่วยย่อยอาหาร",
+                    tips: "ถ้าต้องการลดไขมัน เลือกเนื้อไม่ติดมัน หรือใช้เนื้อไก่แทนหมู"
+                },
+                "ข้าวขาหมู": {
+                    description: "ข้าวขาหมูเป็นอาหารไทยที่มีขาหมูตุ๋นที่อ่อนนุ่ม ราดน้ำราดขาหมูบนข้าวสวยร้อนๆ",
+                    benefits: "ให้โปรตีนสูง มีคอลลาเจนจากขาหมู",
+                    tips: "เป็นอาหารที่มีไขมันและโซเดียมสูง ควรกินในปริมาณที่พอเหมาะ"
+                },
+                "ผัดไทยกุ้งสด": {
+                    description: "ผัดไทยเป็นอาหารเส้นยอดนิยม ผัดก๋วยเตี๋ยวเส้นจันทน์กับกุ้งสด ไข่ เต้าหู้ และถั่วงอก",
+                    benefits: "มีโปรตีนจากกุ้งและไข่ มีไฟเบอร์จากถั่วงอก",
+                    tips: "เพิ่มผักให้มากขึ้น เช่น ถั่วงอก หัวไชเท้า เพื่อเพิ่มไฟเบอร์"
+                },
+                "สลัดอกไก่": {
+                    description: "สลัดอกไก่เป็นเมนูสุขภาพ ประกอบด้วยผักสดนานาชนิดและอกไก่ย่าง",
+                    benefits: "แคลอรี่ต่ำ โปรตีนสูง อุดมด้วยวิตามินและแร่ธาตุจากผัก",
+                    tips: "เลือกน้ำสลัดที่ไขมันต่ำหรือน้ำสลัดแบบใสเพื่อลดแคลอรี่"
+                },
+                "แกงเขียวหวานไก่": {
+                    description: "แกงเขียวหวานเป็นแกงที่หอมกรุ่นจากเครื่องแกงเขียวหวานและกะทิ",
+                    benefits: "มีเครื่องเทศและสมุนไพรที่มีสรรพคุณทางยา เช่น ข่า ตะไคร้",
+                    tips: "ลดการใช้กะทิหรือเลือกใช้กะทิจืดเพื่อลดไขมัน"
+                },
+                "ต้มยำกุ้ง": {
+                    description: "ต้มยำกุ้งเป็นอาหารไทยที่มีรสเปรี้ยวเผ็ดร้อน ใส่กุ้งสด เห็ดหอม และสมุนไพร",
+                    benefits: "แคลอรี่ต่ำ มีโปรตีนจากกุ้ง มีสรรพคุณช่วยเพิ่มความอบอุ่นให้ร่างกาย",
+                    tips: "เป็นเมนูที่ดีสำหรับผู้ที่ต้องการควบคุมน้ำหนักเพราะแคลอรี่ต่ำ"
+                },
+                "ข้าวไข่เจียว": {
+                    description: "ข้าวไข่เจียวเป็นอาหารง่ายๆ ที่ทำจากไข่เจียวทานกับข้าวสวย",
+                    benefits: "ให้โปรตีนและพลังงาน เหมาะสำหรับมื้อเช้า",
+                    tips: "ใช้ไข่ไก่ธรรมดา 1-2 ฟองและใช้น้ำมันน้อยๆ ในการเจียว"
+                },
+                "ส้มตำไทย": {
+                    description: "ส้มตำเป็นอาหารไทยที่เป็นที่รู้จักกันดี ทำจากมะละกอดิบ มะเขือเทศ พริก และถั่วลิสง",
+                    benefits: "แคลอรี่ต่ำมาก อุดมด้วยวิตามินซีและไฟเบอร์",
+                    tips: "ลดปริมาณน้ำตาลและน้ำปลาเพื่อควบคุมโซเดียมและน้ำตาล"
+                },
+                "ลาบหมู": {
+                    description: "ลาบหมูเป็นอาหารอีสานที่ทำจากหมูสับผัดกับเครื่องลาบและทานกับผักสด",
+                    benefits: "มีโปรตีนจากหมู มีรสชาติเผ็ดร้อนช่วยเพิ่มการเผาผลาญ",
+                    tips: "เพิ่มผักสดให้มากขึ้น เช่น ผักกาดขาว ใบกะเพรา เพื่อความสมดุล"
+                },
+                "ข้าวผัดหมู": {
+                    description: "ข้าวผัดหมูเป็นเมนูที่ทำง่าย ประกอบด้วยข้าวสวยผัดกับเนื้อหมู ไข่ และเครื่องปรุง",
+                    benefits: "ให้พลังงานและโปรตีน เหมาะสำหรับมื้อที่ต้องการพลังงาน",
+                    tips: "เพิ่มผักลงไปผัดด้วยเพื่อเพิ่มไฟเบอร์และวิตามิน"
+                },
+                "ก๋วยเตี๋ยวเรือ": {
+                    description: "ก๋วยเตี๋ยวเรือเป็นก๋วยเตี๋ยวที่มีน้ำซุปเข้มข้น ใส่เลือดหมู เนื้อหมู และเครื่องใน",
+                    benefits: "อุดมด้วยโปรตีนและธาตุเหล็ก",
+                    tips: "เป็นเมนูที่มีโซเดียมสูงมาก ควรระวังสำหรับผู้ที่มีปัญหาไตหรือความดัน"
+                },
+                "ข้าวซอยไก่": {
+                    description: "ข้าวซอยเป็นอาหารเหนือที่มีเส้นก๋วยเตี๋ยว น้ำซุปกะทิ และไก่",
+                    benefits: "มีโปรตีนจากไก่และให้พลังงานสูง",
+                    tips: "ลดปริมาณกะทิหรือเลือกกินบางส่วนเพื่อลดไขมัน"
+                },
+                "โจ๊กหมู": {
+                    description: "โจ๊กหมูเป็นอาหารเช้าที่อ่อนโยน ทำจากข้าวต้มกับเนื้อหมูสับและไข่",
+                    benefits: "ย่อยง่าย เหมาะสำหรับคนที่ต้องการอาหารเบาๆ",
+                    tips: "เพิ่มผักและโปรตีนให้มากขึ้นเพื่อให้อิ่มนานขึ้น"
+                },
+                "ปลากะพงทอดน้ำปลา": {
+                    description: "ปลากะพงทอดน้ำปลาเป็นเมนูอาหารทะเลที่ทำจากปลากะพงทอดและราดน้ำปลาหวาน",
+                    benefits: "อุดมด้วยโปรตีนและโอเมก้า 3 จากปลา",
+                    tips: "เลือกการทอดแบบไม่ใช้แป้งมากหรือเลือกกินแต่เนื้อปลาเพื่อลดแคลอรี่"
+                },
+                "แกงจืดเต้าหู้หมูสับ": {
+                    description: "แกงจืดเต้าหู้หมูสับเป็นแกงที่ใส่น้ำซุปใส ใส่เต้าหู้และหมูสับ",
+                    benefits: "แคลอรี่ต่ำ มีโปรตีนจากเต้าหู้และหมู",
+                    tips: "เป็นเมนูที่ดีสำหรับผู้ที่ต้องการควบคุมน้ำหนัก"
+                },
+                "ยำวุ้นเส้น": {
+                    description: "ยำวุ้นเส้นเป็นอาหารที่มีรสเปรี้ยวเผ็ด ทำจากวุ้นเส้น ผักสด และน้ำยำ",
+                    benefits: "แคลอรี่ต่ำมาก มีไฟเบอร์สูง อุดมด้วยวิตามิน",
+                    tips: "ลดน้ำตาลและน้ำปลาในน้ำยำเพื่อควบคุมโซเดียมและน้ำตาล"
+                }
+            };
 
             // 5. ฟังก์ชันเปิด Modal
             function openModal(item) {
@@ -136,16 +767,69 @@
                 const sugar = item.dataset.sugar;
                 const sodium = item.dataset.sodium;
 
+                // หา path รูปภาพ
+                const imagePath = `images/${name.toLowerCase().replace(/\s+/g, '-')}.jpg`;
+                
+                // หาข้อมูลรายละเอียดเพิ่มเติม
+                const details = foodDetails[name] || {
+                    description: "เมนูอาหารไทยที่แสนอร่อย",
+                    benefits: "ให้พลังงานและสารอาหารที่จำเป็น",
+                    tips: "ทานในปริมาณที่เหมาะสมเพื่อสุขภาพที่ดี"
+                };
+
                 modalTitle.textContent = name;
                 modalBody.innerHTML = `
-                    <p><strong>ชื่อเมนู:</strong> ${name}</p>
-                    <p><strong>รายละเอียด:</strong></p>
-                    <ul>
-                        <li>พลังงาน: ${kcal} kcal</li>
-                        <li>ไขมัน: ${fat}g</li>
-                        <li>น้ำตาล: ${sugar}g</li>
-                        <li>โซเดียม: ${sodium}mg</li>
-                    </ul>
+                    <div class="food-modal-image-container">
+                        <img src="${imagePath}" alt="${name}" class="food-modal-image" 
+                             onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 300 300\\'%3E%3Crect fill=\\'%23e8f5e9\\' width=\\'300\\' height=\\'300\\'/%3E%3Ctext x=\\'50%25\\' y=\\'50%25\\' font-size=\\'60\\' text-anchor=\\'middle\\' dominant-baseline=\\'middle\\' fill=\\'%234CAF50\\'%3E🍽️%3C/text%3E%3C/svg%3E';">
+                    </div>
+                    <div class="food-modal-info">
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <span class="nutrition-icon">🔥</span>
+                                <div>
+                                    <div class="nutrition-label">พลังงาน</div>
+                                    <div class="nutrition-value">${kcal} kcal</div>
+                                </div>
+                            </div>
+                            <div class="nutrition-item">
+                                <span class="nutrition-icon">🧈</span>
+                                <div>
+                                    <div class="nutrition-label">ไขมัน</div>
+                                    <div class="nutrition-value">${fat}g</div>
+                                </div>
+                            </div>
+                            <div class="nutrition-item">
+                                <span class="nutrition-icon">🍬</span>
+                                <div>
+                                    <div class="nutrition-label">น้ำตาล</div>
+                                    <div class="nutrition-value">${sugar}g</div>
+                                </div>
+                            </div>
+                            <div class="nutrition-item">
+                                <span class="nutrition-icon">🧂</span>
+                                <div>
+                                    <div class="nutrition-label">โซเดียม</div>
+                                    <div class="nutrition-value">${sodium}mg</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="food-description-section">
+                            <h4 class="section-subtitle">📝 เกี่ยวกับเมนูนี้</h4>
+                            <p class="food-description">${details.description}</p>
+                        </div>
+                        
+                        <div class="food-benefits-section">
+                            <h4 class="section-subtitle">✨ ประโยชน์</h4>
+                            <p class="food-benefits">${details.benefits}</p>
+                        </div>
+                        
+                        <div class="food-tips-section">
+                            <h4 class="section-subtitle">💡 เคล็ดลับสุขภาพ</h4>
+                            <p class="food-tips">${details.tips}</p>
+                        </div>
+                    </div>
                 `;
                 modal.style.display = "flex";
             }
@@ -154,9 +838,9 @@
             function closeModal() {
                 modal.style.display = "none";
             }
-            
+
             closeBtn.onclick = closeModal;
-            window.onclick = function(event) {
+            window.onclick = function (event) {
                 if (event.target == modal) {
                     closeModal();
                 }
@@ -165,9 +849,13 @@
             // 7. ฟังก์ชันเพิ่มลงตะกร้าผ่าน API
             function addToCart(item) {
                 const foodName = item.dataset.name;
+                const foodKcal = parseFloat(item.dataset.kcal);
+                const foodFat = parseFloat(item.dataset.fat);
+                const foodSugar = parseFloat(item.dataset.sugar);
+                const foodSodium = parseFloat(item.dataset.sodium);
                 const username = localStorage.getItem('currentUser');
 
-                    // ตรวจสอบว่ามี username หรือไม่
+                // ตรวจสอบว่ามี username หรือไม่
                 if (!username) {
                     alert('กรุณาเข้าสู่ระบบก่อน');
                     window.location.href = 'login.html';
@@ -194,27 +882,164 @@
                     },
                     body: JSON.stringify(requestBody)
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => {
-                            throw new Error(err.message || 'HTTP error! status: ' + response.status);
-                        });
-                    }
-                    return response.json();
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => {
+                                throw new Error(err.message || 'HTTP error! status: ' + response.status);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.status === 'success') {
+                            alert(`เพิ่ม "${foodName}" ลงในตะกร้าแล้ว!`);
+                            
+                            // บันทึก tracking ผ่าน API
+                            addToTrackingAPI(username, foodName);
+                            
+                            // Track achievement
+                            localStorage.setItem(`food_added_${username}`, 'true');
+                            // Trigger cart update event (ไม่ต้อง update localStorage แล้ว เพราะจะคำนวณจากตะกร้าใหม่ทุกครั้ง)
+                            const updateEvent = new Event('cartUpdated');
+                            window.dispatchEvent(updateEvent);
+                            // Also update localStorage to trigger storage event
+                            localStorage.setItem(`cart_updated_${username}_${Date.now()}`, 'true');
+                        } else {
+                            alert('เกิดข้อผิดพลาด: ' + (data.message || 'ไม่สามารถเพิ่มลงตะกร้าได้'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error adding to cart:', error);
+                        alert('เกิดข้อผิดพลาด: ' + error.message);
+                    });
+            }
+
+            // 8. ฟังก์ชัน tracking (ใช้ Backend API)
+            function loadTrackingData() {
+                const username = localStorage.getItem('currentUser');
+                if (!username) return;
+
+                fetch(`http://localhost:8080/api/tracking/today/${username}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        displayTracking(data);
+                    })
+                    .catch(error => {
+                        console.error('Error loading tracking:', error);
+                        displayTracking([]);
+                    });
+            }
+
+            function addToTrackingAPI(username, foodName) {
+                fetch('http://localhost:8080/api/tracking/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        foodName: foodName
+                    })
                 })
+                .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        alert(`เพิ่ม "${foodName}" ลงในตะกร้าแล้ว!`);
-                    } else {
-                        alert('เกิดข้อผิดพลาด: ' + (data.message || 'ไม่สามารถเพิ่มลงตะกร้าได้'));
+                        // โหลดข้อมูลใหม่
+                        loadTrackingData();
                     }
                 })
                 .catch(error => {
-                    console.error('Error adding to cart:', error);
-                    alert('เกิดข้อผิดพลาด: ' + error.message);
+                    console.error('Error adding tracking:', error);
                 });
             }
+
+            function displayTracking(trackingData) {
+                const trackingList = document.getElementById('trackingList');
+                const clearBtn = document.getElementById('clearTrackingBtn');
+                
+                // คำนวณรวม
+                let totalKcal = 0;
+                let totalFat = 0;
+                let totalSugar = 0;
+                let totalSodium = 0;
+
+                trackingData.forEach(food => {
+                    totalKcal += food.kcal || 0;
+                    totalFat += food.fat || 0;
+                    totalSugar += food.sugar || 0;
+                    totalSodium += food.sodium || 0;
+                });
+
+                // อัปเดต summary
+                document.getElementById('totalKcal').textContent = totalKcal.toFixed(0);
+                document.getElementById('totalFat').textContent = totalFat.toFixed(1);
+                document.getElementById('totalSugar').textContent = totalSugar.toFixed(1);
+                document.getElementById('totalSodium').textContent = totalSodium.toFixed(0);
+
+                // แสดง/ซ่อนปุ่ม clear
+                if (trackingData.length > 0) {
+                    clearBtn.style.display = 'block';
+                } else {
+                    clearBtn.style.display = 'none';
+                }
+
+                // แสดงรายการ
+                if (trackingData.length === 0) {
+                    trackingList.innerHTML = '<p class="empty-tracking">ยังไม่มีประวัติการทานอาหารวันนี้</p>';
+                    return;
+                }
+
+                trackingList.innerHTML = '';
+                // เรียงจากใหม่ไปเก่า
+                trackingData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                trackingData.forEach((food, index) => {
+                    const time = new Date(food.timestamp);
+                    const timeStr = `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`;
+                    
+                    const item = document.createElement('div');
+                    item.className = 'tracking-item';
+                    item.innerHTML = `
+                        <div class="tracking-item-info">
+                            <div class="tracking-item-name">${food.foodName}</div>
+                            <div class="tracking-item-time">${timeStr}</div>
+                        </div>
+                        <div class="tracking-item-nutrition">
+                            <span class="nutrition-badge">${food.kcal.toFixed(0)} kcal</span>
+                            <span class="nutrition-badge">${food.fat.toFixed(1)}g ไขมัน</span>
+                        </div>
+                    `;
+                    trackingList.appendChild(item);
+                });
+            }
+
+            function setupClearTracking() {
+                const clearBtn = document.getElementById('clearTrackingBtn');
+                clearBtn.addEventListener('click', function() {
+                    const username = localStorage.getItem('currentUser');
+                    if (!username) return;
+
+                    if (confirm('คุณต้องการลบประวัติการทานอาหารวันนี้ทั้งหมดหรือไม่?')) {
+                        fetch(`http://localhost:8080/api/tracking/today/${username}`, {
+                            method: 'DELETE'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                loadTrackingData();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error clearing tracking:', error);
+                            alert('เกิดข้อผิดพลาดในการลบประวัติ');
+                        });
+                    }
+                });
+            }
+
+            // ไม่ต้อง update localStorage แล้ว เพราะจะคำนวณจากตะกร้าใหม่ทุกครั้ง
         });
     </script>
 </body>
+
 </html>

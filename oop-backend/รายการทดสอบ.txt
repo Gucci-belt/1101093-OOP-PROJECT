@@ -19,7 +19,7 @@
      - ตรวจสอบว่ามี error หรือไม่
 
    □ รัน Spring Boot ได้หรือไม่
-     - รัน: mvn spring-boot:run
+     - รัน: ./mvnw spring-boot:run
      - ตรวจสอบว่า server ขึ้นที่ port 8080
      - ดู log ว่ามี error หรือไม่
 

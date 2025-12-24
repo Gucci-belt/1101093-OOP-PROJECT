@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Backend Service (Spring Boot)
+  backend:
+    build:
+      context: ./oop-backend
+      dockerfile: Dockerfile
+    container_name: oop-backend
+    ports:
+      - "8080:8080"
+    volumes:
+      # Mount users.txt เพื่อให้ข้อมูล user ยังอยู่แม้ container restart
+      # ใช้ path ที่ถูกต้องตามที่ backend อ่าน (src/main/resources/users.txt)
+      - ./oop-backend/src/main/resources/users.txt:/app/src/main/resources/users.txt
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    restart: unless-stopped
+    networks:
+      - oop-network
+
+  # Frontend Service (Nginx)
+  frontend:
+    build:
+      context: ./oop-frontend
+      dockerfile: Dockerfile
+    container_name: oop-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - oop-network
+
+networks:
+  oop-network:
+    driver: bridge
+

@@ -1,0 +1,82 @@
+สรุป OOP Concepts ในโปรเจค
+==========================
+
+1. INHERITANCE (การสืบทอด) - 2 อัน ✓
+------------------------------------
+
+1.1 Admin extends User
+   - Admin สืบทอดจาก User
+   - ได้ fields และ methods จาก User อัตโนมัติ
+   - Location: models/Admin.java
+   - Code: public class Admin extends User
+
+1.2 Member extends User
+   - Member สืบทอดจาก User
+   - ได้ fields และ methods จาก User อัตโนมัติ
+   - Location: models/Member.java
+   - Code: public class Member extends User
+
+2. POLYMORPHISM (พหุรูป) - 2 อัน ✓
+-----------------------------------
+
+2.1 UserRepository ใช้ List<User> เก็บทั้ง Member และ Admin
+   - List<User> userDatabase สามารถเก็บทั้ง Member และ Admin ได้
+   - เพราะ Member และ Admin สืบทอดจาก User
+   - Location: repositories/UserRepository.java
+   - Code: 
+     private final List<User> userDatabase;
+     userDatabase.add(new Admin(username, password));
+     userDatabase.add(new Member(username, password));
+
+2.2 AuthService รับและคืนค่า User (แต่จริงๆ อาจเป็น Member หรือ Admin)
+   - Method login() และ register() รับและคืนค่า User
+   - แต่จริงๆ อาจเป็น Member หรือ Admin
+   - Location: services/AuthService.java
+   - Code:
+     public User login(String username, String password)
+     public boolean register(String username, String password)
+     User newUser = new Member(username, password);
+
+3. COMPOSITION/AGGREGATION (การประกอบ) - 2 อัน ✓
+------------------------------------------------
+
+3.1 CartItem มี Food (Composition)
+   - CartItem มี Food object เป็นส่วนหนึ่ง
+   - ถ้า CartItem ถูกลบ Food ก็หายไปด้วย (composition)
+   - Location: models/CartItem.java
+   - Code:
+     private final Food food;
+     public CartItem(String username, Food food)
+
+3.2 CartRepository มี List<CartItem> (Aggregation)
+   - CartRepository มี List<CartItem>
+   - CartItem สามารถมีอยู่ได้โดยไม่ต้องมี CartRepository (aggregation)
+   - Location: repositories/CartRepository.java
+   - Code:
+     private final List<CartItem> cartDatabase;
+     cartDatabase.add(cartItem);
+
+รายละเอียดเพิ่มเติม:
+-------------------
+
+INHERITANCE:
+- User เป็น base class
+- Admin และ Member สืบทอดจาก User
+- ใช้คำสั่ง "extends User"
+- ใช้ super() เพื่อเรียก constructor ของ parent class
+
+POLYMORPHISM:
+- ใช้ List<User> เพื่อเก็บทั้ง Member และ Admin
+- Method ที่รับ User สามารถรับ Member หรือ Admin ได้
+- Runtime polymorphism: เรียก method ตาม object จริง
+
+COMPOSITION:
+- CartItem มี Food (strong relationship)
+- Food เป็นส่วนหนึ่งของ CartItem
+- ถ้า CartItem ถูกลบ Food ก็หายไปด้วย
+
+AGGREGATION:
+- CartRepository มี List<CartItem> (weak relationship)
+- CartItem สามารถมีอยู่ได้โดยไม่ต้องมี CartRepository
+- CartItem เป็น independent object
+

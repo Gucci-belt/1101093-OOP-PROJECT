@@ -9,7 +9,7 @@ import java.util.List;
 // Service สำหรับจัดการข้อมูลอาหาร
 @Service
 public class FoodService {
-    
+
     // ต้องใช้ FoodRepository เพื่อดึงข้อมูลอาหาร
     private final FoodRepository foodRepository;
 
@@ -32,4 +32,3 @@ public class FoodService {
         return foodRepository.findByName(name);
     }
 }
-

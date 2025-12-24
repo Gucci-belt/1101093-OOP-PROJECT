@@ -1,0 +1,303 @@
+📐 แผนการออกแบบหน้าแรก (Home Page) - หลัง Login
+
+═══════════════════════════════════════════════════════════════
+
+🎯 เป้าหมายการออกแบบ:
+1. แยกแต่ละฟีเจอร์ให้ชัดเจนด้วย Card Design
+2. สร้าง Visual Hierarchy ที่ดี (ลำดับความสำคัญ)
+3. ใช้สีและ Animation เพื่อดึงดูดความสนใจ
+4. ทำให้ใช้งานง่ายและสวยงาม
+
+═══════════════════════════════════════════════════════════════
+
+📱 โครงสร้างหน้าแรก (จากบนลงล่าง)
+
+═══════════════════════════════════════════════════════════════
+
+【1. Header Section】
+   - ชื่อ: "หน้าหลัก" + Profile Icon
+   - สไตล์: Gradient สีเขียว (เหมือนเดิม)
+   - เพิ่ม: Welcome message แบบย่อ (ถ้าต้องการ)
+
+【2. Quick Actions Section (ใหม่!)】
+   ┌─────────────────────────────────────┐
+   │  ⚡ ฟีเจอร์พิเศษ                      │
+   │  ┌─────────┐ ┌─────────┐          │
+   │  │ 🎰 สุ่ม  │ │ ⚔️ Battle│          │
+   │  │  เมนู   │ │  เปรียบ  │          │
+   │  └─────────┘ └─────────┘          │
+   └─────────────────────────────────────┘
+   
+   - แสดงเป็น 2 Cards ข้างๆ กัน
+   - Card แรก: Gacha Menu (สุ่มเมนู)
+   - Card ที่สอง: Food Battle (เปรียบเทียบ)
+   - Design: Rounded corners, Shadow, Hover effect
+   - สี: Gacha = สีแดง/ส้ม, Battle = สีม่วง/น้ำเงิน
+
+【3. Mood-based Dining Section】
+   ┌─────────────────────────────────────┐
+   │  🎭 วันนี้คุณรู้สึกยังไง?            │
+   │  ┌────┐ ┌────┐ ┌────┐ ┌────┐       │
+   │  │😰  │ │😴  │ │💪  │ │💧  │       │
+   │  │เครียด│ │เหนื่อย│ │ผอม│ │บวมน้ำ│       │
+   │  └────┘ └────┘ └────┘ └────┘       │
+   │  ┌────┐                             │
+   │  │✨  │                             │
+   │  │ทั้งหมด│                            │
+   │  └────┘                             │
+   └─────────────────────────────────────┘
+   
+   - Card พื้นหลังสีอ่อน (Gradient)
+   - ปุ่มอารมณ์: แสดงเป็น Grid 2x3 (2 แถว 3 คอลัมน์)
+   - ปุ่ม "ทั้งหมด" อยู่แถวล่างสุด กว้างเต็ม
+   - Active state: สีเขียว + Shadow
+
+【4. Search Bar Section】
+   ┌─────────────────────────────────────┐
+   │  🔍 [___________________] [🔎]      │
+   └─────────────────────────────────────┘
+   
+   - อยู่กลางหน้า
+   - Rounded, Shadow
+   - Icon ด้านใน input
+
+【5. Food List Section】
+   ┌─────────────────────────────────────┐
+   │  📋 รายการอาหาร                       │
+   │  ┌─────────────────────────────┐    │
+   │  │ [รูป] ชื่ออาหาร              │    │
+   │  │      Kcal: XXX              │    │
+   │  │                    [+]      │    │
+   │  └─────────────────────────────┘    │
+   │  ... (รายการอื่นๆ)                   │
+   └─────────────────────────────────────┘
+   
+   - Card สำหรับแต่ละเมนู
+   - แสดงรูปภาพ (ถ้ามี)
+   - แสดงข้อมูลโภชนาการย่อ
+   - ปุ่ม + ด้านขวา
+
+【6. Footer】
+   - Navigation: 🏠 📊 🛒
+   - เหมือนเดิม
+
+═══════════════════════════════════════════════════════════════
+
+🎨 Design System
+
+═══════════════════════════════════════════════════════════════
+
+【สีหลัก】
+- Primary Green: #4CAF50 (ปุ่มหลัก, Active state)
+- Secondary Colors:
+  * Gacha: #FF6B6B (แดง/ส้ม)
+  * Battle: #667EEA (ม่วง/น้ำเงิน)
+  * Mood: #E8F5E9 (เขียวอ่อน)
+- Background: #F4FCF3 (เขียวมิ้นท์อ่อน)
+- Text: #333 (เข้ม), #777 (อ่อน)
+
+【Card Design】
+- Background: White
+- Border Radius: 15px
+- Shadow: 0 4px 15px rgba(0,0,0,0.1)
+- Padding: 20px
+- Margin: 15px 0
+
+【Typography】
+- Header: 1.6rem, Weight 600
+- Section Title: 1.3rem, Weight 600
+- Body: 1rem, Weight 400
+- Button: 1rem, Weight 600
+
+【Spacing】
+- Section Gap: 20px
+- Card Gap: 15px
+- Padding: 20-24px
+
+═══════════════════════════════════════════════════════════════
+
+✨ Animation & Interactions
+
+═══════════════════════════════════════════════════════════════
+
+1. Card Hover:
+   - Transform: translateY(-3px)
+   - Shadow: เพิ่มขึ้น
+   - Transition: 0.3s ease
+
+2. Button Click:
+   - Scale: 0.95
+   - Ripple effect (optional)
+
+3. Gacha Animation:
+   - Icon หมุน (มีอยู่แล้ว)
+   - เพิ่ม Particle effect (optional)
+
+4. Mood Button Active:
+   - Scale: 1.05
+   - Background: Gradient
+   - Border: สีเขียว
+
+5. Food Item:
+   - Hover: Shadow เพิ่ม
+   - Click: Scale เล็กน้อย
+
+═══════════════════════════════════════════════════════════════
+
+📐 Layout Structure (HTML)
+
+═══════════════════════════════════════════════════════════════
+
+<div class="content">
+  
+  <!-- Quick Actions (2 Cards) -->
+  <div class="quick-actions-section">
+    <div class="action-card gacha-card">
+      <div class="action-icon">🎰</div>
+      <h4>สุ่มเมนู</h4>
+      <p>เสี่ยงดวง!</p>
+    </div>
+    <div class="action-card battle-card">
+      <div class="action-icon">⚔️</div>
+      <h4>Food Battle</h4>
+      <p>เปรียบเทียบ</p>
+    </div>
+  </div>
+
+  <!-- Mood Section -->
+  <div class="mood-card">
+    <h3 class="card-title">🎭 วันนี้คุณรู้สึกยังไง?</h3>
+    <div class="mood-grid">
+      <!-- ปุ่มอารมณ์ -->
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-card">
+    <!-- Search input -->
+  </div>
+
+  <!-- Food List -->
+  <div class="food-list-section">
+    <h3 class="section-title">📋 รายการอาหาร</h3>
+    <div id="menu-container">
+      <!-- รายการอาหาร -->
+    </div>
+  </div>
+
+</div>
+
+═══════════════════════════════════════════════════════════════
+
+🎯 Visual Hierarchy (ลำดับความสำคัญ)
+
+═══════════════════════════════════════════════════════════════
+
+1. 【Priority 1 - ฟีเจอร์พิเศษ】
+   - Quick Actions (Gacha + Battle)
+   - ขนาด: ใหญ่, สีสัน, โดดเด่น
+   - ตำแหน่ง: ด้านบนสุด (หลัง Header)
+
+2. 【Priority 2 - Mood-based Dining】
+   - Card สีอ่อน, ปุ่มชัดเจน
+   - ตำแหน่ง: กลางหน้า
+
+3. 【Priority 3 - Search】
+   - เรียบง่าย, ใช้งานง่าย
+   - ตำแหน่ง: หลัง Mood Section
+
+4. 【Priority 4 - Food List】
+   - รายการหลัก, แสดงมากที่สุด
+   - ตำแหน่ง: ด้านล่าง, Scroll ได้
+
+═══════════════════════════════════════════════════════════════
+
+💡 Features Enhancement
+
+═══════════════════════════════════════════════════════════════
+
+【Quick Actions Cards】
+- เพิ่ม Icon ขนาดใหญ่
+- เพิ่ม Description สั้นๆ
+- Click เพื่อเปิด Modal หรือ Navigate
+- Hover: Scale up + Shadow
+
+【Mood Section】
+- Grid Layout: 2x3 (2 แถว 3 คอลัมน์)
+- ปุ่ม "ทั้งหมด" กว้างเต็ม
+- Active state: สีเขียว + Icon ใหญ่ขึ้น
+- Animation: Smooth transition
+
+【Search Bar】
+- Icon ด้านใน input
+- Placeholder: "ค้นหาอาหาร..."
+- Real-time search (filter ทันที)
+
+【Food List】
+- Card Design สำหรับแต่ละเมนู
+- รูปภาพ: Rounded corners
+- Badge: แสดง Kcal (ถ้าต้องการ)
+- Hover: Shadow + Scale
+
+═══════════════════════════════════════════════════════════════
+
+📱 Responsive Design
+
+═══════════════════════════════════════════════════════════════
+
+- Quick Actions: 2 Cards ข้างๆ กัน (flex)
+- Mood Buttons: Grid 2x3 (responsive)
+- Food List: 1 คอลัมน์ (mobile-first)
+- Spacing: ปรับตามหน้าจอ
+
+═══════════════════════════════════════════════════════════════
+
+✅ สรุป
+
+═══════════════════════════════════════════════════════════════
+
+การออกแบบใหม่จะ:
+✓ แยกแต่ละฟีเจอร์ด้วย Card Design
+✓ สร้าง Visual Hierarchy ที่ชัดเจน
+✓ ใช้สีและ Animation ดึงดูดความสนใจ
+✓ ใช้งานง่ายและสวยงาม
+✓ Responsive และ Modern
+
+═══════════════════════════════════════════════════════════════
+
+🚀 ขั้นตอนการ Implement
+
+═══════════════════════════════════════════════════════════════
+
+1. สร้าง Quick Actions Section (2 Cards)
+2. ปรับ Mood Section เป็น Card Design
+3. ปรับ Search Bar เป็น Card
+4. ปรับ Food List เป็น Card Design
+5. เพิ่ม CSS สำหรับ Cards, Animations
+6. ทดสอบและปรับแต่ง
+
+═══════════════════════════════════════════════════════════════
+
+🎨 ตัวอย่างสีที่แนะนำ
+
+═══════════════════════════════════════════════════════════════
+
+Gacha Card:
+- Background: linear-gradient(135deg, #FF6B6B 0%, #EE5A6F 100%)
+- Text: White
+- Icon: 🎰 (ขนาดใหญ่)
+
+Battle Card:
+- Background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%)
+- Text: White
+- Icon: ⚔️ (ขนาดใหญ่)
+
+Mood Card:
+- Background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)
+- Border: 2px solid #4CAF50
+- Text: #2E7D32
+
+═══════════════════════════════════════════════════════════════
+
+✨ พร้อมเริ่ม Implement แล้ว!
+

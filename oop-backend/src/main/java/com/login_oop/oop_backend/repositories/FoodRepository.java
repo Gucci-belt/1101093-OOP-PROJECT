@@ -39,13 +39,11 @@ public class FoodRepository {
         foodDatabase.add(new Food("ข้าวผัดหมู", 550, 20, 5, 750));
         foodDatabase.add(new Food("ก๋วยเตี๋ยวเรือ", 420, 12, 8, 1200));
         foodDatabase.add(new Food("ข้าวซอยไก่", 560, 30, 9, 800));
-        foodDatabase.add(new Food("หมูปิ้ง (3 ไม้)", 300, 18, 10, 500));
-        foodDatabase.add(new Food("ข้าวเหนียว (1 ห่อ)", 150, 1, 0, 10));
         foodDatabase.add(new Food("โจ๊กหมู", 250, 8, 2, 600));
         foodDatabase.add(new Food("ปลากะพงทอดน้ำปลา", 480, 30, 7, 900));
         foodDatabase.add(new Food("แกงจืดเต้าหู้หมูสับ", 220, 10, 3, 550));
         foodDatabase.add(new Food("ยำวุ้นเส้น", 180, 5, 8, 750));
-        foodDatabase.add(new Food("น้ำเปล่า", 0, 0, 0, 5));
+        
     }
 
     /**

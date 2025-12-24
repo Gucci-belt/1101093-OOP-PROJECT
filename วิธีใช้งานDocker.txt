@@ -1,0 +1,188 @@
+🐳 วิธีใช้งาน Docker สำหรับโปรเจค OOP
+
+═══════════════════════════════════════════════════════════════
+
+📋 สิ่งที่ต้องมีก่อนเริ่มต้น:
+   1. Docker Desktop (สำหรับ Windows/Mac) หรือ Docker Engine (สำหรับ Linux)
+   2. VPS หรือ Server ที่มี Docker ติดตั้งแล้ว
+
+═══════════════════════════════════════════════════════════════
+
+🚀 วิธีรันโปรเจคด้วย Docker (แบบง่ายๆ)
+
+═══════════════════════════════════════════════════════════════
+
+【วิธีที่ 1: ใช้ docker-compose (แนะนำ - ง่ายที่สุด)】
+
+1. เปิด Terminal/Command Prompt
+2. เข้าไปที่โฟลเดอร์โปรเจค:
+   cd E:\1101093-OOP-Project
+
+3. รันคำสั่งเดียวนี้:
+   docker-compose up -d
+
+   คำอธิบาย:
+   - docker-compose up = รันทั้ง backend และ frontend พร้อมกัน
+   - -d = รันในโหมด background (ไม่ต้องเปิด terminal ค้างไว้)
+
+4. รอสักครู่ (ครั้งแรกจะใช้เวลานานเพราะต้อง download images)
+
+5. เปิดเบราว์เซอร์ไปที่:
+   http://localhost
+
+   หรือถ้าอยู่บน VPS:
+   http://[IP-Address-ของ-VPS]
+
+═══════════════════════════════════════════════════════════════
+
+【วิธีที่ 2: รันแยกทีละตัว (ถ้าต้องการควบคุมเอง)】
+
+【Backend】
+1. cd oop-backend
+2. docker build -t oop-backend .
+3. docker run -d -p 8080:8080 --name oop-backend oop-backend
+
+【Frontend】
+1. cd oop-frontend
+2. docker build -t oop-frontend .
+3. docker run -d -p 80:80 --name oop-frontend oop-frontend
+
+═══════════════════════════════════════════════════════════════
+
+📝 คำสั่ง Docker ที่ควรรู้
+
+═══════════════════════════════════════════════════════════════
+
+【ดูสถานะ Container】
+docker ps                    # ดู container ที่กำลังรัน
+docker ps -a                 # ดู container ทั้งหมด (รวมที่หยุดแล้ว)
+
+【หยุด/เริ่ม Container】
+docker-compose stop          # หยุดทั้ง backend และ frontend
+docker-compose start         # เริ่มใหม่
+docker-compose restart       # รีสตาร์ท
+
+【ดู Logs (ดูข้อความที่ container พิมพ์ออกมา)】
+docker-compose logs          # ดู logs ทั้งหมด
+docker-compose logs backend  # ดู logs เฉพาะ backend
+docker-compose logs frontend # ดู logs เฉพาะ frontend
+docker-compose logs -f       # ดู logs แบบ real-time (กด Ctrl+C เพื่อออก)
+
+【ลบ Container】
+docker-compose down          # หยุดและลบ container ทั้งหมด
+docker-compose down -v       # ลบ container + volumes (ข้อมูลจะหาย!)
+
+【Build ใหม่ (หลังจากแก้ไขโค้ด)】
+docker-compose build         # build ใหม่
+docker-compose up -d --build # build และรันใหม่
+
+═══════════════════════════════════════════════════════════════
+
+🌐 การใช้งานบน VPS
+
+═══════════════════════════════════════════════════════════════
+
+【ขั้นตอนที่ 1: อัปโหลดไฟล์ไป VPS】
+
+วิธีที่ 1: ใช้ Git (แนะนำ)
+1. Push โปรเจคขึ้น GitHub/GitLab
+2. บน VPS: git clone [URL-ของ-repo]
+3. cd [ชื่อ-โฟลเดอร์]
+
+วิธีที่ 2: ใช้ SCP หรือ FTP
+- อัปโหลดทั้งโฟลเดอร์ oop-backend และ oop-frontend
+- อัปโหลด docker-compose.yml
+
+【ขั้นตอนที่ 2: ติดตั้ง Docker บน VPS】
+
+สำหรับ Ubuntu/Debian:
+sudo apt update
+sudo apt install docker.io docker-compose -y
+sudo systemctl start docker
+sudo systemctl enable docker
+
+【ขั้นตอนที่ 3: รันโปรเจค】
+cd [โฟลเดอร์-โปรเจค]
+docker-compose up -d
+
+【ขั้นตอนที่ 4: เปิด Firewall Port】
+
+ถ้าใช้ UFW (Ubuntu):
+sudo ufw allow 80/tcp    # สำหรับ frontend
+sudo ufw allow 8080/tcp  # สำหรับ backend (ถ้าต้องการเข้าถึงโดยตรง)
+
+【ขั้นตอนที่ 5: เข้าถึงเว็บไซต์】
+เปิดเบราว์เซอร์ไปที่: http://[IP-Address-ของ-VPS]
+
+═══════════════════════════════════════════════════════════════
+
+⚠️ ข้อควรระวัง
+
+═══════════════════════════════════════════════════════════════
+
+1. ข้อมูล users.txt จะถูกเก็บไว้ในโฟลเดอร์ oop-backend/src/main/resources/
+   - ถ้า container หยุดแล้วเริ่มใหม่ ข้อมูลจะยังอยู่
+   - แต่ถ้าใช้ docker-compose down -v ข้อมูลจะหาย!
+
+2. ถ้าแก้ไขโค้ด ต้อง build ใหม่:
+   docker-compose up -d --build
+
+3. ถ้าแก้ไข frontend (HTML/CSS/JS) บางครั้งต้อง clear cache:
+   - กด Ctrl+Shift+R (hard refresh) ในเบราว์เซอร์
+   - หรือ rebuild container: docker-compose up -d --build
+
+4. Port ที่ใช้:
+   - Frontend: Port 80 (http://localhost)
+   - Backend: Port 8080 (http://localhost:8080)
+   - ถ้า port ถูกใช้งานอยู่ ต้องเปลี่ยนใน docker-compose.yml
+
+═══════════════════════════════════════════════════════════════
+
+🔧 แก้ไขปัญหาเบื้องต้น
+
+═══════════════════════════════════════════════════════════════
+
+【ปัญหา: Port ถูกใช้งานอยู่】
+แก้ไข: เปลี่ยน port ใน docker-compose.yml
+  ports:
+    - "3000:8080"  # เปลี่ยนจาก 8080 เป็น 3000
+
+【ปัญหา: Container ไม่ทำงาน】
+1. ดู logs: docker-compose logs
+2. ตรวจสอบว่า Docker รันอยู่: docker ps
+3. ลอง build ใหม่: docker-compose up -d --build
+
+【ปัญหา: ข้อมูล user หาย】
+- ตรวจสอบว่า volume mount ถูกต้องใน docker-compose.yml
+- ตรวจสอบว่าไฟล์ users.txt อยู่ใน oop-backend/src/main/resources/
+
+【ปัญหา: Frontend เรียก Backend ไม่ได้】
+- ตรวจสอบว่า nginx.conf ถูกคัดลอกไปใน Dockerfile
+- ตรวจสอบ logs: docker-compose logs frontend
+
+═══════════════════════════════════════════════════════════════
+
+💡 คำแนะนำเพิ่มเติม
+
+═══════════════════════════════════════════════════════════════
+
+1. ใช้ Docker Compose เพราะจัดการง่ายกว่า
+2. ใช้ docker-compose logs -f เพื่อดู logs แบบ real-time ตอน debug
+3. เก็บ backup ไฟล์ users.txt ไว้เสมอ
+4. ถ้าใช้ VPS จริง ควรตั้งค่า domain name และ SSL (HTTPS)
+
+═══════════════════════════════════════════════════════════════
+
+✅ ตรวจสอบว่าทำงานถูกต้อง
+
+═══════════════════════════════════════════════════════════════
+
+1. docker ps ควรเห็น container 2 ตัว (backend และ frontend)
+2. เปิดเบราว์เซอร์ไปที่ http://localhost ควรเห็นหน้า login
+3. ลอง login ด้วย admin/admin หรือ member/123
+4. ตรวจสอบ logs: docker-compose logs -f
+
+═══════════════════════════════════════════════════════════════
+
+🎉 เสร็จแล้ว! ตอนนี้โปรเจคของคุณพร้อมใช้งานบน Docker แล้ว!
+

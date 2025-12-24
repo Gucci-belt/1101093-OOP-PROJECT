@@ -1,0 +1,81 @@
+วิธีสร้าง UML Diagram จากไฟล์ PlantUML
+======================================
+
+ไฟล์ที่สร้าง: UML_Diagram.puml
+
+วิธีแปลงเป็นภาพ:
+----------------
+
+1. ใช้ PlantUML Online (แนะนำ)
+   - ไปที่: http://www.plantuml.com/plantuml/uml/
+   - Copy เนื้อหาจากไฟล์ UML_Diagram.puml
+   - Paste ลงในเว็บไซต์
+   - กด "Submit" หรือ "Generate"
+   - จะได้ภาพ UML Diagram
+
+2. ใช้ VS Code Extension
+   - ติดตั้ง extension "PlantUML"
+   - เปิดไฟล์ UML_Diagram.puml
+   - กด Alt+D หรือคลิกขวา → "Preview PlantUML"
+   - จะแสดงภาพ UML Diagram
+
+3. ใช้ IntelliJ IDEA
+   - ติดตั้ง plugin "PlantUML integration"
+   - เปิดไฟล์ UML_Diagram.puml
+   - กด Ctrl+Alt+U หรือคลิกขวา → "PlantUML Preview"
+   - จะแสดงภาพ UML Diagram
+
+4. ใช้ Command Line
+   - ติดตั้ง PlantUML: http://plantuml.com/download
+   - รันคำสั่ง:
+     java -jar plantuml.jar UML_Diagram.puml
+   - จะได้ไฟล์ UML_Diagram.png
+
+5. ใช้ Online Tools อื่นๆ
+   - https://www.planttext.com/
+   - https://kroki.io/
+   - Copy code จาก UML_Diagram.puml แล้ว paste
+
+รายละเอียดใน UML Diagram:
+------------------------
+
+1. INHERITANCE (การสืบทอด)
+   - Admin extends User (ลูกศร solid)
+   - Member extends User (ลูกศร solid)
+
+2. POLYMORPHISM (พหุรูป)
+   - UserRepository ใช้ List<User> เก็บทั้ง Member และ Admin
+   - AuthService รับและคืนค่า User (แต่จริงๆ อาจเป็น Member หรือ Admin)
+   - มี note อธิบายไว้ใน diagram
+
+3. COMPOSITION (การประกอบ - strong)
+   - CartItem *-- Food (ลูกศร solid + diamond)
+
+4. AGGREGATION (การรวม - weak)
+   - CartRepository o-- CartItem (ลูกศร solid + empty diamond)
+
+5. ASSOCIATION (ความสัมพันธ์)
+   - Controllers --> Services
+   - Services --> Repositories
+   - Controllers --> DTOs
+
+6. DEPENDENCY (การพึ่งพา)
+   - CartResponse ..> CartItem (ลูกศร dashed)
+   - OopBackendApplication ..> Controllers (ลูกศร dashed)
+
+สีที่ใช้:
+--------
+- Controllers: สีฟ้าอ่อน (#E1F5FF)
+- Services: สีส้มอ่อน (#FFF4E1)
+- Repositories: สีเขียวอ่อน (#E8F5E9)
+- Models: สีม่วงอ่อน (#F3E5F5)
+- DTOs: สีส้ม (#FFE0B2)
+
+หมายเหตุ:
+--------
+- ลูกศร solid (---) = Inheritance, Composition, Aggregation, Association
+- ลูกศร dashed (..>) = Dependency
+- *-- = Composition (strong relationship)
+- o-- = Aggregation (weak relationship)
+- <|-- = Inheritance (ลูก class extends parent class)
+

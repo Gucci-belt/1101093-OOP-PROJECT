@@ -46,4 +46,3 @@ public class FoodController {
         return Map.of("error", "ไม่พบอาหารที่ชื่อ: " + name);
     }
 }
-

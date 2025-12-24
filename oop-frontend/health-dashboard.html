@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="mobile-screen">
+        
+        <header class="header">
+            <span class="header-title">แดชบอร์ดสุขภาพ</span>
+            <a href="profile.html" class="profile-icon"></a>
+        </header>
+        
+        <div class="content">
+            <!-- Health Streak -->
+            <div class="dashboard-card streak-card">
+                <div class="card-header">
+                    <h3>🔥 Health Streak</h3>
+                    <span class="streak-badge" id="streakDays">0 วัน</span>
+                </div>
+                <p class="streak-desc">คุณบันทึกข้อมูลต่อเนื่อง <strong id="streakCount">0</strong> วันแล้ว!</p>
+                <div class="streak-progress">
+                    <div class="streak-bar" id="streakBar"></div>
+                </div>
+            </div>
+
+            <!-- Daily Calorie Tracker -->
+            <div class="dashboard-card calorie-card">
+                <div class="card-header">
+                    <h3>📊 แคลอรี่วันนี้</h3>
+                </div>
+                <div class="calorie-display">
+                    <div class="calorie-circle">
+                        <span class="calorie-current" id="calorieCurrent">0</span>
+                        <span class="calorie-total">/ <span id="calorieTarget">0</span> kcal</span>
+                    </div>
+                </div>
+                <div class="calorie-progress-bar">
+                    <div class="calorie-progress" id="calorieProgress"></div>
+                </div>
+                <p class="calorie-status" id="calorieStatus">เริ่มบันทึกอาหารของคุณ!</p>
+            </div>
+
+            <!-- Smart Food Recommendations -->
+            <div class="dashboard-card recommendation-card">
+                <div class="card-header">
+                    <h3>🍽️ อาหารแนะนำสำหรับคุณ</h3>
+                </div>
+                <div id="recommendedFoods" class="recommended-foods">
+                    <p style="text-align: center; color: #777;">กำลังโหลด...</p>
+                </div>
+            </div>
+
+
+        </div>
+        
+        <footer class="footer-nav">
+            <a href="home.html" class="footer-icon">🏠</a>
+            <a href="health-dashboard.html" class="footer-icon" style="background: var(--primary-green); color: white;">📊</a>
+            <a href="cart.html" class="footer-icon">🛒</a>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = localStorage.getItem('currentUser');
+            if (!username) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Initialize all features
+            loadHealthStreak();
+            loadDailyCalories();
+            loadFoodRecommendations();
+
+            // 1. Health Streak
+            function loadHealthStreak() {
+                const lastUpdate = localStorage.getItem(`lastUpdate_${username}`);
+                const streakCount = parseInt(localStorage.getItem(`streak_${username}`) || '0');
+                
+                if (lastUpdate) {
+                    const lastDate = new Date(lastUpdate);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    lastDate.setHours(0, 0, 0, 0);
+                    
+                    const daysDiff = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
+                    
+                    if (daysDiff === 0) {
+                        // Same day, keep streak
+                        updateStreakDisplay(streakCount);
+                    } else if (daysDiff === 1) {
+                        // Consecutive day, increase streak
+                        const newStreak = streakCount + 1;
+                        localStorage.setItem(`streak_${username}`, newStreak);
+                        localStorage.setItem(`lastUpdate_${username}`, new Date().toISOString());
+                        updateStreakDisplay(newStreak);
+                    } else {
+                        // Streak broken, reset
+                        localStorage.setItem(`streak_${username}`, '1');
+                        localStorage.setItem(`lastUpdate_${username}`, new Date().toISOString());
+                        updateStreakDisplay(1);
+                    }
+                } else {
+                    // First time
+                    localStorage.setItem(`streak_${username}`, '1');
+                    localStorage.setItem(`lastUpdate_${username}`, new Date().toISOString());
+                    updateStreakDisplay(1);
+                }
+            }
+
+            function updateStreakDisplay(streak) {
+                document.getElementById('streakCount').textContent = streak;
+                document.getElementById('streakDays').textContent = streak + ' วัน';
+                
+                // Progress bar (max 30 days)
+                const progress = Math.min((streak / 30) * 100, 100);
+                document.getElementById('streakBar').style.width = progress + '%';
+            }
+
+            // 2. Daily Calorie Tracker
+            function loadDailyCalories() {
+                // Get target calories from BMI
+                fetch(`http://localhost:8080/api/bmi/${username}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let target = 2000;
+                        if (data.status === 'success') {
+                            target = data.calories;
+                        }
+                        document.getElementById('calorieTarget').textContent = target;
+                        
+                        // Get today's calories from cart API (คำนวณใหม่ทุกครั้งจากตะกร้าปัจจุบัน)
+                        fetch(`http://localhost:8080/api/cart/${username}`)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Failed to fetch cart');
+                                }
+                                return response.json();
+                            })
+                            .then(cart => {
+                                let consumed = 0;
+                                
+                                // คำนวณแคลอรี่จากตะกร้าปัจจุบันทั้งหมด (ไม่ใช้ localStorage)
+                                if (Array.isArray(cart) && cart.length > 0) {
+                                    consumed = cart.reduce((total, item) => {
+                                        const kcal = parseFloat(item.kcal) || 0;
+                                        return total + kcal;
+                                    }, 0);
+                                }
+                                
+                                // อัปเดต localStorage เพื่อเก็บข้อมูล (แต่ไม่ใช้ในการคำนวณ)
+                                const today = new Date().toDateString();
+                                const todayKey = `calories_${username}_${today}`;
+                                localStorage.setItem(todayKey, consumed.toString());
+                                
+                                updateCalorieDisplay(consumed, target);
+                            })
+                            .catch(error => {
+                                console.error('Error fetching cart:', error);
+                                // ถ้า API ไม่ทำงาน ให้ใช้ 0
+                                updateCalorieDisplay(0, target);
+                            });
+                    })
+                    .catch(() => {
+                        document.getElementById('calorieTarget').textContent = '2000';
+                        updateCalorieDisplay(0, 2000);
+                    });
+            }
+            
+            // Refresh calories when page becomes visible
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    loadDailyCalories();
+                }
+            });
+            
+            // Listen for storage events (when cart is updated)
+            window.addEventListener('storage', function(e) {
+                if (e.key && e.key.startsWith('cart_updated_')) {
+                    loadDailyCalories();
+                }
+            });
+            
+            // Listen for custom cart update event
+            window.addEventListener('cartUpdated', function() {
+                loadDailyCalories();
+            });
+            
+            // Refresh calories every 3 seconds
+            setInterval(loadDailyCalories, 3000);
+            
+            // Also refresh when page is focused
+            window.addEventListener('focus', loadDailyCalories);
+
+            function updateCalorieDisplay(consumed, target) {
+                document.getElementById('calorieCurrent').textContent = Math.round(consumed);
+                const percentage = Math.min((consumed / target) * 100, 100);
+                document.getElementById('calorieProgress').style.width = percentage + '%';
+                
+                let status = '';
+                if (consumed === 0) {
+                    status = 'เริ่มบันทึกอาหารของคุณ!';
+                } else if (consumed < target * 0.7) {
+                    status = 'ยังกินได้อีกเยอะเลย! 💪';
+                } else if (consumed < target * 0.9) {
+                    status = 'เกือบถึงเป้าหมายแล้ว! 🎯';
+                } else if (consumed <= target) {
+                    status = 'เยี่ยมเลย! ถึงเป้าหมายแล้ว! ✨';
+                } else {
+                    status = 'เกินเป้าหมายแล้ว ระวังนะ! ⚠️';
+                }
+                document.getElementById('calorieStatus').textContent = status;
+            }
+
+            // 3. Smart Food Recommendations
+            function loadFoodRecommendations() {
+                fetch(`http://localhost:8080/api/bmi/${username}`)
+                    .then(response => response.json())
+                    .then(bmiData => {
+                        if (bmiData.status === 'success') {
+                            const bmi = bmiData.bmi;
+                            const category = bmiData.category;
+                            
+                            fetch('http://localhost:8080/api/foods')
+                                .then(response => response.json())
+                                .then(foods => {
+                                    const recommendations = getRecommendedFoods(foods, bmi, category);
+                                    displayRecommendations(recommendations);
+                                });
+                        } else {
+                            document.getElementById('recommendedFoods').innerHTML = 
+                                '<p style="text-align: center; color: #777;">กรุณาคำนวณ BMI ก่อน</p>';
+                        }
+                    })
+                    .catch(() => {
+                        document.getElementById('recommendedFoods').innerHTML = 
+                            '<p style="text-align: center; color: #777;">ไม่สามารถโหลดข้อมูลได้</p>';
+                    });
+            }
+
+            function getRecommendedFoods(foods, bmi, category) {
+                let recommendations = [];
+                
+                if (bmi < 18.5) {
+                    // ผอมเกินไป - แนะนำอาหารแคลอรี่สูง
+                    recommendations = foods
+                        .filter(f => f.kcal > 500)
+                        .sort((a, b) => b.kcal - a.kcal)
+                        .slice(0, 3);
+                } else if (bmi > 25) {
+                    // อ้วน - แนะนำอาหารแคลอรี่ต่ำ
+                    recommendations = foods
+                        .filter(f => f.kcal < 400 && f.fat < 20)
+                        .sort((a, b) => a.kcal - b.kcal)
+                        .slice(0, 3);
+                } else {
+                    // ปกติ - แนะนำอาหารสมดุล
+                    recommendations = foods
+                        .filter(f => f.kcal >= 300 && f.kcal <= 600)
+                        .sort(() => Math.random() - 0.5)
+                        .slice(0, 3);
+                }
+                
+                return recommendations;
+            }
+
+            function displayRecommendations(foods) {
+                const container = document.getElementById('recommendedFoods');
+                if (foods.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #777;">ไม่พบอาหารที่แนะนำ</p>';
+                    return;
+                }
+                
+                container.innerHTML = foods.map(food => `
+                    <div class="recommended-item">
+                        <div class="recommended-item-info">
+                            <strong>${food.name}</strong>
+                            <span>${food.kcal} kcal</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+        });
+    </script>
+</body>
+</html>
+

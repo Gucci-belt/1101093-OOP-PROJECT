@@ -153,6 +153,10 @@
                     .then(data => {
                         if (data.status === 'success') {
                             resultBox.innerHTML = `<strong>ค่า BMI:</strong> ${data.bmi}<br><small>(ควรกิน ${data.calories} แคลอรี่)</small>`;
+                            // Track achievement
+                            localStorage.setItem(`bmi_calculated_${username}`, 'true');
+                            // Update streak
+                            localStorage.setItem(`lastUpdate_${username}`, new Date().toISOString());
                         } else {
                             resultBox.innerHTML = "เกิดข้อผิดพลาด: " + (data.message || 'ไม่สามารถคำนวณได้');
                         }

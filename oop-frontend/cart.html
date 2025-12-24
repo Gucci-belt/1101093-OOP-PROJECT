@@ -19,8 +19,10 @@
             <a href="summary.html" class="btn" style="margin-top: 30px;" id="summaryBtn">รวม</a>
         </div>
         
-        <footer class="footer-nav" style="justify-content: flex-start;">
-            <a href="home.html" class="footer-icon">⬅️</a>
+        <footer class="footer-nav">
+            <a href="home.html" class="footer-icon">🏠</a>
+            <a href="health-dashboard.html" class="footer-icon">📊</a>
+            <a href="cart.html" class="footer-icon">🛒</a>
         </footer>
 
     </div>
@@ -62,8 +64,13 @@
                                 const menuItemDiv = document.createElement('div');
                                 menuItemDiv.className = 'menu-item';
                                 
+                                // กำหนด path รูปภาพ (ถ้ามีรูปให้ใช้รูป ถ้าไม่มีใช้ placeholder)
+                                const imagePath = `images/${item.name.toLowerCase().replace(/\s+/g, '-')}.jpg`;
+                                
                                 menuItemDiv.innerHTML = `
-                                    <div class="item-image-placeholder"></div>
+                                    <img src="${imagePath}" alt="${item.name}" class="item-image" 
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="item-image-placeholder" style="display: none;"></div>
                                     <div class="item-text">
                                         <strong>${item.name}</strong>
                                         <span>พลังงาน: ${item.kcal} kcal, ไขมัน: ${item.fat}g</span>
@@ -118,6 +125,11 @@
                 .then(data => {
                     if (data.status === 'success') {
                         loadCart(); // โหลดตะกร้าใหม่เพื่ออัปเดตหน้า
+                        // Trigger cart update event
+                        const updateEvent = new Event('cartUpdated');
+                        window.dispatchEvent(updateEvent);
+                        // Also update localStorage to trigger storage event
+                        localStorage.setItem(`cart_updated_${username}_${Date.now()}`, 'true');
                     } else {
                         alert('เกิดข้อผิดพลาด: ' + (data.message || 'ไม่สามารถลบรายการได้'));
                     }

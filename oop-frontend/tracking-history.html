@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ประวัติการทานอาหาร</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="mobile-screen">
+        <header class="header">
+            <a href="home.html" class="back-btn"><i class="fas fa-arrow-left"></i> <span>ย้อนกลับ</span></a>
+            <span class="header-title">ประวัติการทานอาหาร</span>
+            <span style="width: 80px;"></span>
+        </header>
+
+        <div class="content">
+            <!-- Date Filter -->
+            <div class="filter-card">
+                <h3 class="filter-title">📅 เลือกวันที่</h3>
+                <div class="date-filter">
+                    <input type="date" id="startDate" class="date-input">
+                    <span class="date-separator">ถึง</span>
+                    <input type="date" id="endDate" class="date-input">
+                    <button class="filter-btn" id="filterBtn">ค้นหา</button>
+                </div>
+                <button class="show-all-btn" id="showAllBtn">แสดงทั้งหมด</button>
+            </div>
+
+            <!-- Summary -->
+            <div class="history-summary-card" id="summaryCard" style="display: none;">
+                <h3 class="summary-title">📊 สรุป</h3>
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">แคลอรี่</span>
+                        <span class="stat-value" id="totalKcal">0</span>
+                        <span class="stat-unit">kcal</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">ไขมัน</span>
+                        <span class="stat-value" id="totalFat">0</span>
+                        <span class="stat-unit">g</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">น้ำตาล</span>
+                        <span class="stat-value" id="totalSugar">0</span>
+                        <span class="stat-unit">g</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">โซเดียม</span>
+                        <span class="stat-value" id="totalSodium">0</span>
+                        <span class="stat-unit">mg</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History List -->
+            <div class="history-container" id="historyContainer">
+                <p style="text-align: center; color: #777; padding: 20px;">กำลังโหลดประวัติ...</p>
+            </div>
+        </div>
+
+        <footer class="footer-nav">
+            <a href="home.html" class="footer-icon">🏠</a>
+            <a href="health-dashboard.html" class="footer-icon">📊</a>
+            <a href="cart.html" class="footer-icon">🛒</a>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = localStorage.getItem('currentUser');
+            if (!username) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const historyContainer = document.getElementById('historyContainer');
+            const filterBtn = document.getElementById('filterBtn');
+            const showAllBtn = document.getElementById('showAllBtn');
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+
+            // ตั้งค่าวันที่เริ่มต้นเป็นวันนี้
+            const today = new Date().toISOString().split('T')[0];
+            startDateInput.value = today;
+            endDateInput.value = today;
+
+            // โหลดประวัติทั้งหมด
+            loadAllHistory();
+
+            // Event listeners
+            filterBtn.addEventListener('click', function() {
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+                
+                if (!startDate || !endDate) {
+                    alert('กรุณาเลือกวันที่ทั้งสองวัน');
+                    return;
+                }
+                
+                if (startDate > endDate) {
+                    alert('วันที่เริ่มต้นต้องมาก่อนวันที่สิ้นสุด');
+                    return;
+                }
+                
+                loadHistoryByRange(startDate, endDate);
+            });
+
+            showAllBtn.addEventListener('click', function() {
+                loadAllHistory();
+                startDateInput.value = today;
+                endDateInput.value = today;
+            });
+
+            function loadAllHistory() {
+                historyContainer.innerHTML = '<p style="text-align: center; color: #777; padding: 20px;">กำลังโหลดประวัติ...</p>';
+                
+                fetch(`http://localhost:8080/api/tracking/all/${username}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        displayHistory(data);
+                    })
+                    .catch(error => {
+                        console.error('Error loading history:', error);
+                        historyContainer.innerHTML = '<p style="text-align: center; color: red; padding: 20px;">ไม่สามารถโหลดประวัติได้</p>';
+                    });
+            }
+
+            function loadHistoryByRange(startDate, endDate) {
+                historyContainer.innerHTML = '<p style="text-align: center; color: #777; padding: 20px;">กำลังโหลดประวัติ...</p>';
+                
+                fetch(`http://localhost:8080/api/tracking/range/${username}?startDate=${startDate}&endDate=${endDate}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        displayHistory(data);
+                    })
+                    .catch(error => {
+                        console.error('Error loading history:', error);
+                        historyContainer.innerHTML = '<p style="text-align: center; color: red; padding: 20px;">ไม่สามารถโหลดประวัติได้</p>';
+                    });
+            }
+
+            function displayHistory(historyData) {
+                if (historyData.length === 0) {
+                    historyContainer.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">ไม่มีประวัติการทานอาหาร</p>';
+                    document.getElementById('summaryCard').style.display = 'none';
+                    return;
+                }
+
+                // คำนวณสรุป
+                let totalKcal = 0;
+                let totalFat = 0;
+                let totalSugar = 0;
+                let totalSodium = 0;
+
+                historyData.forEach(item => {
+                    totalKcal += item.kcal || 0;
+                    totalFat += item.fat || 0;
+                    totalSugar += item.sugar || 0;
+                    totalSodium += item.sodium || 0;
+                });
+
+                // แสดงสรุป
+                document.getElementById('totalKcal').textContent = totalKcal.toFixed(0);
+                document.getElementById('totalFat').textContent = totalFat.toFixed(1);
+                document.getElementById('totalSugar').textContent = totalSugar.toFixed(1);
+                document.getElementById('totalSodium').textContent = totalSodium.toFixed(0);
+                document.getElementById('summaryCard').style.display = 'block';
+
+                // จัดกลุ่มตามวันที่
+                const groupedByDate = {};
+                historyData.forEach(item => {
+                    const dateKey = item.dateKey;
+                    if (!groupedByDate[dateKey]) {
+                        groupedByDate[dateKey] = [];
+                    }
+                    groupedByDate[dateKey].push(item);
+                });
+
+                // เรียงวันที่จากใหม่ไปเก่า
+                const sortedDates = Object.keys(groupedByDate).sort().reverse();
+
+                // แสดงผล
+                historyContainer.innerHTML = '';
+                
+                sortedDates.forEach(dateKey => {
+                    const dateItems = groupedByDate[dateKey];
+                    
+                    // เรียงเวลาในวันเดียวกันจากใหม่ไปเก่า
+                    dateItems.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    
+                    // แปลงวันที่
+                    const date = new Date(dateKey + 'T00:00:00');
+                    const dateStr = date.toLocaleDateString('th-TH', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        weekday: 'long'
+                    });
+
+                    // คำนวณรวมในวันนั้น
+                    let dayKcal = 0;
+                    let dayFat = 0;
+                    let daySugar = 0;
+                    let daySodium = 0;
+                    dateItems.forEach(item => {
+                        dayKcal += item.kcal || 0;
+                        dayFat += item.fat || 0;
+                        daySugar += item.sugar || 0;
+                        daySodium += item.sodium || 0;
+                    });
+
+                    const dateSection = document.createElement('div');
+                    dateSection.className = 'history-date-section';
+                    dateSection.innerHTML = `
+                        <div class="history-date-header">
+                            <h4 class="history-date-title">${dateStr}</h4>
+                            <div class="history-date-summary">
+                                <span class="date-summary-item">${dayKcal.toFixed(0)} kcal</span>
+                                <span class="date-summary-item">${dateItems.length} รายการ</span>
+                            </div>
+                        </div>
+                        <div class="history-items">
+                            ${dateItems.map(item => {
+                                const time = new Date(item.timestamp);
+                                const timeStr = `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`;
+                                return `
+                                    <div class="history-item">
+                                        <div class="history-item-time">${timeStr}</div>
+                                        <div class="history-item-info">
+                                            <div class="history-item-name">${item.foodName}</div>
+                                            <div class="history-item-nutrition">
+                                                <span>${item.kcal.toFixed(0)} kcal</span>
+                                                <span>${item.fat.toFixed(1)}g ไขมัน</span>
+                                                <span>${item.sugar.toFixed(1)}g น้ำตาล</span>
+                                                <span>${item.sodium.toFixed(0)}mg โซเดียม</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                    historyContainer.appendChild(dateSection);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+

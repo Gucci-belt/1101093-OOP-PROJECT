@@ -105,10 +105,15 @@
                             height: newHeight
                         })
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         if (data.status === 'success') {
-                            // อัปเดตหน้าจอ
+                            // อัปเดตหน้าจอทันทีหลังจากได้ข้อมูล
                             updateProfileDisplay({
                                 weight: newWeight,
                                 height: newHeight,
@@ -117,14 +122,58 @@
                                 category: data.category,
                                 categoryRange: data.categoryRange
                             });
+                            
+                            // รีโหลดข้อมูลจาก API เพื่อให้แน่ใจว่าข้อมูลถูกต้อง
+                            setTimeout(() => {
+                                loadProfileData();
+                            }, 100);
+                            
                             alert('บันทึกข้อมูลใหม่แล้ว!');
+                            // Update streak
+                            localStorage.setItem(`lastUpdate_${username}`, new Date().toISOString());
                         } else {
                             alert('เกิดข้อผิดพลาด: ' + (data.message || 'ไม่สามารถคำนวณได้'));
                         }
                     })
                     .catch(error => {
                         console.error('Error calculating BMI:', error);
-                        alert('เกิดข้อผิดพลาด: ไม่สามารถเชื่อมต่อกับ server ได้');
+                        let errorMessage = 'ไม่สามารถเชื่อมต่อกับ server ได้';
+                        if (error.message) {
+                            errorMessage = error.message;
+                        }
+                        alert('เกิดข้อผิดพลาด: ' + errorMessage + '\n\nกรุณาตรวจสอบว่า Backend Server กำลังรันอยู่ที่ http://localhost:8080');
+                        
+                        // แสดงข้อมูลในช่องสีเหลี่ยมแบบชั่วคราวจากการคำนวณฝั่ง client
+                        const calculatedBmi = (newWeight / ((newHeight / 100) ** 2)).toFixed(1);
+                        const calories = Math.round(newWeight * 24);
+                        let category = '';
+                        let categoryRange = '';
+                        
+                        if (calculatedBmi < 18.5) {
+                            category = 'น้ำหนักน้อย';
+                            categoryRange = 'น้อยกว่า 18.5';
+                        } else if (calculatedBmi < 23.0) {
+                            category = 'ปกติ';
+                            categoryRange = '18.5 - 22.9';
+                        } else if (calculatedBmi < 25.0) {
+                            category = 'น้ำหนักเกิน';
+                            categoryRange = '23.0 - 24.9';
+                        } else if (calculatedBmi < 30.0) {
+                            category = 'อ้วน';
+                            categoryRange = '25.0 - 29.9';
+                        } else {
+                            category = 'อ้วนมาก';
+                            categoryRange = '30.0 ขึ้นไป';
+                        }
+                        
+                        updateProfileDisplay({
+                            weight: newWeight,
+                            height: newHeight,
+                            bmi: calculatedBmi,
+                            calories: calories,
+                            category: category,
+                            categoryRange: categoryRange
+                        });
                     });
                 } else {
                     alert('กรุณากรอกข้อมูลให้ถูกต้อง');
@@ -134,9 +183,19 @@
             // 5. ฟังก์ชันโหลดข้อมูลน้ำหนักและส่วนสูง
             function loadUserData() {
                 fetch(`http://localhost:8080/api/bmi/data/${username}`)
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            // ถ้า response ไม่ ok แต่ไม่ใช่ 404 อาจจะเป็น server error
+                            if (response.status !== 404) {
+                                throw new Error('Server error: ' + response.status);
+                            }
+                            // ถ้า 404 แสดงว่าไม่มีข้อมูล ไม่ต้องทำอะไร
+                            return null;
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        if (data.status === 'success') {
+                        if (data && data.status === 'success') {
                             // แสดงข้อมูลใน input fields
                             editWeight.value = data.weight;
                             editHeight.value = data.height;
@@ -147,7 +206,7 @@
                     })
                     .catch(error => {
                         console.error('Error loading user data:', error);
-                        // ไม่แสดง error ถ้ายังไม่มีข้อมูล
+                        // ไม่แสดง error ถ้ายังไม่มีข้อมูล (อาจเป็นครั้งแรกที่ใช้)
                     });
             }
 
@@ -158,12 +217,19 @@
                 
                 // เรียก API เพื่อดึงข้อมูล BMI
                 fetch(`http://localhost:8080/api/bmi/${username}`)
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         if (data.status === 'success') {
+                            // ใช้ข้อมูลจาก API โดยตรง
+                            const weight = parseFloat(data.weight) || parseFloat(editWeight.value) || 0;
+                            const height = parseFloat(data.height) || parseFloat(editHeight.value) || 0;
+                            
                             // อัปเดตส่วนแสดงผล
-                            const weight = parseFloat(editWeight.value) || 0;
-                            const height = parseFloat(editHeight.value) || 0;
                             updateProfileDisplay({
                                 weight: weight,
                                 height: height,
@@ -172,17 +238,46 @@
                                 category: data.category,
                                 categoryRange: data.categoryRange
                             });
+                            
+                            // อัปเดต input fields
+                            if (weight > 0) {
+                                editWeight.value = weight;
+                            }
+                            if (height > 0) {
+                                editHeight.value = height;
+                            }
                         } else {
-                            // กรณีไม่เคยกรอกข้อมูล
-                            document.getElementById('profile-bmi-box').innerHTML = 
-                                'ไม่พบข้อมูล BMI <br> <small>กรุณากลับไปหน้า "ข้อมูลผู้ใช้" เพื่อคำนวณ</small>';
+                            // กรณีไม่เคยกรอกข้อมูล - ยังคงแสดงโครงสร้างช่องสีเหลี่ยม
+                            const bmiBox = document.getElementById('profile-bmi-box');
+                            bmiBox.innerHTML = `
+                                <strong>น้ำหนัก:</strong> <span id="profile-weight">--</span> kg
+                                <br>
+                                <strong>ส่วนสูง:</strong> <span id="profile-height">--</span> cm
+                                <br><br>
+                                <strong>ค่า BMI:</strong> <span id="profile-bmi">--.-</span>
+                                <br>
+                                <small>(ควรกิน <span id="profile-calories">----</span> แคลอรี่)</small>
+                                <br><br>
+                                <small style="color: #ff6b6b;">ไม่พบข้อมูล BMI - กรุณาคำนวณใหม่</small>
+                            `;
                             bmiTableBody.innerHTML = '<tr><td>-</td><td>-</td></tr>';
                         }
                     })
                     .catch(error => {
                         console.error('Error loading BMI:', error);
-                        document.getElementById('profile-bmi-box').innerHTML = 
-                            'ไม่พบข้อมูล BMI <br> <small>กรุณากลับไปหน้า "ข้อมูลผู้ใช้" เพื่อคำนวณ</small>';
+                        // แสดงโครงสร้างช่องสีเหลี่ยมแม้มี error
+                        const bmiBox = document.getElementById('profile-bmi-box');
+                        bmiBox.innerHTML = `
+                            <strong>น้ำหนัก:</strong> <span id="profile-weight">--</span> kg
+                            <br>
+                            <strong>ส่วนสูง:</strong> <span id="profile-height">--</span> cm
+                            <br><br>
+                            <strong>ค่า BMI:</strong> <span id="profile-bmi">--.-</span>
+                            <br>
+                            <small>(ควรกิน <span id="profile-calories">----</span> แคลอรี่)</small>
+                            <br><br>
+                            <small style="color: #ff6b6b;">ไม่พบข้อมูล BMI - กรุณาคำนวณใหม่</small>
+                        `;
                         bmiTableBody.innerHTML = '<tr><td>-</td><td>-</td></tr>';
                     });
             }
@@ -192,17 +287,45 @@
                 // แสดงน้ำหนักและส่วนสูง
                 if (data.weight) {
                     profileWeight.textContent = data.weight;
+                    editWeight.value = data.weight; // อัปเดต input field ด้วย
                 }
                 if (data.height) {
                     profileHeight.textContent = data.height;
+                    editHeight.value = data.height; // อัปเดต input field ด้วย
                 }
                 
                 // แสดง BMI และแคลอรี่
-                profileBmi.textContent = data.bmi;
-                profileCalories.textContent = data.calories;
+                if (data.bmi) {
+                    profileBmi.textContent = data.bmi;
+                }
+                if (data.calories) {
+                    profileCalories.textContent = data.calories;
+                }
                 
                 // อัปเดตตาราง (ใช้ข้อมูลจาก API)
-                bmiTableBody.innerHTML = `<tr><td>${data.category}</td><td>${data.categoryRange}</td></tr>`;
+                if (data.category && data.categoryRange) {
+                    bmiTableBody.innerHTML = `<tr><td>${data.category}</td><td>${data.categoryRange}</td></tr>`;
+                }
+                
+                // ตรวจสอบว่า bmi-result-box แสดงข้อมูลอยู่หรือไม่
+                const bmiBox = document.getElementById('profile-bmi-box');
+                if (bmiBox && data.bmi) {
+                    // กำหนด HTML ให้ช่องสีเหลี่ยมใหม่เพื่อให้แน่ใจว่าข้อมูลแสดงทุกครั้ง
+                    bmiBox.innerHTML = `
+                        <strong>น้ำหนัก:</strong> <span id="profile-weight">${data.weight || '--'}</span> kg
+                        <br>
+                        <strong>ส่วนสูง:</strong> <span id="profile-height">${data.height || '--'}</span> cm
+                        <br><br>
+                        <strong>ค่า BMI:</strong> <span id="profile-bmi">${data.bmi || '--.-'}</span>
+                        <br>
+                        <small>(ควรกิน <span id="profile-calories">${data.calories || '----'}</span> แคลอรี่)</small>
+                    `;
+                    // อัปเดต reference ใหม่
+                    profileWeight.textContent = data.weight || '--';
+                    profileHeight.textContent = data.height || '--';
+                    profileBmi.textContent = data.bmi || '--.-';
+                    profileCalories.textContent = data.calories || '----';
+                }
             }
 
             // 8. ล้างข้อมูลเมื่อออกจากระบบ

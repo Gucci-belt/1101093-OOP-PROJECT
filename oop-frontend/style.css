@@ -1,83 +1,293 @@
 /* --- 1. Import Font (ใหม่) --- */
 @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap');
 
-/* --- 2. ปรับตัวแปรสี (ใหม่) --- */
+/* --- 2. Green Theme Dark Mode Design System --- */
 :root {
-    --bg-light-green: #f4fcf3;      /* เขียวมิ้นท์อ่อนๆ (เกือบขาว) */
-    --header-dark-green: #3d7a3b;   /* เขียวเข้ม (เหมือนเดิม) */
-    --primary-green: #4CAF50;      /* เขียวสดใส (สำหรับปุ่ม) */
-    --btn-bg: #ffffff;             /* สีพื้นหลังปุ่ม/การ์ด (ขาว) */
+    /* Dark Mode Colors */
+    --dark-bg: #0a0e0a;
+    --dark-surface: #121612;
+    --dark-card: #1a1f1a;
+    --dark-card-hover: #1f251f;
+    
+    /* Neon Green Accents */
+    --neon-green: #00ff41;
+    --neon-green-bright: #39ff14;
+    --neon-green-soft: #00ff88;
+    --neon-green-dark: #00cc33;
+    --neon-green-glow: rgba(0, 255, 65, 0.4);
+    --neon-green-glow-strong: rgba(57, 255, 20, 0.6);
+    
+    /* Text Colors */
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --text-tertiary: rgba(255, 255, 255, 0.5);
+    
+    /* Glassmorphism */
+    --glass-bg: rgba(26, 31, 26, 0.4);
+    --glass-border: rgba(0, 255, 65, 0.2);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    
+    /* Gradients */
+    --gradient-neon: linear-gradient(135deg, #00ff41 0%, #39ff14 50%, #00ff88 100%);
+    --gradient-dark: linear-gradient(135deg, #0a0e0a 0%, #121612 100%);
+    --gradient-card: linear-gradient(135deg, rgba(0, 255, 65, 0.1) 0%, rgba(57, 255, 20, 0.05) 100%);
+    
+    /* Shadows */
+    --shadow-neon: 0 0 20px var(--neon-green-glow), 0 0 40px var(--neon-green-glow);
+    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    
+    /* Light Theme (for other pages) */
+    --bg-light-green: #f4fcf3;
+    --header-dark-green: #3d7a3b;
+    --primary-green: #4CAF50;
+    --primary-green-hover: #45a049;
+    --btn-bg: #ffffff;
     --text-dark: #333;
     --text-light: #777;
-    --border-light: #e0e0e0;       /* สีขอบจางๆ */
+    --border-light: #e0e0e0;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 15px rgba(0,0,0,0.1);
+    --shadow-lg: 0 8px 25px rgba(0,0,0,0.15);
+    --gradient-green: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    --gradient-header: linear-gradient(135deg, #3d7a3b 0%, #2d5a2b 100%);
 }
 
-/* --- 3. ตั้งค่า body (ใหม่) --- */
+/* --- 3. Body Settings --- */
 body {
-    font-family: 'Kanit', sans-serif; /* <-- ใช้ฟอนต์ใหม่ */
-    background-color: #f0f4f0;      /* สีพื้นหลังด้านนอกจอ (เทาอ่อน) */
+    font-family: 'Kanit', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    padding: 20px 0;
+    align-items: center;
+    padding: 20px;
     min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
 }
 
+
+/* Animated Background Particles */
+.particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(76, 175, 80, 0.3);
+    border-radius: 50%;
+    animation: particleFloat 15s infinite ease-in-out;
+}
+
+.particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+.particle:nth-child(2) { left: 20%; animation-delay: 2s; }
+.particle:nth-child(3) { left: 30%; animation-delay: 4s; }
+.particle:nth-child(4) { left: 40%; animation-delay: 1s; }
+.particle:nth-child(5) { left: 50%; animation-delay: 3s; }
+.particle:nth-child(6) { left: 60%; animation-delay: 5s; }
+.particle:nth-child(7) { left: 70%; animation-delay: 2.5s; }
+.particle:nth-child(8) { left: 80%; animation-delay: 4.5s; }
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(100vh) translateX(0) scale(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) translateX(100px) scale(1);
+        opacity: 0;
+    }
+}
+
+/* Floating Icons */
+.floating-icons {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.floating-icon {
+    position: absolute;
+    font-size: 2rem;
+    opacity: 0.1;
+    animation: floatIcon 20s infinite ease-in-out;
+}
+
+.floating-icon:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
+.floating-icon:nth-child(2) { left: 80%; top: 30%; animation-delay: 3s; }
+.floating-icon:nth-child(3) { left: 20%; top: 60%; animation-delay: 6s; }
+.floating-icon:nth-child(4) { left: 70%; top: 70%; animation-delay: 2s; }
+.floating-icon:nth-child(5) { left: 50%; top: 10%; animation-delay: 4s; }
+.floating-icon:nth-child(6) { left: 30%; top: 80%; animation-delay: 5s; }
+
+@keyframes floatIcon {
+    0%, 100% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-30px) translateX(20px) rotate(90deg);
+    }
+    50% {
+        transform: translateY(-60px) translateX(-20px) rotate(180deg);
+    }
+    75% {
+        transform: translateY(-30px) translateX(20px) rotate(270deg);
+    }
+}
+
+
 .mobile-screen {
-    width: 375px;
-    height: 667px; /* ความสูงมาตรฐานของ iPhone (แทน min-height) */
-    max-height: 90vh; /* ไม่ให้สูงเกิน 90% ของหน้าจอ */
-    background-color: var(--bg-light-green); /* <-- พื้นหลังแอป (เขียวมิ้นท์อ่อน) */
-    border: 10px solid #222;
-    border-radius: 40px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    width: 393px;
+    height: 852px;
+    max-width: 95vw;
+    max-height: 95vh;
+    background-color: var(--bg-light-green);
+    border: 12px solid #1a1a1a;
+    border-radius: 50px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4), 
+                0 0 0 1px rgba(255,255,255,0.1) inset;
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    z-index: 10;
+}
+
+
+/* Notch สำหรับ iPhone (optional) */
+.mobile-screen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 30px;
+    background: #1a1a1a;
+    border-radius: 0 0 20px 20px;
+    z-index: 1000;
 }
 
 .content {
-    padding: 20px;
+    padding: 24px;
     flex-grow: 1;
     overflow-y: auto;
-    max-height: calc(100% - 140px); /* ลบความสูงของ header และ footer */
+    max-height: calc(100% - 160px);
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+    z-index: 1;
 }
 
-/* --- Header (เหมือนเดิม) --- */
+
+/* --- Header (ปรับปรุง) --- */
 .header {
-    background-color: var(--header-dark-green);
+    background: var(--gradient-header);
     color: white;
-    padding: 20px;
+    padding: 24px 20px 20px 20px; /* เพิ่ม padding ด้านบนสำหรับ notch */
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    z-index: 100;
 }
 .header-title {
-    font-size: 1.5rem;
-    font-weight: 500; /* ปรับความหนา */
+    font-size: 1.6rem; /* เพิ่มขนาดฟอนต์เล็กน้อย */
+    font-weight: 600; /* หนาขึ้น */
+    letter-spacing: 0.5px; /* เพิ่มระยะห่างตัวอักษร */
 }
 .profile-icon {
     width: 40px;
     height: 40px;
     background-color: white;
     border-radius: 50%;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+    color: var(--primary-green);
+    font-size: 1.2rem;
+}
+.profile-icon:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+.profile-icon::before {
+    content: "👤";
+}
+
+/* Back Button */
+.back-btn {
+    color: white;
+    text-decoration: none;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.back-btn:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: translateX(-2px);
+}
+
+.back-btn i {
+    font-size: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.back-btn:hover i {
+    transform: translateX(-2px);
 }
 
 /* --- 4. Footer (ปรับปรุง) --- */
 .footer-nav {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around; /* กระจายให้เท่ากัน */
     align-items: center;
-    padding: 15px 20px;
+    padding: 18px 20px; /* เพิ่ม padding เล็กน้อย */
     border-top: 1px solid var(--border-light); /* ขอบจางๆ */
-    background-color: var(--bg-light-green);
+    background-color: white; /* เปลี่ยนเป็นสีขาว */
     margin-top: auto;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05); /* เพิ่มเงา */
+    position: relative;
+    z-index: 100;
 }
 .footer-icon {
-    width: 45px;
-    height: 45px;
+    width: 50px; /* เพิ่มขนาดเล็กน้อย */
+    height: 50px;
     border-radius: 50%;
     background-color: var(--btn-bg); /* สีขาว */
     color: var(--primary-green); /* ไอคอนสีเขียว */
@@ -86,8 +296,13 @@ body {
     justify-content: center;
     align-items: center;
     text-decoration: none;
-    font-size: 1.5rem;
+    font-size: 1.6rem; /* เพิ่มขนาดไอคอน */
     font-weight: bold;
+    transition: all 0.3s ease; /* เพิ่ม transition */
+}
+.footer-icon:hover {
+    transform: translateY(-3px); /* เลื่อนขึ้นเมื่อ hover */
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
 }
 
 /* --- 5. Forms (ปรับปรุง) --- */
@@ -95,35 +310,303 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
-    padding: 40px 10px;
+    gap: 24px;
+    padding: 40px 24px;
+    position: relative;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08),
+                0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(76, 175, 80, 0.1);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
-.welcome-title {
-    font-size: 1.9rem; /* ใหญ่ขึ้นเล็กน้อย */
-    font-weight: 700; /* หนาขึ้น */
-    color: var(--header-dark-green); /* สีเขียวเข้ม */
+
+.form-container > * {
+    position: relative;
+    z-index: 1;
+}
+
+.login-header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 32px;
+    width: 100%;
 }
+
+.app-logo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.25);
+}
+
+.app-logo i {
+    font-size: 2.5rem;
+    color: #ffffff;
+}
+
+/* Register Page Styles - แตกต่างจาก Login */
+.register-container {
+    background: linear-gradient(135deg, #f8fff9 0%, #ffffff 100%);
+    border: 2px solid rgba(76, 175, 80, 0.15);
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 32px;
+    width: 100%;
+}
+
+.register-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, #66BB6A 0%, #81C784 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(102, 187, 106, 0.3);
+}
+
+.register-icon i {
+    font-size: 2rem;
+    color: #ffffff;
+}
+
+.register-title {
+    font-size: 1.65rem;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+    color: #2c3e50;
+}
+
+.register-subtitle {
+    font-size: 0.875rem;
+    color: #6c757d;
+    text-align: center;
+    margin: 0;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.welcome-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 12px 0;
+    line-height: 1.4;
+    color: #2c3e50;
+}
+
+.welcome-title .highlight {
+    background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+}
+
+.welcome-subtitle {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-align: center;
+    margin: 0;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
 .form-group {
     width: 100%;
-}
-.form-group label {
-    display: block;
     margin-bottom: 5px;
-    color: var(--text-dark);
-    font-weight: 500;
 }
-.form-group input[type="text"],
-.form-group input[type="password"] {
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.label-icon {
+    color: var(--primary-green);
+    font-size: 0.9rem;
+    transition: transform 0.3s ease;
+}
+
+.form-group:focus-within .label-icon {
+    transform: scale(1.2) rotate(10deg);
+}
+
+.label-text {
+    transition: color 0.3s ease;
+}
+
+.form-group:focus-within .label-text {
+    color: var(--primary-green);
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 16px;
+    color: #999;
+    font-size: 1rem;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.form-input {
     width: 100%;
-    padding: 15px;
-    border: 1px solid var(--border-light); /* ขอบจางๆ */
-    border-radius: 10px;
-    background-color: #ffffff; /* พื้นขาว */
+    padding: 15px 50px 15px 45px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background-color: #ffffff;
     box-sizing: border-box;
     font-size: 1rem;
     font-family: 'Kanit', sans-serif;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    padding-left: 50px;
+}
+
+.form-input:focus + .password-toggle + .input-line,
+.form-input:focus ~ .input-line {
+    width: 100%;
+}
+
+.input-wrapper:focus-within .input-icon {
+    color: var(--primary-green);
+    transform: scale(1.1);
+}
+
+.input-line {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-green), #66BB6A);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    z-index: 3;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 16px;
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 1rem;
+    cursor: pointer;
+    z-index: 2;
+    padding: 5px;
+    transition: all 0.3s ease;
+}
+
+.password-toggle:hover {
+    color: var(--primary-green);
+    transform: scale(1.1);
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"] {
+    width: 100%;
+    padding: 15px 15px 15px 45px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    font-size: 1rem;
+    font-family: 'Kanit', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="password"]:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    background-color: #fafafa;
+}
+
+.form-group input::placeholder {
+    color: #bbb;
+}
+
+.error-message {
+    color: #d32f2f;
+    text-align: center;
+    margin-top: 12px;
+    font-size: 0.875rem;
+    display: none;
+    padding: 12px 16px;
+    background: #ffebee;
+    border-radius: 12px;
+    border: 1px solid #ffcdd2;
+    box-shadow: 0 2px 4px rgba(211, 47, 47, 0.1);
+}
+
+.error-message:not(:empty) {
+    display: block;
+}
+
+/* Success Animation */
+.success-animation {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.success-animation.show {
+    opacity: 1;
+}
+
+.success-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #4CAF50, #66BB6A);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+    box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+    position: relative;
+    z-index: 2;
 }
 
 /* --- 6. Buttons (ปรับปรุง) --- */
@@ -132,41 +615,220 @@ body {
     width: 90%;
     padding: 15px;
     margin: 10px auto;
-    background-color: var(--primary-green); /* สีเขียวหลัก */
-    
-    /* 🌟 (แก้ไข 1/2) เปลี่ยนจาก 'border: none;' เป็น 'border: 1px solid transparent;' (ขอบใส) */
+    background: var(--gradient-green);
     border: 1px solid transparent; 
-    
     border-radius: 25px;
     font-size: 1.1rem;
-    font-weight: 500;
-    color: #ffffff; /* ตัวหนังสือสีขาว */
+    font-weight: 600;
+    color: #ffffff;
     text-align: center;
     text-decoration: none;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* เงาจางๆ */
-    transition: transform 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
-    
-    box-sizing: border-box; 
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
 }
+
+.btn-primary {
+    background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+    color: white;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #45a049 0%, #5cb660 100%);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(76, 175, 80, 0.25);
+}
+
+.btn-login {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-login.loading .btn-text {
+    opacity: 0;
+}
+
+.btn-login.loading .btn-loader {
+    display: block;
+}
+
+.btn-loader {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.btn-register {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+    color: #66BB6A;
+    border: 2px solid transparent;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.25);
+}
+
+.btn-register:hover {
+    background: linear-gradient(135deg, #45a049 0%, #5cb660 100%);
+    color: #81C784;
+    border-color: transparent;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.35);
+}
+
+.btn-register i {
+    transition: transform 0.2s ease;
+    color: #66BB6A;
+}
+
+.btn-register:hover i {
+    transform: translateX(3px);
+    color: #81C784;
+}
+
+.btn-register-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.btn-register-submit i {
+    font-size: 1.1rem;
+}
+
+.register-footer {
+    text-align: center;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.register-footer p {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin: 0;
+}
+
+.register-footer a {
+    color: #4CAF50;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.register-footer a:hover {
+    color: #45a049;
+    text-decoration: underline;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
 .btn:hover {
-    transform: translateY(-2px); /* เอฟเฟกต์ตอนชี้ */
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, var(--primary-green-hover) 0%, var(--primary-green) 100%);
+}
+
+.btn:active {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
 }
 
 /* ปุ่มรอง (เช่น "ลงทะเบียน" ในหน้า Login) */
 .btn-secondary-link {
-    background-color: var(--btn-bg); /* พื้นขาว */
-    color: var(--primary-green); /* ตัวหนังสือเขียว */
-    
-    /* 🌟 (แก้ไข 2/2) เปลี่ยนจาก 'border:' เป็น 'border-color:' (เปลี่ยนแค่สีขอบ) */
-    border-color: var(--primary-green); 
-    
+    background: transparent;
+    color: #4CAF50;
+    border: 2px solid #4CAF50;
     box-shadow: none;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(76, 175, 80, 0.1), transparent);
+    transition: left 0.4s ease;
+}
+
+.btn-secondary-link:hover::before {
+    left: 100%;
+}
+
+.btn-secondary-link:hover {
+    background: rgba(76, 175, 80, 0.1);
+    color: #45a049;
+    border-color: #45a049;
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+}
+
+.btn-secondary-link:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(76, 175, 80, 0.15);
+}
+
+.btn-secondary-link i {
+    transition: transform 0.2s ease;
+    color: #4CAF50;
+}
+
+.btn-secondary-link:hover i {
+    transform: translateX(2px);
+    color: #45a049;
 }
 .btn-secondary {
     background-color: #d0d0d0;
     width: 50%;
     box-shadow: none;
+    font-weight: 600;
 }
 .btn-nutrient {
     background-color: #f0f0f0;
@@ -185,17 +847,29 @@ body {
     color: var(--header-dark-green);
 }
 .bmi-result-box {
-    background-color: var(--btn-bg); /* พื้นขาว */
-    padding: 20px;
-    border-radius: 15px; /* มนขึ้น */
+    background: linear-gradient(135deg, #ffffff 0%, #f0f8f0 100%);
+    padding: 25px;
+    border-radius: 15px;
     text-align: center;
     font-size: 1.1rem;
     width: 100%;
     margin: 15px 0;
     box-sizing: border-box;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.07); /* เงา */
+    box-shadow: var(--shadow-md);
     color: var(--header-dark-green);
     font-weight: 500;
+    border: 2px solid var(--primary-green);
+    animation: fadeIn 0.5s ease;
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 .bmi-table {
     width: 100%;
@@ -230,10 +904,17 @@ body {
     display: flex;
     align-items: center;
     background-color: #ffffff;
-    border-radius: 25px; /* ทำให้ขอบมน */
+    border-radius: 25px;
     padding: 8px 15px;
-    margin-bottom: 25px; /* เว้นระยะห่างจากเมนู */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+    margin-bottom: 25px;
+    box-shadow: var(--shadow-sm);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+.search-bar-container:focus-within {
+    border-color: var(--primary-green);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
 }
 .search-bar-container input {
     flex-grow: 1; /* ยืดเต็มพื้นที่ */
@@ -261,23 +942,44 @@ body {
 .menu-item {
     display: flex;
     align-items: center;
-    background-color: var(--btn-bg); /* พื้นขาว */
-    padding: 15px;
-    border-radius: 15px; /* มนขึ้น (เหมือนเดิม) */
-    margin-bottom: 12px;
+    background: white;
+    padding: 14px;
+    border-radius: 14px;
+    margin-bottom: 14px;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.07); /* เงา (เหมือนเดิม) */
-    transition: transform 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.25s;
+    border: 1px solid #f0f0f0;
 }
 .menu-item:hover {
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    border-color: #4CAF50;
+}
+.item-image-placeholder,
+.item-image {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+    border-radius: 15px;
+    margin-right: 15px;
+    object-fit: cover;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+.item-image:hover {
+    transform: scale(1.05);
 }
 .item-image-placeholder {
-    width: 60px;
-    height: 60px;
-    background-color: #f0f0f0; /* สีเทาอ่อน */
-    border-radius: 15px; /* <-- แก้ไข: ทำให้มนเท่าในรูป */
-    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 1.5rem;
+}
+.item-image-placeholder::before {
+    content: "🍽️";
 }
 .item-text {
     flex-grow: 1;
@@ -285,26 +987,40 @@ body {
 .item-text strong {
     font-size: 1.1rem;
     display: block;
-    color: var(--primary-green); /* <-- แก้ไข: เปลี่ยนเป็นสีเขียวสด */
-    font-weight: 500;
+    color: #2e7d32;
+    font-weight: 600;
+    margin-bottom: 4px;
 }
 .item-text span {
-    color: var(--text-light); /* สีเทาอ่อน (เหมือนเดิม) */
+    color: #777;
     font-size: 0.9rem;
 }
 
 .add-btn {
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background-color: var(--primary-green); /* สีเขียว */
+    background: var(--gradient-green);
     border: none;
     font-size: 1.8rem;
     font-weight: bold;
-    color: #ffffff; /* เครื่องหมาย + สีขาว */
+    color: #ffffff;
     cursor: pointer;
-    line-height: 30px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+.add-btn:hover {
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, var(--primary-green-hover) 0%, var(--primary-green) 100%);
+}
+.add-btn:active {
+    transform: scale(0.95);
 }
 .modal {
     display: none; /* ซ่อนไว้ก่อน (นี่คือตัวที่หายไป) */
@@ -322,13 +1038,42 @@ body {
 }
 /* --- 9. Modal (ปรับปรุง) --- */
 .modal-content {
-    background-color: #fefefe;
-    border-radius: 15px; /* มนขึ้น */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 300px;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    font-family: 'Kanit', sans-serif; /* ใช้ฟอนต์ใหม่ */
+    background: linear-gradient(135deg, #ffffff 0%, #f9fff9 100%);
+    border-radius: 20px;
+    padding: 25px;
+    border: 2px solid var(--primary-green);
+    width: 90%;
+    max-width: 400px;
+    max-height: 85vh;
+    box-shadow: var(--shadow-lg);
+    font-family: 'Kanit', sans-serif;
+    animation: modalSlideIn 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+.close-btn {
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+.close-btn:hover {
+    color: var(--primary-green);
+    transform: rotate(90deg) scale(1.2);
 }
 .modal-header {
     border-bottom: 1px solid #eee;
@@ -341,7 +1086,31 @@ body {
 }
 .modal-body {
     padding-top: 15px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: calc(85vh - 120px);
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
 }
+
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--primary-green);
+    border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-green-hover);
+}
+
 .modal-body p {
     margin: 5px 0;
 }
@@ -350,14 +1119,100 @@ body {
     margin: 5px 0;
 }
 
+/* Food Modal Image */
+.food-modal-image-container {
+    width: 100%;
+    margin-bottom: 20px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.food-modal-image {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    display: block;
+}
+
+.food-modal-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.nutrition-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.nutrition-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: linear-gradient(135deg, #f1f8f4 0%, #e8f5e9 100%);
+    border-radius: 12px;
+    border: 1px solid #c8e6c9;
+}
+
+.nutrition-icon {
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.nutrition-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.nutrition-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2e7d32;
+}
+
+.food-description-section,
+.food-benefits-section,
+.food-tips-section {
+    padding: 16px;
+    background: #f9f9f9;
+    border-radius: 12px;
+    border-left: 4px solid var(--primary-green);
+}
+
+.section-subtitle {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2e7d32;
+    margin: 0 0 10px 0;
+}
+
+.food-description,
+.food-benefits,
+.food-tips {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #333;
+    margin: 0;
+}
+
 /* --- 10. Profile Page (ปรับปรุง) --- */
 .profile-info-box {
-    background-color: var(--btn-bg); /* พื้นขาว */
+    background: linear-gradient(135deg, #ffffff 0%, #f9fff9 100%);
     padding: 20px;
-    border-radius: 15px; /* มน */
+    border-radius: 15px;
     margin: 15px 0;
     font-size: 1.1rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.07); /* เงา */
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
+    transition: all 0.3s ease;
+}
+.profile-info-box:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
 }
 .profile-info-box strong {
     color: var(--header-dark-green);
@@ -374,6 +1229,7 @@ body {
     width: 100%;
     margin: 8px 0;
     box-sizing: border-box;
+    font-weight: 600;
 }
 .btn-full-width:first-child {
     display: flex;
@@ -384,15 +1240,1439 @@ body {
 
 /* --- 11. ปุ่มลบในตะกร้า (เพิ่มใหม่) --- */
 .remove-btn {
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background-color: #f44336; /* สีแดง */
+    background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
     border: none;
     font-size: 1.8rem;
     font-weight: bold;
     color: #ffffff;
     cursor: pointer;
-    line-height: 30px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+.remove-btn:hover {
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+}
+.remove-btn:active {
+    transform: scale(0.95);
+}
+
+/* --- Dashboard Styles (ใหม่) --- */
+.dashboard-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f9fff9 100%);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
+    transition: all 0.3s ease;
+}
+.dashboard-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.card-header h3 {
+    margin: 0;
+    color: var(--header-dark-green);
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+/* Health Streak */
+.streak-card {
+    background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%);
+    border: 2px solid #ff9800;
+}
+.streak-badge {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: var(--shadow-sm);
+}
+.streak-desc {
+    color: var(--text-dark);
+    margin: 10px 0;
+}
+.streak-progress {
+    width: 100%;
+    height: 10px;
+    background-color: #ffe0b2;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+.streak-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ff9800 0%, #f57c00 100%);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+    width: 0%;
+}
+
+/* Daily Calorie Tracker */
+.calorie-card {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border: 2px solid #2196F3;
+}
+.calorie-display {
+    text-align: center;
+    margin: 20px 0;
+}
+.calorie-circle {
+    display: inline-block;
+    padding: 20px;
+    background: white;
+    border-radius: 50%;
+    min-width: 120px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-md);
+}
+.calorie-current {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--header-dark-green);
+}
+.calorie-total {
+    font-size: 1rem;
+    color: var(--text-light);
+}
+.calorie-progress-bar {
+    width: 100%;
+    height: 15px;
+    background-color: #e1f5fe;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+.calorie-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #2196F3 0%, #1976D2 100%);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+    width: 0%;
+}
+.calorie-status {
+    text-align: center;
+    color: var(--text-dark);
+    font-weight: 500;
+    margin-top: 10px;
+}
+
+/* Food Recommendations */
+.recommendation-card {
+    background: linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%);
+    border: 2px solid #8BC34A;
+}
+.recommended-foods {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.recommended-item {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.recommended-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.recommended-item-info strong {
+    color: var(--header-dark-green);
+}
+.recommended-item-info span {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+/* Achievements */
+.achievement-card {
+    background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+    border: 2px solid #E91E63;
+}
+.achievements-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.achievement-item {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+.achievement-item.unlocked {
+    border-left: 4px solid #4CAF50;
+}
+.achievement-item.locked {
+    opacity: 0.6;
+    border-left: 4px solid #ccc;
+}
+.achievement-icon {
+    font-size: 2rem;
+}
+.achievement-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.achievement-info strong {
+    color: var(--header-dark-green);
+}
+.achievement-info span {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+.achievement-badge {
+    color: #4CAF50;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Health Tips */
+.tips-card {
+    background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+    border: 2px solid #FBC02D;
+}
+.tip-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 15px 0;
+    box-shadow: var(--shadow-sm);
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+}
+.tip-content p {
+    margin: 0;
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+.btn-tip {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #FBC02D 0%, #F9A825 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    font-family: 'Kanit', sans-serif;
+}
+.btn-tip:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Health News Section */
+.health-news-section {
+    margin-bottom: 24px;
+}
+
+.news-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.news-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.news-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.news-container {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 8px 0 16px 0;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-green) transparent;
+    scroll-snap-type: x mandatory;
+    position: relative;
+}
+
+.news-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+.news-container::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+}
+
+.news-container::-webkit-scrollbar-thumb {
+    background: var(--primary-green);
+    border-radius: 10px;
+}
+
+.news-container::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-green-hover);
+}
+
+.news-card {
+    min-width: 280px;
+    max-width: 280px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-light);
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+}
+
+.news-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-green);
+}
+
+.news-card-image {
+    width: 100%;
+    height: 160px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+}
+
+.news-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    display: block;
+}
+
+.news-card:hover .news-image {
+    transform: scale(1.05);
+}
+
+.news-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.news-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.1) 100%);
+    z-index: 1;
+}
+
+.news-emoji {
+    font-size: 3.5rem;
+    z-index: 2;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    position: relative;
+}
+
+.news-card-content {
+    padding: 16px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.news-category {
+    display: inline-block;
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--primary-green);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    align-self: flex-start;
+}
+
+.news-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.news-card-text {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    line-height: 1.5;
+    margin: 0 0 12px 0;
+    flex-grow: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.news-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-light);
+}
+
+.news-date {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.news-date i {
+    font-size: 0.7rem;
+}
+
+.news-read-more {
+    font-size: 0.75rem;
+    color: var(--primary-green);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: transform 0.2s ease;
+}
+
+.news-card:hover .news-read-more {
+    transform: translateX(4px);
+    color: var(--primary-green-hover);
+}
+
+.news-read-more i {
+    font-size: 0.7rem;
+}
+
+/* News Detail Page */
+.news-detail {
+    margin-bottom: 24px;
+}
+
+.news-detail-image {
+    width: 100%;
+    height: 250px;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-md);
+}
+
+.news-detail-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.news-detail-content {
+    padding: 0 4px;
+}
+
+.news-detail-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.news-detail-category {
+    display: inline-block;
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--primary-green);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 12px;
+}
+
+.news-detail-date {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.news-detail-date i {
+    font-size: 0.75rem;
+}
+
+.news-detail-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 20px 0;
+    line-height: 1.4;
+}
+
+.news-detail-body {
+    color: var(--text-dark);
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.news-detail-body p {
+    margin: 0 0 16px 0;
+}
+
+.news-detail-loading,
+.news-detail-error {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-light);
+}
+
+.news-detail-error i {
+    font-size: 3rem;
+    color: var(--primary-green);
+    margin-bottom: 16px;
+}
+
+.news-detail-error p {
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+}
+
+/* Quick Actions */
+.quick-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+.action-card {
+    flex: 1;
+    background: white;
+    border-radius: 16px;
+    padding: 20px 16px;
+    text-align: center;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+.action-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+.gacha-card {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+}
+.battle-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+.action-icon {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+    display: block;
+}
+.action-card h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 8px 0 4px;
+}
+.action-card p {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin: 0;
+}
+.action-icon.spinning {
+    animation: spin 0.5s linear infinite;
+}
+
+/* Mood Card */
+.mood-card {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    padding: 18px;
+    border-radius: 16px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 2px solid #4CAF50;
+}
+.card-title {
+    font-size: 1.2rem;
+    color: #2e7d32;
+    margin: 0 0 14px 0;
+    font-weight: 600;
+}
+.mood-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+.mood-btn {
+    padding: 12px 16px;
+    border: 2px solid #4CAF50;
+    background: white;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #2e7d32;
+    transition: all 0.2s;
+    font-family: 'Kanit', sans-serif;
+}
+.mood-btn:hover {
+    background: #f1f8f4;
+    transform: scale(1.02);
+}
+.mood-btn.active {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    border-color: #45a049;
+    box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3);
+}
+.mood-btn-full {
+    grid-column: 1 / -1;
+}
+
+/* Tracking Card */
+.tracking-card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.tracking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.tracking-title {
+    font-size: 1.2rem;
+    color: #2e7d32;
+    margin: 0;
+    font-weight: 600;
+}
+
+.history-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+}
+
+.history-btn:hover {
+    background: #45a049;
+    transform: scale(1.05);
+}
+
+.clear-tracking-btn {
+    background: #ff5252;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.clear-tracking-btn:hover {
+    background: #ff1744;
+    transform: scale(1.05);
+}
+
+.tracking-summary {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    background: linear-gradient(135deg, #f1f8f4 0%, #e8f5e9 100%);
+    border-radius: 12px;
+    border: 1px solid #c8e6c9;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #2e7d32;
+    line-height: 1;
+}
+
+.stat-unit {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 2px;
+}
+
+.tracking-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.empty-tracking {
+    text-align: center;
+    color: #999;
+    padding: 20px;
+    font-size: 0.9rem;
+}
+
+.tracking-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: #f9f9f9;
+    border-radius: 12px;
+    border-left: 4px solid #4CAF50;
+    transition: all 0.2s;
+}
+
+.tracking-item:hover {
+    background: #f1f8f4;
+    transform: translateX(2px);
+}
+
+.tracking-item-info {
+    flex: 1;
+}
+
+.tracking-item-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+}
+
+.tracking-item-time {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.tracking-item-nutrition {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.nutrition-badge {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* History Page Styles */
+.filter-card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.filter-title {
+    font-size: 1.1rem;
+    color: #2e7d32;
+    margin: 0 0 14px 0;
+    font-weight: 600;
+}
+
+.date-filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.date-input {
+    flex: 1;
+    min-width: 120px;
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: 'Kanit', sans-serif;
+    transition: all 0.2s;
+}
+
+.date-input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.date-separator {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Kanit', sans-serif;
+}
+
+.filter-btn:hover {
+    background: #45a049;
+    transform: scale(1.05);
+}
+
+.show-all-btn {
+    width: 100%;
+    padding: 10px;
+    background: #f1f8f4;
+    color: #2e7d32;
+    border: 2px solid #4CAF50;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Kanit', sans-serif;
+}
+
+.show-all-btn:hover {
+    background: #e8f5e9;
+}
+
+.history-summary-card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.summary-title {
+    font-size: 1.1rem;
+    color: #2e7d32;
+    margin: 0 0 14px 0;
+    font-weight: 600;
+}
+
+.history-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.history-date-section {
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.history-date-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.history-date-title {
+    font-size: 1.1rem;
+    color: #2e7d32;
+    margin: 0;
+    font-weight: 600;
+}
+
+.history-date-summary {
+    display: flex;
+    gap: 12px;
+}
+
+.date-summary-item {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.history-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.history-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    background: #f9f9f9;
+    border-radius: 12px;
+    border-left: 4px solid #4CAF50;
+    transition: all 0.2s;
+}
+
+.history-item:hover {
+    background: #f1f8f4;
+}
+
+.history-item-time {
+    font-size: 0.9rem;
+    color: #888;
+    font-weight: 500;
+    min-width: 50px;
+    padding-top: 2px;
+}
+
+.history-item-info {
+    flex: 1;
+}
+
+.history-item-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+}
+
+.history-item-nutrition {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.history-item-nutrition span {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Search Card */
+.search-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.search-icon {
+    position: absolute;
+    left: 14px;
+    color: #999;
+    font-size: 1rem;
+}
+.search-wrapper input {
+    width: 100%;
+    padding: 12px 14px 12px 40px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: 'Kanit', sans-serif;
+    transition: all 0.2s;
+}
+.search-wrapper input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.sort-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.sort-label {
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.sort-select {
+    flex: 1;
+    padding: 8px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: 'Kanit', sans-serif;
+    background: white;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sort-select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.sort-select:hover {
+    border-color: #4CAF50;
+}
+
+.sort-select optgroup {
+    font-weight: 600;
+    color: #4CAF50;
+    font-size: 0.85rem;
+}
+
+.sort-select option {
+    padding: 4px 8px;
+    font-weight: normal;
+}
+
+/* Food List Section */
+.food-list-section {
+    margin-top: 8px;
+}
+.section-title {
+    font-size: 1.3rem;
+    color: #2e7d32;
+    margin: 0 0 16px 0;
+    font-weight: 600;
+}
+
+/* ========== Mood-based Dining Styles (old - keep for compatibility) ========== */
+.mood-section {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    box-shadow: var(--shadow-sm);
+}
+
+.mood-title {
+    font-size: 1.1rem;
+    color: var(--header-dark-green);
+    margin-bottom: 12px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.mood-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.mood-btn {
+    padding: 10px 15px;
+    border: 2px solid var(--primary-green);
+    background: white;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--header-dark-green);
+    transition: all 0.3s ease;
+    font-family: 'Kanit', sans-serif;
+    box-shadow: var(--shadow-sm);
+}
+
+.mood-btn:hover {
+    background: var(--gradient-green);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.mood-btn.active {
+    background: var(--gradient-green);
+    color: white;
+    border-color: var(--primary-green-hover);
+    box-shadow: var(--shadow-md);
+}
+
+/* ========== Gacha Menu Styles (old - keep for compatibility) ========== */
+.gacha-section {
+    margin-bottom: 15px;
+}
+
+.gacha-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    border: none;
+    border-radius: 15px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    font-family: 'Kanit', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.gacha-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.gacha-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.gacha-icon {
+    font-size: 1.5rem;
+    display: inline-block;
+}
+
+.gacha-btn.spinning .gacha-icon {
+    animation: spin 0.5s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.gacha-result {
+    text-align: center;
+}
+
+.gacha-food-card {
+    background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid #FBC02D;
+    box-shadow: var(--shadow-md);
+}
+
+.gacha-food-card h3 {
+    color: var(--header-dark-green);
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.gacha-food-card ul {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    margin: 15px 0;
+}
+
+.gacha-food-card li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    color: var(--text-dark);
+}
+
+/* ========== Food Battle Link Styles (old - keep for compatibility) ========== */
+.battle-section {
+    margin-bottom: 15px;
+}
+
+.battle-link {
+    display: block;
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 15px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    font-family: 'Kanit', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.battle-link:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.battle-icon {
+    font-size: 1.5rem;
+}
+
+/* ========== Food Battle Page Styles ========== */
+.battle-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+.battle-header {
+    text-align: center;
+    color: var(--header-dark-green);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.food-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.food-select-box {
+    background: white;
+    border: 2px solid var(--border-light);
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.food-select-box:hover {
+    border-color: var(--primary-green);
+    box-shadow: var(--shadow-md);
+}
+
+.food-select-box.selected {
+    border-color: var(--primary-green);
+    background: var(--bg-light-green);
+    box-shadow: var(--shadow-md);
+}
+
+.food-select-box h4 {
+    color: var(--header-dark-green);
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.food-select-box p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.comparison-result {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: var(--shadow-md);
+    margin-top: 20px;
+}
+
+.comparison-header {
+    text-align: center;
+    color: var(--header-dark-green);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.comparison-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 15px;
+    background: var(--bg-light-green);
+    border-radius: 10px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--header-dark-green);
+}
+
+.bar-chart {
+    margin: 20px 0;
+}
+
+.bar-item {
+    margin-bottom: 15px;
+}
+
+.bar-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+}
+
+.bar-container {
+    height: 30px;
+    background: #e0e0e0;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+}
+
+.bar-fill {
+    height: 100%;
+    background: var(--gradient-green);
+    border-radius: 15px;
+    transition: width 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.bar-fill.higher {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+}
+
+.battle-summary {
+    background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid #FBC02D;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.battle-summary h3 {
+    color: var(--header-dark-green);
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.battle-summary p {
+    color: var(--text-dark);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
 }

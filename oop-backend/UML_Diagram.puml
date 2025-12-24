@@ -1,0 +1,308 @@
+@startuml OOP Backend UML Diagram
+
+!define CONTROLLER_COLOR #E1F5FF
+!define SERVICE_COLOR #FFF4E1
+!define REPOSITORY_COLOR #E8F5E9
+!define MODEL_COLOR #F3E5F5
+!define DTO_COLOR #FFE0B2
+
+package "Controllers" CONTROLLER_COLOR {
+    class AuthController {
+        - authService: AuthService
+        + handleLogin(LoginRequest): Map<String, String>
+        + handleRegister(RegisterRequest): Map<String, String>
+    }
+    
+    class FoodController {
+        - foodService: FoodService
+        + getAllFoods(): List<Food>
+        + getFoodByName(String): Object
+    }
+    
+    class CartController {
+        - cartService: CartService
+        + addToCart(CartRequest): Map<String, String>
+        + getCart(String): List<CartResponse>
+        + removeFromCart(CartRequest): Map<String, String>
+        + clearCart(String): Map<String, String>
+    }
+    
+    class BMIController {
+        - bmiService: BMIService
+        + calculateBMI(BMIRequest): Object
+        + getUserBMI(String): Object
+        + getUserData(String): Object
+    }
+}
+
+package "DTOs" DTO_COLOR {
+    class LoginRequest {
+        - username: String
+        - password: String
+        + getUsername(): String
+        + getPassword(): String
+        + setUsername(String): void
+        + setPassword(String): void
+    }
+    
+    class RegisterRequest {
+        - username: String
+        - password: String
+        + getUsername(): String
+        + getPassword(): String
+        + setUsername(String): void
+        + setPassword(String): void
+    }
+    
+    class CartRequest {
+        - username: String
+        - foodName: String
+        + getUsername(): String
+        + getFoodName(): String
+        + setUsername(String): void
+        + setFoodName(String): void
+    }
+    
+    class CartResponse {
+        - name: String
+        - kcal: double
+        - fat: double
+        - sugar: double
+        - sodium: double
+        + getName(): String
+        + getKcal(): double
+        + getFat(): double
+        + getSugar(): double
+        + getSodium(): double
+        + {static} fromCartItem(CartItem): CartResponse
+        + {static} fromCartItems(List<CartItem>): List<CartResponse>
+    }
+    
+    class BMIRequest {
+        - username: String
+        - weight: double
+        - height: double
+        + getUsername(): String
+        + getWeight(): double
+        + getHeight(): double
+        + setUsername(String): void
+        + setWeight(double): void
+        + setHeight(double): void
+    }
+    
+    class BMIResponse {
+        - bmi: double
+        - calories: double
+        - category: String
+        - categoryRange: String
+        + getBmi(): double
+        + getCalories(): double
+        + getCategory(): String
+        + getCategoryRange(): String
+    }
+}
+
+package "Services" SERVICE_COLOR {
+    class AuthService {
+        - userRepository: UserRepository
+        + login(String, String): User
+        + register(String, String): boolean
+    }
+    
+    class FoodService {
+        - foodRepository: FoodRepository
+        + getAllFoods(): List<Food>
+        + getFoodByName(String): Food
+    }
+    
+    class CartService {
+        - cartRepository: CartRepository
+        - foodRepository: FoodRepository
+        + addToCart(String, String): boolean
+        + getCart(String): List<CartItem>
+        + removeFromCart(String, String): boolean
+        + clearCart(String): void
+    }
+    
+    class BMIService {
+        - userDataRepository: UserDataRepository
+        + calculateBMI(String, double, double): BMIResponse
+        + getUserBMI(String): BMIResponse
+        + getUserData(String): UserData
+        - getBMICategory(double): String
+        - getBMICategoryRange(double): String
+    }
+}
+
+package "Models" MODEL_COLOR {
+    class User {
+        - username: String
+        - password: String
+        - role: String
+        + User(String, String, String)
+        + getUsername(): String
+        + getRole(): String
+        + checkPassword(String): boolean
+    }
+    
+    class Admin {
+        + Admin(String, String)
+        + performAdminTasks(): void
+    }
+    
+    class Member {
+        + Member(String, String)
+    }
+    
+    class Food {
+        - name: String
+        - kcal: double
+        - fat: double
+        - sugar: double
+        - sodium: double
+        + Food(String, double, double, double, double)
+        + getName(): String
+        + getKcal(): double
+        + getFat(): double
+        + getSugar(): double
+        + getSodium(): double
+    }
+    
+    class CartItem {
+        - username: String
+        - food: Food
+        + CartItem(String, Food)
+        + getUsername(): String
+        + getFood(): Food
+    }
+    
+    class UserData {
+        - username: String
+        - weight: double
+        - height: double
+        - bmi: double
+        - calories: double
+        + UserData(String, double, double, double, double)
+        + getUsername(): String
+        + getWeight(): double
+        + getHeight(): double
+        + getBmi(): double
+        + getCalories(): double
+        + setWeight(double): void
+        + setHeight(double): void
+        + setBmi(double): void
+        + setCalories(double): void
+    }
+}
+
+package "Repositories" REPOSITORY_COLOR {
+    class UserRepository {
+        - userDatabase: List<User>
+        - passwordStorage: Map<String, String>
+        - filePath: String
+        + UserRepository()
+        + findByUsername(String): User
+        + save(User, String): void
+        + save(User): void
+        - loadUsersFromFile(): void
+        - saveToFile(): void
+    }
+    
+    class FoodRepository {
+        - foodDatabase: List<Food>
+        + FoodRepository()
+        + findAll(): List<Food>
+        + findByName(String): Food
+        - initializeFoods(): void
+    }
+    
+    class CartRepository {
+        - cartDatabase: List<CartItem>
+        + CartRepository()
+        + addToCart(String, Food): void
+        + findByUsername(String): List<CartItem>
+        + removeFromCart(String, String): boolean
+        + clearCart(String): void
+        + countByUsername(String): int
+    }
+    
+    class UserDataRepository {
+        - userDataDatabase: List<UserData>
+        + UserDataRepository()
+        + save(UserData): void
+        + findByUsername(String): UserData
+    }
+}
+
+class OopBackendApplication {
+    + main(String[]): void
+}
+
+' Relationships with Multiplicity and Labels
+
+' Inheritance
+User <|-- Admin
+User <|-- Member
+
+' Composition & Aggregation
+CartItem "0..*" --* "1" Food : contains >
+CartRepository "1" o-- "0..*" CartItem : stores >
+UserRepository "1" o-- "0..*" User : stores >
+FoodRepository "1" o-- "0..*" Food : stores >
+UserDataRepository "1" o-- "0..*" UserData : stores >
+
+' Dependencies (MVC Flow)
+AuthController ..> AuthService : uses >
+FoodController ..> FoodService : uses >
+CartController ..> CartService : uses >
+BMIController ..> BMIService : uses >
+
+' Service Dependencies
+AuthService ..> UserRepository : uses >
+FoodService ..> FoodRepository : uses >
+CartService ..> CartRepository : uses >
+CartService ..> FoodRepository : uses >
+BMIService ..> UserDataRepository : uses >
+
+' DTO Usage
+AuthController ..> LoginRequest : uses >
+AuthController ..> RegisterRequest : uses >
+CartController ..> CartRequest : uses >
+CartController ..> CartResponse : returns >
+BMIController ..> BMIRequest : uses >
+BMIController ..> BMIResponse : returns >
+
+' Hide getters and setters to make it look like the example
+hide members
+show methods
+hide User methods
+hide Admin methods
+hide Member methods
+hide Food methods
+hide CartItem methods
+hide UserData methods
+hide LoginRequest methods
+hide RegisterRequest methods
+hide CartRequest methods
+hide CartResponse methods
+hide BMIRequest methods
+hide BMIResponse methods
+
+' Show only business logic methods
+show AuthController methods
+show FoodController methods
+show CartController methods
+show BMIController methods
+show AuthService methods
+show FoodService methods
+show CartService methods
+show BMIService methods
+show UserRepository methods
+show FoodRepository methods
+show CartRepository methods
+show UserDataRepository methods
+
+note "Standard Class Diagram\nwith Multiplicity" as N1
+
+
+@enduml

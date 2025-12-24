@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Battle</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <div class="mobile-screen">
+
+        <header class="header">
+            <a href="home.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>ย้อนกลับ</span>
+            </a>
+            <span class="header-title">⚔️ Food Battle</span>
+            <div style="width: 60px;"></div>
+        </header>
+
+        <div class="content">
+            <div class="battle-container">
+                <h2 class="battle-header">เลือกอาหาร 2 อย่างมา Battle!</h2>
+
+                <div class="food-selector">
+                    <div class="food-select-box" id="food1Box" onclick="openFoodSelector(1)">
+                        <h4>อาหารที่ 1</h4>
+                        <p id="food1Name">กดเพื่อเลือก</p>
+                    </div>
+                    <div class="food-select-box" id="food2Box" onclick="openFoodSelector(2)">
+                        <h4>อาหารที่ 2</h4>
+                        <p id="food2Name">กดเพื่อเลือก</p>
+                    </div>
+                </div>
+
+                <div id="comparisonResult" style="display: none;">
+                    <div class="comparison-result">
+                        <h3 class="comparison-header">ผลการเปรียบเทียบ</h3>
+                        
+                        <div class="comparison-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">อาหารที่ 1</div>
+                                <div class="stat-value" id="food1Total">0</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">อาหารที่ 2</div>
+                                <div class="stat-value" id="food2Total">0</div>
+                            </div>
+                        </div>
+
+                        <div class="bar-chart">
+                            <div class="bar-item">
+                                <div class="bar-label">
+                                    <span>พลังงาน (kcal)</span>
+                                    <span id="kcalWinner"></span>
+                                </div>
+                                <div class="bar-container">
+                                    <div class="bar-fill" id="kcalBar1" style="width: 0%;"></div>
+                                </div>
+                                <div class="bar-container">
+                                    <div class="bar-fill" id="kcalBar2" style="width: 0%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="bar-item">
+                                <div class="bar-label">
+                                    <span>ไขมัน (g)</span>
+                                    <span id="fatWinner"></span>
+                                </div>
+                                <div class="bar-container">
+                                    <div class="bar-fill" id="fatBar1" style="width: 0%;"></div>
+                                </div>
+                                <div class="bar-container">
+                                    <div class="bar-fill" id="fatBar2" style="width: 0%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="bar-item">
+                                <div class="bar-label">
+                                    <span>น้ำตาล (g)</span>
+                                    <span id="sugarWinner"></span>
+                                </div>
+                                <div class="bar-container">
+                                    <div class="bar-fill" id="sugarBar1" style="width: 0%;"></div>
+                                </div>
+                                <div class="bar-container">
+                                    <div class="bar-fill" id="sugarBar2" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="battle-summary" id="battleSummary">
+                            <h3>สรุปผล</h3>
+                            <p id="summaryText"></p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer class="footer-nav">
+            <a href="home.html" class="footer-icon">🏠</a>
+            <a href="health-dashboard.html" class="footer-icon">📊</a>
+            <a href="cart.html" class="footer-icon">🛒</a>
+        </footer>
+
+    </div>
+
+    <!-- Food Selection Modal -->
+    <div id="foodModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">เลือกอาหาร</span>
+                <span class="close-btn" id="closeBtn">&times;</span>
+            </div>
+            <div class="modal-body" id="foodList">
+                <!-- รายการอาหารจะถูกโหลดที่นี่ -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const username = localStorage.getItem('currentUser');
+            if (!username) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            let allFoods = [];
+            let selectedFood1 = null;
+            let selectedFood2 = null;
+            let currentSelector = null;
+
+            const modal = document.getElementById("foodModal");
+            const foodList = document.getElementById("foodList");
+            const closeBtn = document.getElementById("closeBtn");
+
+            // โหลดรายการอาหาร
+            loadFoods();
+
+            function loadFoods() {
+                fetch('http://localhost:8080/api/foods')
+                    .then(response => response.json())
+                    .then(foods => {
+                        allFoods = foods;
+                    })
+                    .catch(error => {
+                        console.error('Error loading foods:', error);
+                    });
+            }
+
+            // เปิด Modal เลือกอาหาร
+            window.openFoodSelector = function(foodNumber) {
+                currentSelector = foodNumber;
+                displayFoodList();
+                modal.style.display = "flex";
+            }
+
+            function displayFoodList() {
+                foodList.innerHTML = '';
+                allFoods.forEach(food => {
+                    const foodItem = document.createElement('div');
+                    foodItem.className = 'menu-item';
+                    foodItem.style.cursor = 'pointer';
+                    foodItem.innerHTML = `
+                        <div class="item-text">
+                            <strong>${food.name}</strong>
+                            <span>${food.kcal} kcal | ไขมัน: ${food.fat}g | น้ำตาล: ${food.sugar}g</span>
+                        </div>
+                    `;
+                    foodItem.addEventListener('click', function() {
+                        selectFood(food);
+                    });
+                    foodList.appendChild(foodItem);
+                });
+            }
+
+            function selectFood(food) {
+                if (currentSelector === 1) {
+                    selectedFood1 = food;
+                    document.getElementById('food1Name').textContent = food.name;
+                    document.getElementById('food1Box').classList.add('selected');
+                } else if (currentSelector === 2) {
+                    selectedFood2 = food;
+                    document.getElementById('food2Name').textContent = food.name;
+                    document.getElementById('food2Box').classList.add('selected');
+                }
+                closeModal();
+                
+                // ถ้าเลือกครบ 2 อย่างแล้ว ให้เปรียบเทียบ
+                if (selectedFood1 && selectedFood2) {
+                    compareFoods();
+                }
+            }
+
+            function compareFoods() {
+                const resultDiv = document.getElementById('comparisonResult');
+                resultDiv.style.display = 'block';
+
+                // คำนวณคะแนนรวม (ใช้ kcal เป็นหลัก)
+                const total1 = selectedFood1.kcal;
+                const total2 = selectedFood2.kcal;
+                
+                document.getElementById('food1Total').textContent = total1;
+                document.getElementById('food2Total').textContent = total2;
+
+                // หาค่าสูงสุดสำหรับ normalization
+                const maxKcal = Math.max(selectedFood1.kcal, selectedFood2.kcal);
+                const maxFat = Math.max(selectedFood1.fat, selectedFood2.fat);
+                const maxSugar = Math.max(selectedFood1.sugar, selectedFood2.sugar);
+
+                // แสดงกราฟ Kcal
+                const kcal1Percent = (selectedFood1.kcal / maxKcal) * 100;
+                const kcal2Percent = (selectedFood2.kcal / maxKcal) * 100;
+                document.getElementById('kcalBar1').style.width = kcal1Percent + '%';
+                document.getElementById('kcalBar1').textContent = selectedFood1.kcal + ' kcal';
+                document.getElementById('kcalBar2').style.width = kcal2Percent + '%';
+                document.getElementById('kcalBar2').textContent = selectedFood2.kcal + ' kcal';
+                
+                if (selectedFood1.kcal > selectedFood2.kcal) {
+                    document.getElementById('kcalBar1').classList.add('higher');
+                    document.getElementById('kcalWinner').textContent = '🏆 ' + selectedFood1.name;
+                } else if (selectedFood2.kcal > selectedFood1.kcal) {
+                    document.getElementById('kcalBar2').classList.add('higher');
+                    document.getElementById('kcalWinner').textContent = '🏆 ' + selectedFood2.name;
+                } else {
+                    document.getElementById('kcalWinner').textContent = 'เสมอกัน';
+                }
+
+                // แสดงกราฟ Fat
+                const fat1Percent = (selectedFood1.fat / maxFat) * 100;
+                const fat2Percent = (selectedFood2.fat / maxFat) * 100;
+                document.getElementById('fatBar1').style.width = fat1Percent + '%';
+                document.getElementById('fatBar1').textContent = selectedFood1.fat + 'g';
+                document.getElementById('fatBar2').style.width = fat2Percent + '%';
+                document.getElementById('fatBar2').textContent = selectedFood2.fat + 'g';
+                
+                if (selectedFood1.fat > selectedFood2.fat) {
+                    document.getElementById('fatBar1').classList.add('higher');
+                    document.getElementById('fatWinner').textContent = '🏆 ' + selectedFood1.name;
+                } else if (selectedFood2.fat > selectedFood1.fat) {
+                    document.getElementById('fatBar2').classList.add('higher');
+                    document.getElementById('fatWinner').textContent = '🏆 ' + selectedFood2.name;
+                } else {
+                    document.getElementById('fatWinner').textContent = 'เสมอกัน';
+                }
+
+                // แสดงกราฟ Sugar
+                const sugar1Percent = (selectedFood1.sugar / maxSugar) * 100;
+                const sugar2Percent = (selectedFood2.sugar / maxSugar) * 100;
+                document.getElementById('sugarBar1').style.width = sugar1Percent + '%';
+                document.getElementById('sugarBar1').textContent = selectedFood1.sugar + 'g';
+                document.getElementById('sugarBar2').style.width = sugar2Percent + '%';
+                document.getElementById('sugarBar2').textContent = selectedFood2.sugar + 'g';
+                
+                if (selectedFood1.sugar > selectedFood2.sugar) {
+                    document.getElementById('sugarBar1').classList.add('higher');
+                    document.getElementById('sugarWinner').textContent = '🏆 ' + selectedFood1.name;
+                } else if (selectedFood2.sugar > selectedFood1.sugar) {
+                    document.getElementById('sugarBar2').classList.add('higher');
+                    document.getElementById('sugarWinner').textContent = '🏆 ' + selectedFood2.name;
+                } else {
+                    document.getElementById('sugarWinner').textContent = 'เสมอกัน';
+                }
+
+                // สรุปผล
+                let summary = '';
+                if (total1 > total2) {
+                    const ratio = (total1 / total2).toFixed(1);
+                    summary = `"${selectedFood1.name}" อ้วนกว่า "${selectedFood2.name}" ${ratio} เท่า! (${total1} vs ${total2} kcal)`;
+                } else if (total2 > total1) {
+                    const ratio = (total2 / total1).toFixed(1);
+                    summary = `"${selectedFood2.name}" อ้วนกว่า "${selectedFood1.name}" ${ratio} เท่า! (${total2} vs ${total1} kcal)`;
+                } else {
+                    summary = `"${selectedFood1.name}" และ "${selectedFood2.name}" มีพลังงานเท่ากัน! (${total1} kcal)`;
+                }
+                document.getElementById('summaryText').textContent = summary;
+
+                // Scroll to result
+                resultDiv.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            function closeModal() {
+                modal.style.display = "none";
+            }
+
+            closeBtn.onclick = closeModal;
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    closeModal();
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
+
