@@ -26,11 +26,15 @@
                 <h2 class="battle-header">เลือกอาหาร 2 อย่างมา Battle!</h2>
 
                 <div class="food-selector">
-                    <div class="food-select-box" id="food1Box" onclick="openFoodSelector(1)">
+                    <div class="food-select-box" id="food1Box" onclick="openFoodSelector(1)" 
+                         tabindex="0" role="button" 
+                         onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openFoodSelector(1); }">
                         <h4>อาหารที่ 1</h4>
                         <p id="food1Name">กดเพื่อเลือก</p>
                     </div>
-                    <div class="food-select-box" id="food2Box" onclick="openFoodSelector(2)">
+                    <div class="food-select-box" id="food2Box" onclick="openFoodSelector(2)" 
+                         tabindex="0" role="button" 
+                         onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openFoodSelector(2); }">
                         <h4>อาหารที่ 2</h4>
                         <p id="food2Name">กดเพื่อเลือก</p>
                     </div>
