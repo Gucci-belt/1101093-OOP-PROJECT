@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="mobile-screen">
@@ -38,6 +39,10 @@
                 <br>
                 <small>(ควรกิน <span id="profile-calories">----</span> แคลอรี่)</small>
             </div>
+            
+            <a href="bmi-history.html" class="btn btn-secondary" style="margin-bottom: 20px; width: 100%;">
+                <i class="fas fa-chart-line"></i> ดูประวัติ BMI และกราฟ
+            </a>
             
             <table class="bmi-table">
                 <thead>
@@ -122,6 +127,9 @@
                                 category: data.category,
                                 categoryRange: data.categoryRange
                             });
+                            
+                            // บันทึก BMI History
+                            recordBMIHistory(username, newWeight, newHeight);
                             
                             // รีโหลดข้อมูลจาก API เพื่อให้แน่ใจว่าข้อมูลถูกต้อง
                             setTimeout(() => {
@@ -210,7 +218,32 @@
                     });
             }
 
-            // 6. ฟังก์ชันโหลดข้อมูล BMI จาก API
+            // 6. ฟังก์ชันบันทึก BMI History
+            function recordBMIHistory(username, weight, height) {
+                fetch('http://localhost:8080/api/bmi/history/record', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        weight: weight,
+                        height: height
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        console.log('บันทึก BMI History สำเร็จ:', data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error recording BMI history:', error);
+                    // ไม่แสดง error ให้ user เพราะไม่ใช่ฟีเจอร์หลัก
+                });
+            }
+
+            // 7. ฟังก์ชันโหลดข้อมูล BMI จาก API
             function loadProfileData() {
                 // โหลดข้อมูลน้ำหนักและส่วนสูงก่อน
                 loadUserData();

@@ -41,6 +41,11 @@
                     <h4>Food Battle</h4>
                     <p>เปรียบเทียบ</p>
                 </a>
+                <a href="health-history-search.html" class="action-card history-search-card-link">
+                    <div class="action-icon">🔍</div>
+                    <h4>ค้นหาประวัติ</h4>
+                    <p>BMI + การกิน</p>
+                </a>
             </div>
 
             <!-- Tracking Section -->
@@ -85,15 +90,14 @@
                 </div>
             </div>
 
-            <!-- Mood Section -->
+            <!-- Health Issue Section -->
             <div class="mood-card">
-                <h3 class="card-title">🎭 วันนี้คุณรู้สึกยังไง?</h3>
+                <h3 class="card-title">🏥 คุณมีปัญหาสุขภาพอะไรบ้าง?</h3>
                 <div class="mood-grid">
-                    <button class="mood-btn" data-mood="เครียด">😰 เครียด</button>
-                    <button class="mood-btn" data-mood="เหนื่อย">😴 เหนื่อย</button>
-                    <button class="mood-btn" data-mood="อยากผอม">💪 อยากผอม</button>
-                    <button class="mood-btn" data-mood="บวมน้ำ">💧 บวมน้ำ</button>
-                    <button class="mood-btn mood-btn-full" data-mood="ทั้งหมด">✨ ทั้งหมด</button>
+                    <button class="mood-btn" data-mood="เบาหวาน">🩺 เบาหวาน</button>
+                    <button class="mood-btn" data-mood="ความดันสูง">❤️‍🩹 ความดันสูง</button>
+                    <button class="mood-btn" data-mood="ลดน้ำหนัก">⚖️ ลดน้ำหนัก</button>
+                    <button class="mood-btn" data-mood="ไขมันในเลือดสูง">💊 ไขมันในเลือดสูง</button>
                 </div>
             </div>
 
@@ -103,28 +107,9 @@
                     <i class="fas fa-search search-icon"></i>
                     <input type="text" placeholder="ค้นหาอาหาร..." id="searchInput">
                 </div>
-                <div class="sort-controls">
-                    <span class="sort-label">เรียงตาม:</span>
-                    <select id="sortSelect" class="sort-select">
-                        <option value="none">ทั้งหมด</option>
-                        <optgroup label="แคลอรี่">
-                            <option value="kcal-low">แคลอรี่ (น้อย → มาก)</option>
-                            <option value="kcal-high">แคลอรี่ (มาก → น้อย)</option>
-                        </optgroup>
-                        <optgroup label="ไขมัน">
-                            <option value="fat-low">ไขมัน (น้อย → มาก)</option>
-                            <option value="fat-high">ไขมัน (มาก → น้อย)</option>
-                        </optgroup>
-                        <optgroup label="น้ำตาล">
-                            <option value="sugar-low">น้ำตาล (น้อย → มาก)</option>
-                            <option value="sugar-high">น้ำตาล (มาก → น้อย)</option>
-                        </optgroup>
-                        <optgroup label="โซเดียม">
-                            <option value="sodium-low">โซเดียม (น้อย → มาก)</option>
-                            <option value="sodium-high">โซเดียม (มาก → น้อย)</option>
-                        </optgroup>
-                    </select>
-                </div>
+                <button id="filterSortBtn" class="btn filter-sort-btn">
+                    <i class="fas fa-filter"></i> เรียงและกรอง
+                </button>
             </div>
 
             <!-- Food List -->
@@ -145,6 +130,7 @@
 
     </div>
 
+    <!-- Food Detail Modal -->
     <div id="foodModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -154,6 +140,205 @@
             <div class="modal-body" id="modalBody">
             </div>
         </div>
+    </div>
+
+    <!-- Sort & Filter Bottom Sheet -->
+    <div id="filterSortModal" class="bottom-sheet">
+        <div class="bottom-sheet-content">
+            <div class="bottom-sheet-header">
+                <span class="bottom-sheet-title">เรียงและกรอง</span>
+                <button class="close-bottom-sheet" id="closeFilterSortBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="bottom-sheet-body">
+                <!-- Sort Section -->
+                <div class="filter-section">
+                    <h3 class="filter-section-title">เรียงตาม</h3>
+                    <div class="radio-options">
+                        <label class="radio-option">
+                            <input type="radio" name="sort" value="none" checked>
+                            <span class="radio-label">
+                                <i class="fas fa-thumbs-up"></i>
+                                <span>แนะนำ</span>
+                            </span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="sort" value="calorie-asc">
+                            <span class="radio-label">
+                                <i class="fas fa-fire"></i>
+                                <span>แคลอรี่ (น้อย → มาก)</span>
+                            </span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="sort" value="calorie-desc">
+                            <span class="radio-label">
+                                <i class="fas fa-fire"></i>
+                                <span>แคลอรี่ (มาก → น้อย)</span>
+                            </span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="sort" value="sugar-asc">
+                            <span class="radio-label">
+                                <i class="fas fa-candy-cane"></i>
+                                <span>น้ำตาล (น้อย → มาก)</span>
+                            </span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="sort" value="sugar-desc">
+                            <span class="radio-label">
+                                <i class="fas fa-candy-cane"></i>
+                                <span>น้ำตาล (มาก → น้อย)</span>
+                            </span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="sort" value="fat-asc">
+                            <span class="radio-label">
+                                <i class="fas fa-bacon"></i>
+                                <span>ไขมัน (น้อย → มาก)</span>
+                            </span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="sort" value="fat-desc">
+                            <span class="radio-label">
+                                <i class="fas fa-bacon"></i>
+                                <span>ไขมัน (มาก → น้อย)</span>
+                            </span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="sort" value="sodium-asc">
+                            <span class="radio-label">
+                                <i class="fas fa-salt"></i>
+                                <span>โซเดียม (น้อย → มาก)</span>
+                            </span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="sort" value="sodium-desc">
+                            <span class="radio-label">
+                                <i class="fas fa-salt"></i>
+                                <span>โซเดียม (มาก → น้อย)</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <h3 class="filter-section-title">ตัวกรองอาหาร</h3>
+                    <p class="filter-section-description">เลือกเงื่อนไขที่ต้องการ</p>
+                    
+                    <!-- Preset Combinations (Recommended) -->
+                    <div class="filter-item">
+                        <div class="filter-item-header">
+                            <span class="filter-item-label">
+                                <i class="fas fa-star"></i>
+                                <span>แนะนำ</span>
+                            </span>
+                        </div>
+                        <div class="preset-combination-buttons">
+                            <button type="button" class="combination-btn" data-combination="highCalLowFat">
+                                <span>🔥 แคลอรี่เยอะ แต่ไขมันน้อย</span>
+                            </button>
+                            <button type="button" class="combination-btn" data-combination="highFatLowSugar">
+                                <span>🥓 ไขมันมาก แต่น้ำตาลน้อย</span>
+                            </button>
+                            <button type="button" class="combination-btn" data-combination="lowCalLowFat">
+                                <span>🥗 แคลอรี่ต่ำ ไขมันต่ำ</span>
+                            </button>
+                            <button type="button" class="combination-btn" data-combination="highCalLowSugar">
+                                <span>⚡ แคลอรี่เยอะ แต่น้ำตาลน้อย</span>
+                            </button>
+                            <button type="button" class="combination-btn" data-combination="lowSodiumLowFat">
+                                <span>💧 โซเดียมต่ำ ไขมันต่ำ</span>
+                            </button>
+                            <button type="button" class="combination-btn" data-combination="highFatLowSodium">
+                                <span>🍖 ไขมันมาก แต่โซเดียมน้อย</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Custom Filters -->
+                    <div class="filter-item">
+                        <div class="filter-item-header">
+                            <span class="filter-item-label">
+                                <i class="fas fa-sliders-h"></i>
+                                <span>กรองแบบละเอียด</span>
+                            </span>
+                        </div>
+                        <div class="custom-filter-options">
+                            <!-- แคลอรี่ -->
+                            <div class="filter-option-row">
+                                <label class="filter-option-label">
+                                    <i class="fas fa-fire"></i>
+                                    <span>แคลอรี่:</span>
+                                </label>
+                                <div class="filter-value-buttons">
+                                    <button type="button" class="value-btn" data-filter="calorie" data-type="low">ต่ำ</button>
+                                    <button type="button" class="value-btn" data-filter="calorie" data-type="high">เยอะ</button>
+                                    <button type="button" class="value-btn clear-btn" data-filter="calorie">ยกเลิก</button>
+                                </div>
+                            </div>
+
+                            <!-- น้ำตาล -->
+                            <div class="filter-option-row">
+                                <label class="filter-option-label">
+                                    <i class="fas fa-candy-cane"></i>
+                                    <span>น้ำตาล:</span>
+                                </label>
+                                <div class="filter-value-buttons">
+                                    <button type="button" class="value-btn" data-filter="sugar" data-type="low">น้อย</button>
+                                    <button type="button" class="value-btn" data-filter="sugar" data-type="high">มาก</button>
+                                    <button type="button" class="value-btn clear-btn" data-filter="sugar">ยกเลิก</button>
+                                </div>
+                            </div>
+
+                            <!-- ไขมัน -->
+                            <div class="filter-option-row">
+                                <label class="filter-option-label">
+                                    <i class="fas fa-bacon"></i>
+                                    <span>ไขมัน:</span>
+                                </label>
+                                <div class="filter-value-buttons">
+                                    <button type="button" class="value-btn" data-filter="fat" data-type="low">น้อย</button>
+                                    <button type="button" class="value-btn" data-filter="fat" data-type="high">มาก</button>
+                                    <button type="button" class="value-btn clear-btn" data-filter="fat">ยกเลิก</button>
+                                </div>
+                            </div>
+
+                            <!-- โซเดียม -->
+                            <div class="filter-option-row">
+                                <label class="filter-option-label">
+                                    <i class="fas fa-salt"></i>
+                                    <span>โซเดียม:</span>
+                                </label>
+                                <div class="filter-value-buttons">
+                                    <button type="button" class="value-btn" data-filter="sodium" data-type="low">น้อย</button>
+                                    <button type="button" class="value-btn" data-filter="sodium" data-type="high">มาก</button>
+                                    <button type="button" class="value-btn clear-btn" data-filter="sodium">ยกเลิก</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden inputs for filter values -->
+                    <input type="hidden" id="calorieMin" name="calorieMin" value="">
+                    <input type="hidden" id="calorieMax" name="calorieMax" value="">
+                    <input type="hidden" id="sugarMin" name="sugarMin" value="">
+                    <input type="hidden" id="sugarMax" name="sugarMax" value="">
+                    <input type="hidden" id="fatMin" name="fatMin" value="">
+                    <input type="hidden" id="fatMax" name="fatMax" value="">
+                    <input type="hidden" id="sodiumMin" name="sodiumMin" value="">
+                    <input type="hidden" id="sodiumMax" name="sodiumMax" value="">
+                </div>
+            </div>
+
+            <div class="bottom-sheet-footer">
+                <button id="resetFilterSortBtn" class="btn btn-secondary">รีเซ็ต</button>
+                <button id="applyFilterSortBtn" class="btn btn-primary">ใช้</button>
+            </div>
+        </div>
+        <div class="bottom-sheet-backdrop"></div>
     </div>
 
     <script>
@@ -174,8 +359,18 @@
 
             // เก็บข้อมูลอาหารทั้งหมด
             let allFoods = [];
-            let currentMood = 'ทั้งหมด';
+            let currentMood = null; // ไม่มีปัญหาสุขภาพที่เลือกเริ่มต้น
             let currentSort = 'none';
+            let currentFilters = {
+                calorieMin: null,
+                calorieMax: null,
+                sugarMin: null,
+                sugarMax: null,
+                fatMin: null,
+                fatMax: null,
+                sodiumMin: null,
+                sodiumMax: null
+            };
 
             // 1. โหลดข่าวสารสุขภาพ
             loadHealthNews();
@@ -429,18 +624,33 @@
                     });
             }
 
-            // 3. ตั้งค่า Mood Buttons
+            // Sort functionality has been moved to Bottom Sheet Modal (see above)
+
+            // 3. ตั้งค่า Health Issue Buttons (รองรับ toggle functionality)
             function setupMoodButtons() {
                 const moodButtons = document.querySelectorAll('.mood-btn');
                 moodButtons.forEach(btn => {
                     btn.addEventListener('click', function() {
-                        // ลบ active class จากปุ่มอื่น
-                        moodButtons.forEach(b => b.classList.remove('active'));
-                        // เพิ่ม active class ให้ปุ่มที่กด
-                        this.classList.add('active');
+                        const selectedMood = this.dataset.mood;
+                        const isCurrentlyActive = this.classList.contains('active');
                         
-                        currentMood = this.dataset.mood;
-                        // ล้าง search input เมื่อเลือก mood
+                        // ถ้าปุ่มนี้กำลัง active อยู่ ให้ยกเลิกการเลือก (toggle off)
+                        if (isCurrentlyActive) {
+                            this.classList.remove('active');
+                            currentMood = null; // ไม่มีปัญหาสุขภาพที่เลือก
+                        } else {
+                            // ลบ active จากปุ่มอื่น (ให้เลือกได้แค่ปุ่มเดียว)
+                            moodButtons.forEach(b => {
+                                if (b !== this) {
+                                    b.classList.remove('active');
+                                }
+                            });
+                            // เพิ่ม active ให้ปุ่มที่กด
+                            this.classList.add('active');
+                            currentMood = selectedMood;
+                        }
+                        
+                        // ล้าง search input เมื่อเลือกปัญหาสุขภาพ
                         searchInput.value = '';
                         performSearchAndSort();
                     });
@@ -482,70 +692,420 @@
                 });
             }
 
-            // Sort functionality
-            const sortSelect = document.getElementById('sortSelect');
-            if (sortSelect) {
-                sortSelect.addEventListener('change', function() {
-                    currentSort = this.value;
+            // Bottom Sheet Modal สำหรับ Filter & Sort
+            const filterSortModal = document.getElementById('filterSortModal');
+            const filterSortBtn = document.getElementById('filterSortBtn');
+            const closeFilterSortBtn = document.getElementById('closeFilterSortBtn');
+            const applyFilterSortBtn = document.getElementById('applyFilterSortBtn');
+            const resetFilterSortBtn = document.getElementById('resetFilterSortBtn');
+            const backdrop = filterSortModal ? filterSortModal.querySelector('.bottom-sheet-backdrop') : null;
+
+            // เปิด Bottom Sheet
+            if (filterSortBtn && filterSortModal) {
+                filterSortBtn.addEventListener('click', function() {
+                    filterSortModal.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                });
+            }
+
+            // ปิด Bottom Sheet
+            function closeFilterSortModal() {
+                if (filterSortModal) {
+                    filterSortModal.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            }
+
+            if (closeFilterSortBtn) {
+                closeFilterSortBtn.addEventListener('click', closeFilterSortModal);
+            }
+
+            if (backdrop) {
+                backdrop.addEventListener('click', closeFilterSortModal);
+            }
+
+            // Apply Filter & Sort
+            if (applyFilterSortBtn) {
+                applyFilterSortBtn.addEventListener('click', function() {
+                    // อ่านค่า sort จาก radio buttons
+                    const selectedSort = document.querySelector('input[name="sort"]:checked');
+                    if (selectedSort) {
+                        currentSort = selectedSort.value;
+                    }
+
+                    // เก็บค่า range filters
+                    currentFilters = {
+                        calorieMin: document.getElementById('calorieMin').value || null,
+                        calorieMax: document.getElementById('calorieMax').value || null,
+                        sugarMin: document.getElementById('sugarMin').value || null,
+                        sugarMax: document.getElementById('sugarMax').value || null,
+                        fatMin: document.getElementById('fatMin').value || null,
+                        fatMax: document.getElementById('fatMax').value || null,
+                        sodiumMin: document.getElementById('sodiumMin').value || null,
+                        sodiumMax: document.getElementById('sodiumMax').value || null
+                    };
+
+                    closeFilterSortModal();
                     performSearchAndSort();
                 });
             }
 
-            // ฟังก์ชันค้นหาและเรียงลำดับ
-            function performSearchAndSort() {
-                const searchTerm = searchInput.value.toLowerCase().trim();
-                let filtered = [...allFoods];
-
-                // กรองตามการค้นหา
-                if (searchTerm !== '') {
-                    filtered = filtered.filter(food => 
-                        food.name.toLowerCase().includes(searchTerm)
-                    );
+            // Filter Combination Presets
+            const filterPresets = {
+                'highCalLowFat': {
+                    calorieMin: 500,
+                    calorieMax: '',
+                    fatMin: '',
+                    fatMax: 15
+                },
+                'highFatLowSugar': {
+                    fatMin: 20,
+                    fatMax: '',
+                    sugarMin: '',
+                    sugarMax: 5
+                },
+                'lowCalLowFat': {
+                    calorieMin: '',
+                    calorieMax: 400,
+                    fatMin: '',
+                    fatMax: 10
+                },
+                'highCalLowSugar': {
+                    calorieMin: 500,
+                    calorieMax: '',
+                    sugarMin: '',
+                    sugarMax: 5
+                },
+                'lowSodiumLowFat': {
+                    sodiumMin: '',
+                    sodiumMax: 500,
+                    fatMin: '',
+                    fatMax: 10
+                },
+                'highFatLowSodium': {
+                    fatMin: 20,
+                    fatMax: '',
+                    sodiumMin: '',
+                    sodiumMax: 500
                 }
+            };
 
-                // กรองตาม mood (ถ้าไม่ได้ค้นหา)
-                if (searchTerm === '' && currentMood !== 'ทั้งหมด') {
-                    filtered = filterFoodsByMoodData(currentMood);
-                }
+            // Setup Filter Buttons after DOM ready
+            setTimeout(() => {
+                // Combination Buttons Handler
+                document.querySelectorAll('.combination-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const combination = this.dataset.combination;
+                        
+                        // Remove active from all combination buttons
+                        document.querySelectorAll('.combination-btn').forEach(b => b.classList.remove('active'));
+                        
+                        // Remove active from all value buttons
+                        document.querySelectorAll('.value-btn').forEach(b => b.classList.remove('active'));
+                        
+                        // Clear all filter inputs
+                        ['calorie', 'sugar', 'fat', 'sodium'].forEach(filter => {
+                            const minInput = document.getElementById(filter + 'Min');
+                            const maxInput = document.getElementById(filter + 'Max');
+                            if (minInput) minInput.value = '';
+                            if (maxInput) maxInput.value = '';
+                        });
+                        
+                        // Apply preset values
+                        if (filterPresets[combination]) {
+                            const preset = filterPresets[combination];
+                            Object.keys(preset).forEach(key => {
+                                const input = document.getElementById(key);
+                                if (input) {
+                                    input.value = preset[key] || '';
+                                }
+                            });
+                            this.classList.add('active');
+                        }
+                    });
+                });
 
-                // เรียงลำดับตามที่เลือก
-                if (currentSort === 'kcal-low') {
-                    filtered.sort((a, b) => a.kcal - b.kcal);
-                } else if (currentSort === 'kcal-high') {
-                    filtered.sort((a, b) => b.kcal - a.kcal);
-                } else if (currentSort === 'fat-low') {
-                    filtered.sort((a, b) => a.fat - b.fat);
-                } else if (currentSort === 'fat-high') {
-                    filtered.sort((a, b) => b.fat - a.fat);
-                } else if (currentSort === 'sugar-low') {
-                    filtered.sort((a, b) => a.sugar - b.sugar);
-                } else if (currentSort === 'sugar-high') {
-                    filtered.sort((a, b) => b.sugar - a.sugar);
-                } else if (currentSort === 'sodium-low') {
-                    filtered.sort((a, b) => a.sodium - b.sodium);
-                } else if (currentSort === 'sodium-high') {
-                    filtered.sort((a, b) => b.sodium - a.sodium);
-                }
+                // Value Buttons Handler (ต่ำ/เยอะ, น้อย/มาก)
+                document.querySelectorAll('.value-btn:not(.clear-btn)').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const filterType = this.dataset.filter;
+                        const valueType = this.dataset.type; // 'low' or 'high'
+                        
+                        // Remove active from other buttons in same row
+                        const row = this.closest('.filter-option-row');
+                        row.querySelectorAll('.value-btn').forEach(b => b.classList.remove('active'));
+                        
+                        // Remove active from combination buttons
+                        document.querySelectorAll('.combination-btn').forEach(b => b.classList.remove('active'));
+                        
+                        // Define thresholds
+                        const thresholds = {
+                            calorie: { low: 300, high: 500 },
+                            sugar: { low: 5, high: 15 },
+                            fat: { low: 10, high: 20 },
+                            sodium: { low: 500, high: 1000 }
+                        };
+                        
+                        const minInput = document.getElementById(filterType + 'Min');
+                        const maxInput = document.getElementById(filterType + 'Max');
+                        
+                        // Toggle active
+                        if (this.classList.contains('active')) {
+                            this.classList.remove('active');
+                            // Clear values
+                            if (minInput) minInput.value = '';
+                            if (maxInput) maxInput.value = '';
+                        } else {
+                            this.classList.add('active');
+                            // Set values based on type
+                            if (valueType === 'low') {
+                                if (maxInput) maxInput.value = thresholds[filterType].low;
+                                if (minInput) minInput.value = '';
+                            } else if (valueType === 'high') {
+                                if (minInput) minInput.value = thresholds[filterType].high;
+                                if (maxInput) maxInput.value = '';
+                            }
+                        }
+                    });
+                });
 
-                displayFoods(filtered);
+                // Clear Buttons Handler
+                document.querySelectorAll('.value-btn.clear-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const filterType = this.dataset.filter;
+                        const row = this.closest('.filter-option-row');
+                        
+                        // Remove active from all buttons in row
+                        row.querySelectorAll('.value-btn').forEach(b => b.classList.remove('active'));
+                        
+                        // Clear inputs
+                        const minInput = document.getElementById(filterType + 'Min');
+                        const maxInput = document.getElementById(filterType + 'Max');
+                        if (minInput) minInput.value = '';
+                        if (maxInput) maxInput.value = '';
+                    });
+                });
+            }, 200);
+
+            // Reset Filter & Sort
+            if (resetFilterSortBtn) {
+                resetFilterSortBtn.addEventListener('click', function() {
+                    // Reset radio buttons
+                    document.querySelector('input[name="sort"][value="none"]').checked = true;
+                    currentSort = 'none';
+
+                    // Reset range inputs
+                    document.getElementById('calorieMin').value = '';
+                    document.getElementById('calorieMax').value = '';
+                    document.getElementById('sugarMin').value = '';
+                    document.getElementById('sugarMax').value = '';
+                    document.getElementById('fatMin').value = '';
+                    document.getElementById('fatMax').value = '';
+                    document.getElementById('sodiumMin').value = '';
+                    document.getElementById('sodiumMax').value = '';
+
+                    // Reset all buttons
+                    document.querySelectorAll('.combination-btn').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.value-btn').forEach(btn => btn.classList.remove('active'));
+
+                    currentFilters = {
+                        calorieMin: null,
+                        calorieMax: null,
+                        sugarMin: null,
+                        sugarMax: null,
+                        fatMin: null,
+                        fatMax: null,
+                        sodiumMin: null,
+                        sodiumMax: null
+                    };
+
+                    performSearchAndSort();
+                });
             }
 
-            // ฟังก์ชันกรองตาม mood (return array)
-            function filterFoodsByMoodData(mood) {
-                let filtered = [...allFoods];
+            // ฟังก์ชันค้นหาและเรียงลำดับ (ใช้ Backend API)
+            function performSearchAndSort() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
                 
-                if (mood === 'เครียด') {
-                    filtered = allFoods.filter(food => food.sugar >= 5);
-                    filtered.sort((a, b) => b.sugar - a.sugar);
-                } else if (mood === 'เหนื่อย') {
-                    filtered = allFoods.filter(food => food.kcal >= 400);
-                    filtered.sort((a, b) => b.kcal - a.kcal);
-                } else if (mood === 'อยากผอม') {
-                    filtered = allFoods.filter(food => food.kcal <= 350);
-                    filtered.sort((a, b) => a.kcal - b.kcal);
-                } else if (mood === 'บวมน้ำ') {
-                    filtered = allFoods.filter(food => food.sodium <= 600);
-                    filtered.sort((a, b) => a.sodium - b.sodium);
+                // ตรวจสอบว่ามีการค้นหาหรือใช้ filter หรือไม่
+                const hasSearchTerm = searchTerm.length > 0;
+                const hasMoodFilter = currentMood !== null && currentMood !== undefined;
+                const hasFilters = currentFilters && (
+                    currentFilters.calorieMin || currentFilters.calorieMax ||
+                    currentFilters.sugarMin || currentFilters.sugarMax ||
+                    currentFilters.fatMin || currentFilters.fatMax ||
+                    currentFilters.sodiumMin || currentFilters.sodiumMax
+                );
+                
+                // ถ้ามีการค้นหาข้อความ หรือ mood filter หรือ filter ใดๆ ให้ใช้ client-side filtering
+                if (hasSearchTerm || hasMoodFilter || hasFilters) {
+                    // เริ่มจาก allFoods
+                    let filtered = [...allFoods];
+                    
+                    // 1. Filter ด้วย text search (รองรับคำค้นหาแบบธรรมชาติ)
+                    if (hasSearchTerm) {
+                        filtered = filtered.filter(food => {
+                            const name = food.name.toLowerCase();
+                            const searchLower = searchTerm.toLowerCase();
+                            
+                            // ค้นหาจากชื่ออาหาร
+                            if (name.includes(searchLower)) {
+                                return true;
+                            }
+                            
+                            // ค้นหาจากคำสำคัญเกี่ยวกับโภชนาการ
+                            const hasLowFat = searchLower.includes('ไขมันน้อย') || searchLower.includes('ไขมันต่ำ');
+                            const hasHighFat = searchLower.includes('ไขมันมาก') || searchLower.includes('ไขมันเยอะ');
+                            const hasLowCalorie = searchLower.includes('แคลน้อย') || searchLower.includes('แคลต่ำ');
+                            const hasHighCalorie = searchLower.includes('แคลเยอะ') || searchLower.includes('แคลมาก') || searchLower.includes('แคลอรี่เยอะ') || searchLower.includes('แคลอรี่มาก');
+                            const hasLowSugar = searchLower.includes('น้ำตาลน้อย') || searchLower.includes('น้ำตาลต่ำ');
+                            const hasHighSugar = searchLower.includes('น้ำตาลมาก') || searchLower.includes('น้ำตาลเยอะ');
+                            const hasLowSodium = searchLower.includes('โซเดียมน้อย') || searchLower.includes('โซเดียมต่ำ');
+                            const hasHighSodium = searchLower.includes('โซเดียมมาก') || searchLower.includes('โซเดียมเยอะ');
+                            
+                            // ตรวจสอบเงื่อนไขโภชนาการ
+                            if (hasLowFat && food.fat >= 10) return false;
+                            if (hasHighFat && food.fat < 20) return false;
+                            if (hasLowCalorie && food.kcal > 400) return false;
+                            if (hasHighCalorie && food.kcal < 500) return false;
+                            if (hasLowSugar && food.sugar > 5) return false;
+                            if (hasHighSugar && food.sugar < 10) return false;
+                            if (hasLowSodium && food.sodium > 600) return false;
+                            if (hasHighSodium && food.sodium < 800) return false;
+                            
+                            // ถ้าไม่มีเงื่อนไขพิเศษ ให้ค้นหาจากชื่อเท่านั้น
+                            return false;
+                        });
+                    }
+                    
+                    // 2. Filter ด้วย mood
+                    if (hasMoodFilter) {
+                        filtered = filterFoodsByMoodData(currentMood, filtered);
+                    }
+                    
+                    // 3. Filter ด้วย range filters (จากตัวกรอง)
+                    if (hasFilters) {
+                        filtered = filtered.filter(food => {
+                            if (currentFilters.calorieMin && food.kcal < currentFilters.calorieMin) return false;
+                            if (currentFilters.calorieMax && food.kcal > currentFilters.calorieMax) return false;
+                            if (currentFilters.sugarMin && food.sugar < currentFilters.sugarMin) return false;
+                            if (currentFilters.sugarMax && food.sugar > currentFilters.sugarMax) return false;
+                            if (currentFilters.fatMin && food.fat < currentFilters.fatMin) return false;
+                            if (currentFilters.fatMax && food.fat > currentFilters.fatMax) return false;
+                            if (currentFilters.sodiumMin && food.sodium < currentFilters.sodiumMin) return false;
+                            if (currentFilters.sodiumMax && food.sodium > currentFilters.sodiumMax) return false;
+                            return true;
+                        });
+                    }
+                    
+                    // 4. Sort
+                    if (currentSort !== 'none') {
+                        applyClientSort(filtered);
+                    } else {
+                        displayFoods(filtered);
+                    }
+                    return;
+                }
+
+                // ถ้าไม่มี search, mood และ filter ให้ใช้ Backend API
+                buildAndCallFoodAPI();
+            }
+
+            // สร้าง URL และเรียก API
+            function buildAndCallFoodAPI() {
+                let url = 'http://localhost:8080/api/foods?';
+                const params = new URLSearchParams();
+
+                // เพิ่ม range filter parameters
+                if (currentFilters && typeof currentFilters === 'object') {
+                    if (currentFilters.calorieMin) params.append('calorieMin', currentFilters.calorieMin);
+                    if (currentFilters.calorieMax) params.append('calorieMax', currentFilters.calorieMax);
+                    if (currentFilters.sugarMin) params.append('sugarMin', currentFilters.sugarMin);
+                    if (currentFilters.sugarMax) params.append('sugarMax', currentFilters.sugarMax);
+                    if (currentFilters.fatMin) params.append('fatMin', currentFilters.fatMin);
+                    if (currentFilters.fatMax) params.append('fatMax', currentFilters.fatMax);
+                    if (currentFilters.sodiumMin) params.append('sodiumMin', currentFilters.sodiumMin);
+                    if (currentFilters.sodiumMax) params.append('sodiumMax', currentFilters.sodiumMax);
+                }
+
+                // เพิ่ม sort parameters
+                if (currentSort !== 'none') {
+                    if (currentSort.startsWith('calorie-')) {
+                        params.append('sortBy', 'calorie');
+                        params.append('sortOrder', currentSort === 'calorie-asc' ? 'asc' : 'desc');
+                    } else if (currentSort.startsWith('fat-')) {
+                        params.append('sortBy', 'fat');
+                        params.append('sortOrder', currentSort === 'fat-asc' ? 'asc' : 'desc');
+                    } else if (currentSort.startsWith('sugar-')) {
+                        params.append('sortBy', 'sugar');
+                        params.append('sortOrder', currentSort === 'sugar-asc' ? 'asc' : 'desc');
+                    } else if (currentSort.startsWith('sodium-')) {
+                        params.append('sortBy', 'sodium');
+                        params.append('sortOrder', currentSort === 'sodium-asc' ? 'asc' : 'desc');
+                    }
+                }
+
+                url += params.toString();
+
+                // เรียก API
+                fetch(url)
+                    .then(response => response.json())
+                    .then(foods => {
+                        allFoods = foods;
+                        displayFoods(foods);
+                    })
+                    .catch(error => {
+                        console.error('Error loading foods:', error);
+                        // Fallback to client-side sorting
+                        applyClientSort(allFoods);
+                    });
+            }
+
+            // ใช้สำหรับ client-side sorting (fallback)
+            function applyClientSort(foods) {
+                let sorted = [...foods];
+                
+                if (currentSort === 'calorie-asc') {
+                    sorted.sort((a, b) => a.kcal - b.kcal);
+                } else if (currentSort === 'calorie-desc') {
+                    sorted.sort((a, b) => b.kcal - a.kcal);
+                } else if (currentSort === 'fat-asc') {
+                    sorted.sort((a, b) => a.fat - b.fat);
+                } else if (currentSort === 'fat-desc') {
+                    sorted.sort((a, b) => b.fat - a.fat);
+                } else if (currentSort === 'sugar-asc') {
+                    sorted.sort((a, b) => a.sugar - b.sugar);
+                } else if (currentSort === 'sugar-desc') {
+                    sorted.sort((a, b) => b.sugar - a.sugar);
+                } else if (currentSort === 'sodium-asc') {
+                    sorted.sort((a, b) => a.sodium - b.sodium);
+                } else if (currentSort === 'sodium-desc') {
+                    sorted.sort((a, b) => b.sodium - a.sodium);
+                }
+                
+                displayFoods(sorted);
+            }
+
+            // ฟังก์ชันกรองตามปัญหาสุขภาพ (return array)
+            function filterFoodsByMoodData(mood, foodsToFilter = null) {
+                let filtered = foodsToFilter ? [...foodsToFilter] : [...allFoods];
+                
+                if (mood === 'เบาหวาน') {
+                    // สำหรับเบาหวาน: น้ำตาลต่ำ (<= 5g) และไขมันไม่สูงเกินไป
+                    filtered = filtered.filter(food => food.sugar <= 5);
+                    filtered.sort((a, b) => a.sugar - b.sugar); // เรียงจากน้ำตาลน้อยไปมาก
+                } else if (mood === 'ความดันสูง') {
+                    // สำหรับความดันสูง: โซเดียมต่ำ (<= 600mg)
+                    filtered = filtered.filter(food => food.sodium <= 600);
+                    filtered.sort((a, b) => a.sodium - b.sodium); // เรียงจากโซเดียมน้อยไปมาก
+                } else if (mood === 'ลดน้ำหนัก') {
+                    // สำหรับลดน้ำหนัก: แคลอรี่ต่ำ (<= 400 kcal) และไขมันต่ำ (<= 15g)
+                    filtered = filtered.filter(food => food.kcal <= 400 && food.fat <= 15);
+                    filtered.sort((a, b) => a.kcal - b.kcal); // เรียงจากแคลอรี่น้อยไปมาก
+                } else if (mood === 'ไขมันในเลือดสูง') {
+                    // สำหรับไขมันในเลือดสูง: ไขมันต่ำ (<= 15g) และโซเดียมไม่สูงเกินไป
+                    filtered = filtered.filter(food => food.fat <= 15 && food.sodium <= 800);
+                    filtered.sort((a, b) => a.fat - b.fat); // เรียงจากไขมันน้อยไปมาก
                 }
                 
                 return filtered;
@@ -756,6 +1316,26 @@
                     description: "ยำวุ้นเส้นเป็นอาหารที่มีรสเปรี้ยวเผ็ด ทำจากวุ้นเส้น ผักสด และน้ำยำ",
                     benefits: "แคลอรี่ต่ำมาก มีไฟเบอร์สูง อุดมด้วยวิตามิน",
                     tips: "ลดน้ำตาลและน้ำปลาในน้ำยำเพื่อควบคุมโซเดียมและน้ำตาล"
+                },
+                "บะหมี่หยกเป็ดย่าง": {
+                    description: "บะหมี่หยกเส้นกรอบที่เสิร์ฟพร้อมกับเป็ดย่างหอมกรุ่น เนื้อเป็ดย่างมีรสชาติเข้มข้น ไขมันต่ำเหมาะสำหรับผู้ที่ดูแลสุขภาพ",
+                    benefits: "ไขมันต่ำมาก (3g) เหมาะสำหรับผู้ที่ต้องการควบคุมน้ำหนัก มีโปรตีนจากเป็ดย่างช่วยเสริมสร้างกล้ามเนื้อ แคลอรี่ปานกลาง (520 kcal) ให้พลังงานเพียงพอสำหรับมื้อเที่ยง",
+                    tips: "เนื่องจากมีโซเดียมสูง (800mg) ควรดื่มน้ำให้มากหลังทาน แนะนำให้ทานคู่กับผักสดเพื่อเพิ่มไฟเบอร์ เหมาะสำหรับผู้ที่ออกกำลังกายและต้องการโปรตีนแต่ไม่ต้องการไขมัน"
+                },
+                "ข้าวหน้าปลาแกะ": {
+                    description: "ปลาแกะเนื้อแน่นนุ่มที่เสิร์ฟพร้อมข้าวสวยร้อนๆ รสชาติกลมกล่อม ไขมันต่ำมากและโซเดียมต่ำเหมาะสำหรับผู้ที่ใส่ใจสุขภาพ",
+                    benefits: "ไขมันต่ำมากที่สุด (2g) เหมาะสำหรับผู้ควบคุมน้ำหนัก โซเดียมต่ำ (450mg) เหมาะสำหรับผู้ที่เป็นโรคความดันโลหิตสูง ปลาแกะเป็นแหล่งโปรตีนคุณภาพสูงและโอเมก้า-3 ที่ดีต่อสมอง",
+                    tips: "ปลาแกะมีโอเมก้า-3 ช่วยบำรุงสมองและลดการอักเสบในร่างกาย แนะนำให้ทานคู่กับผักต้มหรือผักลวกเพื่อเพิ่มวิตามินและแร่ธาตุ ควรทานสัปดาห์ละ 2-3 ครั้งเพื่อรับโอเมก้า-3 ที่เพียงพอ"
+                },
+                "ข้าวไก่อบสมุนไพร": {
+                    description: "เนื้อไก่ที่หมักด้วยสมุนไพรไทยเช่น ตะไคร้ ขมิ้น ใบมะกรูด แล้วนำไปอบ ให้เนื้อไก่นุ่มหอมกลิ่นสมุนไพร รสชาติเข้มข้น ไขมันต่ำมาก",
+                    benefits: "ไขมันต่ำมาก (3g) เหมาะสำหรับผู้ควบคุมน้ำหนัก โซเดียมต่ำที่สุด (300mg) ปลอดภัยสำหรับผู้ที่ต้องจำกัดโซเดียม สมุนไพรไทยมีสรรพคุณต้านอนุมูลอิสระและลดการอักเสบ โปรตีนสูงจากอกไก่ช่วยเสริมสร้างกล้ามเนื้อ",
+                    tips: "สมุนไพรในเครื่องหมักช่วยเพิ่มภูมิคุ้มกันและช่วยระบบย่อยอาหาร วิธีการอบช่วยลดไขมันได้มากกว่าการทอด แนะนำให้ทานคู่กับข้าวกล้องเพื่อเพิ่มไฟเบอร์และคุณค่าทางโภชนาการ เหมาะสำหรับผู้ที่ออกกำลังกายและต้องการโปรตีนสูง ไขมันต่ำ"
+                },
+                "สปาเก็ตตี้ผัดพริกแห้งอกไก่": {
+                    description: "สปาเก็ตตี้ผัดกับพริกแห้งและอกไก่หั่นชิ้น รสชาติเผ็ดร้อนกลมกล่อม ไขมันต่ำมากและโซเดียมต่ำ เหมาะสำหรับผู้ที่ชอบทานอาหารอิตาเลียนแต่ดูแลสุขภาพ",
+                    benefits: "ไขมันต่ำมากที่สุด (2g) เหมาะสำหรับผู้ที่ต้องจำกัดไขมัน โซเดียมต่ำมาก (250mg) ปลอดภัยสำหรับผู้ที่เป็นโรคความดันโลหิตสูง โปรตีนสูงจากอกไก่ช่วยเสริมสร้างกล้ามเนื้อและทำให้อิ่มนาน คาร์โบไฮเดรตจากเส้นสปาเก็ตตี้ให้พลังงานสำหรับกิจกรรมประจำวัน",
+                    tips: "พริกแห้งมีแคปไซซินที่ช่วยเร่งการเผาผลาญและลดความอยากอาหาร อกไก่เป็นแหล่งโปรตีนลีนที่ย่อยง่ายและให้พลังงานต่อเนื่อง แนะนำให้ทานคู่กับผักใบเขียวเพื่อเพิ่มวิตามินและแร่ธาตุ เหมาะสำหรับผู้ที่ออกกำลังกายเป็นประจำและต้องการโปรตีนสูง วิธีทานเพื่อสุขภาพ: เริ่มทานผักก่อนจะช่วยลดปริมาณคาร์บที่ทานได้"
                 }
             };
 

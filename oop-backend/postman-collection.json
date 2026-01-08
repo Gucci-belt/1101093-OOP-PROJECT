@@ -1,0 +1,328 @@
+{
+	"info": {
+		"_postman_id": "oop-health-app-collection",
+		"name": "OOP Health App APIs",
+		"description": "Collection สำหรับทดสอบ OOP Health Application APIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"testuser123\",\n  \"password\": \"testpass123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/register",
+							"host": ["{{base_url}}"],
+							"path": ["register"]
+						}
+					}
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"member\",\n  \"password\": \"123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": ["{{base_url}}"],
+							"path": ["login"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Food APIs",
+			"item": [
+				{
+					"name": "Get All Foods",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/foods",
+							"host": ["{{base_url}}"],
+							"path": ["api", "foods"]
+						}
+					}
+				},
+				{
+					"name": "Search Food by Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/foods/ข้าวผัด",
+							"host": ["{{base_url}}"],
+							"path": ["api", "foods", "ข้าวผัด"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "BMI APIs",
+			"item": [
+				{
+					"name": "Calculate BMI",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"member\",\n  \"weight\": 70,\n  \"height\": 175\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bmi/calculate",
+							"host": ["{{base_url}}"],
+							"path": ["api", "bmi", "calculate"]
+						}
+					}
+				},
+				{
+					"name": "Get BMI Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bmi/member",
+							"host": ["{{base_url}}"],
+							"path": ["api", "bmi", "member"]
+						}
+					}
+				},
+				{
+					"name": "Get BMI Weight/Height",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bmi/data/member",
+							"host": ["{{base_url}}"],
+							"path": ["api", "bmi", "data", "member"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Cart APIs",
+			"item": [
+				{
+					"name": "Add to Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"member\",\n  \"foodName\": \"ข้าวผัด\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cart/add",
+							"host": ["{{base_url}}"],
+							"path": ["api", "cart", "add"]
+						}
+					}
+				},
+				{
+					"name": "Get Cart",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/cart/member",
+							"host": ["{{base_url}}"],
+							"path": ["api", "cart", "member"]
+						}
+					}
+				},
+				{
+					"name": "Remove from Cart",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"member\",\n  \"foodName\": \"ข้าวผัด\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cart/remove",
+							"host": ["{{base_url}}"],
+							"path": ["api", "cart", "remove"]
+						}
+					}
+				},
+				{
+					"name": "Clear Cart",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/cart/clear/member",
+							"host": ["{{base_url}}"],
+							"path": ["api", "cart", "clear", "member"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Food Tracking APIs",
+			"item": [
+				{
+					"name": "Add Tracking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"member\",\n  \"foodName\": \"ข้าวผัด\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/tracking/add",
+							"host": ["{{base_url}}"],
+							"path": ["api", "tracking", "add"]
+						}
+					}
+				},
+				{
+					"name": "Get Today Tracking",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/tracking/today/member",
+							"host": ["{{base_url}}"],
+							"path": ["api", "tracking", "today", "member"]
+						}
+					}
+				},
+				{
+					"name": "Get All Tracking",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/tracking/all/member",
+							"host": ["{{base_url}}"],
+							"path": ["api", "tracking", "all", "member"]
+						}
+					}
+				},
+				{
+					"name": "Get Tracking by Date",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/tracking/date/member/2024-01-15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "tracking", "date", "member", "2024-01-15"]
+						}
+					}
+				},
+				{
+					"name": "Get Tracking by Date Range",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/tracking/range/member?startDate=2024-01-01&endDate=2024-01-31",
+							"host": ["{{base_url}}"],
+							"path": ["api", "tracking", "range", "member"],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Today Tracking",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/tracking/today/member",
+							"host": ["{{base_url}}"],
+							"path": ["api", "tracking", "today", "member"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Actuator Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/actuator/health",
+							"host": ["{{base_url}}"],
+							"path": ["actuator", "health"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
+

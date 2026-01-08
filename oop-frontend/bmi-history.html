@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ประวัติ BMI</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="mobile-screen">
+        <header class="header">
+            <a href="profile.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <span class="header-title">ประวัติ BMI</span>
+            <div style="width: 40px;"></div>
+        </header>
+
+        <div class="content">
+            <!-- Date Range Filter -->
+            <div class="card bmi-history-card">
+                <h3 class="card-title">📅 เลือกช่วงวันที่</h3>
+                <div class="date-filter-container">
+                    <div class="date-input-group">
+                        <label class="date-label">จากวันที่</label>
+                        <input type="date" id="startDate" class="date-input">
+                    </div>
+                    <div class="date-input-group">
+                        <label class="date-label">ถึงวันที่</label>
+                        <input type="date" id="endDate" class="date-input">
+                    </div>
+                </div>
+                <div class="filter-buttons">
+                    <button id="filterBtn" class="btn filter-btn">
+                        <i class="fas fa-filter"></i> กรองข้อมูล
+                    </button>
+                    <button id="showAllBtn" class="btn btn-secondary show-all-btn">
+                        <i class="fas fa-list"></i> แสดงทั้งหมด
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="card bmi-history-card">
+                <h3 class="card-title">📈 กราฟ BMI Progress</h3>
+                <div class="chart-container">
+                    <canvas id="bmiChart"></canvas>
+                </div>
+            </div>
+
+            <!-- BMI Recommendations -->
+            <div class="card bmi-history-card" id="recommendationCard" style="display: none;">
+                <h3 class="card-title">💡 คำแนะนำสุขภาพ</h3>
+                <div id="recommendationContent" class="recommendation-content">
+                    <!-- จะแสดงคำแนะนำตามค่า BMI -->
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="card bmi-history-card">
+                <h3 class="card-title">📊 สรุปข้อมูล</h3>
+                <div id="summaryStats" class="summary-stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">BMI ปัจจุบัน</div>
+                        <div id="currentBMI" class="stat-value">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">น้ำหนักเฉลี่ย</div>
+                        <div id="avgWeight" class="stat-value">--</div>
+                        <div class="stat-unit">kg</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">จำนวนครั้ง</div>
+                        <div id="totalRecords" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-card stat-card-wide">
+                        <div class="stat-label">ช่วงเวลา</div>
+                        <div id="dateRange" class="stat-value-small">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History List -->
+            <div class="card bmi-history-card">
+                <h3 class="card-title">📋 รายการบันทึก</h3>
+                <div id="historyList" class="history-list-container">
+                    <p class="loading-text">กำลังโหลดข้อมูล...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = localStorage.getItem('currentUser');
+            if (!username) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const filterBtn = document.getElementById('filterBtn');
+            const showAllBtn = document.getElementById('showAllBtn');
+            const historyList = document.getElementById('historyList');
+            let bmiChart = null;
+
+            // ตั้งค่าวันที่เริ่มต้น (30 วันย้อนหลัง)
+            const today = new Date();
+            const thirtyDaysAgo = new Date(today);
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+            
+            startDateInput.value = thirtyDaysAgo.toISOString().split('T')[0];
+            endDateInput.value = today.toISOString().split('T')[0];
+
+            // โหลดข้อมูลเริ่มต้น
+            loadBMIHistory();
+
+            // Event Listeners
+            filterBtn.addEventListener('click', function() {
+                loadBMIHistory();
+            });
+
+            showAllBtn.addEventListener('click', function() {
+                startDateInput.value = '';
+                endDateInput.value = '';
+                loadBMIHistory();
+            });
+
+            // ฟังก์ชันโหลด BMI History
+            function loadBMIHistory() {
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+
+                let url = `http://localhost:8080/api/bmi/history/${username}`;
+                if (startDate && endDate) {
+                    url = `http://localhost:8080/api/bmi/history/${username}/range?startDate=${startDate}&endDate=${endDate}`;
+                }
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.dataPoints && data.dataPoints.length > 0) {
+                            displayHistory(data.dataPoints);
+                            updateChart(data.dataPoints);
+                            updateSummary(data.dataPoints);
+                        } else {
+                            historyList.innerHTML = '<p class="empty-text">ไม่พบข้อมูลในช่วงเวลาที่เลือก</p>';
+                            if (bmiChart) {
+                                bmiChart.destroy();
+                            }
+                            updateSummary([]);
+                            document.getElementById('recommendationCard').style.display = 'none';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading BMI history:', error);
+                        historyList.innerHTML = '<p class="error-text">ไม่สามารถโหลดข้อมูลได้</p>';
+                    });
+            }
+
+            // แสดงรายการประวัติ
+            function displayHistory(dataPoints) {
+                historyList.innerHTML = '';
+                
+                if (dataPoints.length === 0) {
+                    historyList.innerHTML = '<p class="empty-text">ไม่พบข้อมูลในช่วงเวลาที่เลือก</p>';
+                    return;
+                }
+                
+                dataPoints.forEach((point, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    
+                    const categoryColor = getCategoryColor(point.category);
+                    
+                    item.innerHTML = `
+                        <div class="history-item-header">
+                            <div class="history-date-info">
+                                <div class="history-date">${point.date}</div>
+                                <div class="history-time">${point.timestamp.split(' ')[1] || ''}</div>
+                            </div>
+                            <div class="history-bmi-display">
+                                <div class="history-bmi-value" style="color: ${categoryColor};">${point.bmi.toFixed(2)}</div>
+                                <div class="history-bmi-label">BMI</div>
+                            </div>
+                        </div>
+                        <div class="history-item-details">
+                            <div class="history-detail-item">
+                                <div class="history-detail-label">น้ำหนัก</div>
+                                <div class="history-detail-value">${point.weight} kg</div>
+                            </div>
+                            <div class="history-detail-item">
+                                <div class="history-detail-label">ส่วนสูง</div>
+                                <div class="history-detail-value">${point.height} cm</div>
+                            </div>
+                            <div class="history-detail-item">
+                                <div class="history-detail-label">หมวดหมู่</div>
+                                <div class="history-detail-value category-text" style="color: ${categoryColor};">${point.category}</div>
+                            </div>
+                        </div>
+                    `;
+                    historyList.appendChild(item);
+                });
+            }
+
+            // อัปเดตกราฟ
+            function updateChart(dataPoints) {
+                const ctx = document.getElementById('bmiChart').getContext('2d');
+                
+                // ทำลาย chart เดิมถ้ามี
+                if (bmiChart) {
+                    bmiChart.destroy();
+                }
+
+                const dates = dataPoints.map(p => p.date);
+                const bmiValues = dataPoints.map(p => p.bmi);
+                const latestBMI = bmiValues[bmiValues.length - 1];
+
+                // คำนวณช่วงสำหรับแสดง BMI
+                const minBMI = Math.max(15, Math.min(...bmiValues) - 2);
+                const maxBMI = Math.min(35, Math.max(...bmiValues) + 2);
+
+                bmiChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'ค่า BMI',
+                            data: bmiValues,
+                            borderColor: '#4CAF50',
+                            backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            pointBackgroundColor: '#4CAF50',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 10,
+                                titleFont: {
+                                    size: 13,
+                                    weight: 'bold'
+                                },
+                                bodyFont: {
+                                    size: 13
+                                },
+                                callbacks: {
+                                    label: function(context) {
+                                        return `BMI: ${context.parsed.y.toFixed(2)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'ค่า BMI',
+                                    font: {
+                                        size: 13,
+                                        weight: 'bold'
+                                    },
+                                    padding: { top: 10, bottom: 10 }
+                                },
+                                min: minBMI,
+                                max: maxBMI,
+                                ticks: {
+                                    stepSize: 1,
+                                    font: {
+                                        size: 11
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // แสดงคำแนะนำ
+                showRecommendations(latestBMI);
+            }
+
+            // แสดงคำแนะนำตามค่า BMI
+            function showRecommendations(bmi) {
+                const recommendationCard = document.getElementById('recommendationCard');
+                const recommendationContent = document.getElementById('recommendationContent');
+                
+                let recommendations = {};
+                
+                if (bmi < 18.5) {
+                    recommendations = {
+                        category: 'ผอมเกินไป',
+                        categoryColor: '#2196F3',
+                        status: 'ต่ำกว่าเกณฑ์',
+                        targetBMI: '18.5-23.0',
+                        description: 'น้ำหนักของคุณต่ำกว่าเกณฑ์มาตรฐาน ควรเพิ่มน้ำหนักอย่างเหมาะสม',
+                        foodsToEat: [
+                            'ข้าว เนื้อสัตว์ ไข่ ปลา (เพิ่มโปรตีน)',
+                            'นม โยเกิร์ต (แคลเซียมและโปรตีน)',
+                            'ถั่ว อัลมอนด์ (ไขมันดี)',
+                            'อะโวคาโด กล้วย (แคลอรี่สูง)',
+                            'น้ำมันมะกอก (เพิ่มแคลอรี่)'
+                        ],
+                        foodsToAvoid: [
+                            'อาหารที่มีแคลอรี่ต่ำมาก',
+                            'เครื่องดื่มแอลกอฮอล์',
+                            'อาหารที่ไม่มีประโยชน์'
+                        ],
+                        tips: [
+                            'กินมื้อเล็กๆ บ่อยขึ้น (5-6 มื้อต่อวัน)',
+                            'เพิ่มโปรตีนในทุกมื้ออาหาร',
+                            'ออกกำลังกายแบบสร้างกล้ามเนื้อ',
+                            'พักผ่อนให้เพียงพอ'
+                        ]
+                    };
+                } else if (bmi < 23) {
+                    recommendations = {
+                        category: 'ปกติ',
+                        categoryColor: '#4CAF50',
+                        status: 'ดีมาก',
+                        targetBMI: '18.5-23.0',
+                        description: 'คุณมีน้ำหนักอยู่ในเกณฑ์ปกติแล้ว! รักษาสุขภาพให้ดีต่อไป',
+                        foodsToEat: [
+                            'ผักและผลไม้หลากสี (วิตามินและไฟเบอร์)',
+                            'โปรตีนไร้ไขมัน (ไก่ ปลา เต้าหู้)',
+                            'คาร์โบไฮเดรตเชิงซ้อน (ข้าวกล้อง ข้าวโอ๊ต)',
+                            'ไขมันดี (ถั่ว อะโวคาโด)',
+                            'น้ำเปล่า (ดื่มวันละ 8-10 แก้ว)'
+                        ],
+                        foodsToAvoid: [
+                            'อาหารที่มีน้ำตาลสูง',
+                            'อาหารทอด ไขมันอิ่มตัว',
+                            'เครื่องดื่มรสหวาน'
+                        ],
+                        tips: [
+                            'รักษาสมดุลการกินอาหาร 5 หมู่',
+                            'ออกกำลังกายสม่ำเสมอ (อย่างน้อย 150 นาที/สัปดาห์)',
+                            'ควบคุมปริมาณแคลอรี่ให้เหมาะสม',
+                            'นอนหลับให้เพียงพอ'
+                        ]
+                    };
+                } else if (bmi < 25) {
+                    recommendations = {
+                        category: 'ท้วม',
+                        categoryColor: '#FF9800',
+                        status: 'เริ่มเกินเกณฑ์',
+                        targetBMI: '18.5-23.0',
+                        description: 'น้ำหนักเริ่มเกินเกณฑ์เล็กน้อย ควรควบคุมน้ำหนัก',
+                        foodsToEat: [
+                            'ผักใบเขียวมากๆ (ไฟเบอร์สูง แคลอรี่ต่ำ)',
+                            'ผลไม้รสไม่หวาน (แอปเปิล ฝรั่ง)',
+                            'โปรตีนไร้ไขมัน (อกไก่ ไข่ขาว)',
+                            'ไขมันดี (ปลาแซลมอน อะโวคาโด)',
+                            'น้ำเปล่าและชาเขียว'
+                        ],
+                        foodsToAvoid: [
+                            'อาหารทอด อาหารมัน',
+                            'ของหวาน เค้ก ขนม',
+                            'เครื่องดื่มรสหวาน น้ำอัดลม',
+                            'อาหารแปรรูป อาหารสำเร็จรูป',
+                            'แอลกอฮอล์'
+                        ],
+                        tips: [
+                            'ลดแคลอรี่วันละ 200-300 แคลอรี่',
+                            'เพิ่มการออกกำลังกาย (คาร์ดิโอ + เวท)',
+                            'กินอาหารเช้าเพื่อเพิ่มเมตาบอลิซึม',
+                            'ควบคุมส่วนอาหาร (ใช้จานเล็ก)',
+                            'หลีกเลี่ยงการกินดึก'
+                        ]
+                    };
+                } else if (bmi < 30) {
+                    recommendations = {
+                        category: 'อ้วนระดับ 1',
+                        categoryColor: '#FF5722',
+                        status: 'เกินเกณฑ์',
+                        targetBMI: '18.5-23.0',
+                        description: 'น้ำหนักเกินเกณฑ์ ควรลดน้ำหนักอย่างจริงจังเพื่อสุขภาพที่ดีขึ้น',
+                        foodsToEat: [
+                            'ผักสดทุกมื้อ (เพิ่มไฟเบอร์)',
+                            'โปรตีนไร้ไขมัน (ไก่ไม่ติดหนัง ปลา)',
+                            'คาร์บเชิงซ้อน (ข้าวกล้อง ควินัว)',
+                            'ผลไม้รสไม่หวาน',
+                            'น้ำเปล่า (ดื่มก่อนอาหาร)'
+                        ],
+                        foodsToAvoid: [
+                            'อาหารทอด อาหารมัน',
+                            'ของหวานทุกชนิด',
+                            'เครื่องดื่มรสหวาน น้ำอัดลม',
+                            'อาหารแปรรูป อาหารสำเร็จรูป',
+                            'คาร์บขัดขาว (ข้าวขาว ขนมปังขาว)',
+                            'แอลกอฮอล์'
+                        ],
+                        tips: [
+                            'ลดแคลอรี่วันละ 500-750 แคลอรี่',
+                            'ออกกำลังกาย 150-300 นาที/สัปดาห์',
+                            'กินอาหารช้าๆ เคี้ยวให้ละเอียด',
+                            'เพิ่มโปรตีนและไฟเบอร์ในมื้อเช้า',
+                            'นอนหลับให้เพียงพอ 7-9 ชั่วโมง',
+                            'ติดตามน้ำหนักทุกวัน'
+                        ]
+                    };
+                } else {
+                    recommendations = {
+                        category: 'อ้วนระดับ 2',
+                        categoryColor: '#D32F2F',
+                        status: 'อ้วนมาก',
+                        targetBMI: '18.5-23.0',
+                        description: 'น้ำหนักเกินเกณฑ์มาก ควรปรึกษาแพทย์และเริ่มลดน้ำหนักทันที',
+                        foodsToEat: [
+                            'ผักใบเขียว (แคลอรี่ต่ำมาก)',
+                            'โปรตีนไร้ไขมัน (อกไก่ ปลา เต้าหู้)',
+                            'ผลไม้รสไม่หวาน (ในปริมาณจำกัด)',
+                            'น้ำเปล่าเท่านั้น',
+                            'ธัญพืชไม่ขัดสี (ข้าวโอ๊ต)'
+                        ],
+                        foodsToAvoid: [
+                            'อาหารทอด อาหารมัน',
+                            'ของหวานทุกชนิด',
+                            'เครื่องดื่มทุกชนิดยกเว้นน้ำเปล่า',
+                            'อาหารแปรรูป',
+                            'คาร์โบไฮเดรตขัดขาว',
+                            'แอลกอฮอล์'
+                        ],
+                        tips: [
+                            'ปรึกษาแพทย์เพื่อวางแผนลดน้ำหนัก',
+                            'ลดแคลอรี่วันละ 750-1000 แคลอรี่',
+                            'ออกกำลังกายเบาๆ เริ่มจากเดิน',
+                            'กินอาหารเป็นเวลา อย่าข้ามมื้อ',
+                            'ดื่มน้ำก่อนอาหารทุกมื้อ',
+                            'นอนหลับให้เพียงพอ',
+                            'หลีกเลี่ยงความเครียด'
+                        ]
+                    };
+                }
+
+                recommendationContent.innerHTML = `
+                    <div class="recommendation-header" style="border-left: 4px solid ${recommendations.categoryColor}; padding-left: 15px; margin-bottom: 20px;">
+                        <div style="font-size: 1.1rem; font-weight: bold; color: ${recommendations.categoryColor}; margin-bottom: 5px;">
+                            ${recommendations.category} (BMI: ${bmi.toFixed(2)})
+                        </div>
+                        <div style="color: #666; font-size: 0.9rem;">${recommendations.status} - เป้าหมาย: ${recommendations.targetBMI}</div>
+                    </div>
+                    
+                    <div style="color: #555; margin-bottom: 20px; line-height: 1.6;">
+                        ${recommendations.description}
+                    </div>
+
+                    <div style="display: grid; gap: 20px;">
+                        <div class="recommendation-section">
+                            <div class="recommendation-section-title" style="color: #4CAF50;">
+                                <i class="fas fa-check-circle"></i> ควรกิน
+                            </div>
+                            <ul class="recommendation-list">
+                                ${recommendations.foodsToEat.map(food => `<li>${food}</li>`).join('')}
+                            </ul>
+                        </div>
+
+                        <div class="recommendation-section">
+                            <div class="recommendation-section-title" style="color: #F44336;">
+                                <i class="fas fa-times-circle"></i> ควรหลีกเลี่ยง
+                            </div>
+                            <ul class="recommendation-list recommendation-list-avoid">
+                                ${recommendations.foodsToAvoid.map(food => `<li>${food}</li>`).join('')}
+                            </ul>
+                        </div>
+
+                        <div class="recommendation-section">
+                            <div class="recommendation-section-title" style="color: #2196F3;">
+                                <i class="fas fa-lightbulb"></i> เคล็ดลับ
+                            </div>
+                            <ul class="recommendation-list recommendation-list-tips">
+                                ${recommendations.tips.map(tip => `<li>${tip}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                
+                recommendationCard.style.display = 'block';
+            }
+
+            // อัปเดตสรุปข้อมูล
+            function updateSummary(dataPoints) {
+                if (dataPoints.length === 0) {
+                    document.getElementById('currentBMI').textContent = '--';
+                    document.getElementById('avgWeight').textContent = '--';
+                    document.getElementById('totalRecords').textContent = '0';
+                    document.getElementById('dateRange').textContent = '--';
+                    return;
+                }
+
+                // BMI ล่าสุด
+                const latest = dataPoints[dataPoints.length - 1];
+                document.getElementById('currentBMI').textContent = latest.bmi.toFixed(2);
+
+                // น้ำหนักเฉลี่ย
+                const avgWeight = dataPoints.reduce((sum, p) => sum + p.weight, 0) / dataPoints.length;
+                document.getElementById('avgWeight').textContent = avgWeight.toFixed(1);
+
+                // จำนวนครั้ง
+                document.getElementById('totalRecords').textContent = dataPoints.length;
+
+                // ช่วงเวลา
+                const firstDate = dataPoints[0].date;
+                const lastDate = dataPoints[dataPoints.length - 1].date;
+                document.getElementById('dateRange').textContent = firstDate === lastDate ? firstDate : `${firstDate} ถึง ${lastDate}`;
+            }
+
+            // ฟังก์ชันหาสีตามหมวดหมู่ BMI
+            function getCategoryColor(category) {
+                if (category.includes('ผอม') || category.includes('น้อย')) {
+                    return '#2196F3'; // น้ำเงิน
+                } else if (category.includes('ปกติ')) {
+                    return '#4CAF50'; // เขียว
+                } else if (category.includes('เกิน')) {
+                    return '#FF9800'; // ส้ม
+                } else if (category.includes('อ้วน')) {
+                    return '#F44336'; // แดง
+                }
+                return '#666';
+            }
+        });
+    </script>
+</body>
+</html>
+

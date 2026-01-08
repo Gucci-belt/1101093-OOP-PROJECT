@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ค้นหาประวัติสุขภาพ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <div class="mobile-screen">
+        <header class="header">
+            <a href="home.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <span class="header-title">ค้นหาประวัติสุขภาพ</span>
+            <div style="width: 40px;"></div>
+        </header>
+
+        <div class="content">
+            <!-- Health History Search -->
+            <div class="card history-search-card">
+                <div class="history-search-header">
+                    <i class="fas fa-search history-search-icon"></i>
+                    <h3 class="card-title">ค้นหาประวัติสุขภาพ (BMI + การกิน)</h3>
+                </div>
+                
+                <!-- Quick Date Presets -->
+                <div class="date-presets">
+                    <button class="preset-btn" data-preset="today">วันนี้</button>
+                    <button class="preset-btn" data-preset="week">7 วันล่าสุด</button>
+                    <button class="preset-btn active" data-preset="month">30 วันล่าสุด</button>
+                    <button class="preset-btn" data-preset="all">ทั้งหมด</button>
+                </div>
+
+                <!-- Keyword Search -->
+                <div class="history-search-input-wrapper">
+                    <i class="fas fa-search search-input-icon"></i>
+                    <input type="text" id="healthHistorySearch" class="history-search-input" placeholder="ค้นหา เช่น bmi, ผอม, ข้าวผัด, ไขมันต่ำ...">
+                    <button id="quickSearchBtn" class="quick-search-btn" title="ค้นหา">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+
+                <!-- Date Range -->
+                <div class="date-range-wrapper">
+                    <div class="date-input-wrapper">
+                        <label class="date-label">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>จากวันที่</span>
+                        </label>
+                        <input type="date" id="historyStartDate" class="date-input-enhanced">
+                    </div>
+                    <div class="date-separator-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <div class="date-input-wrapper">
+                        <label class="date-label">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>ถึงวันที่</span>
+                        </label>
+                        <input type="date" id="historyEndDate" class="date-input-enhanced">
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="history-search-actions">
+                    <button id="searchHistoryBtn" class="btn btn-primary search-action-btn">
+                        <i class="fas fa-search"></i>
+                        <span>ค้นหา</span>
+                    </button>
+                    <button id="resetHistoryBtn" class="btn btn-secondary reset-action-btn">
+                        <i class="fas fa-redo"></i>
+                        <span>ล้าง</span>
+                    </button>
+                </div>
+
+                <!-- Search Results -->
+                <div id="historySearchResult" class="history-search-result">
+                    <div class="empty-state">
+                        <i class="fas fa-search-location empty-icon"></i>
+                        <p class="hint-text">ใส่คำค้นหรือเลือกช่วงวันที่เพื่อค้นหา BMI และประวัติการกิน</p>
+                        <p class="hint-subtext">ลองค้นหาด้วยคำว่า "bmi", "ผอม", "ข้าว" หรือเลือกวันที่</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer-nav">
+            <a href="home.html" class="footer-icon">🏠</a>
+            <a href="health-dashboard.html" class="footer-icon">📊</a>
+            <a href="cart.html" class="footer-icon">🛒</a>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // DOM Elements
+            const historySearchInput = document.getElementById("healthHistorySearch");
+            const historyStartDate = document.getElementById("historyStartDate");
+            const historyEndDate = document.getElementById("historyEndDate");
+            const searchHistoryBtn = document.getElementById("searchHistoryBtn");
+            const resetHistoryBtn = document.getElementById("resetHistoryBtn");
+            const historySearchResult = document.getElementById("historySearchResult");
+
+            // ตรวจสอบว่าผู้ใช้ login หรือยัง
+            const username = localStorage.getItem('currentUser');
+            if (!username) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // ตั้งค่าวันที่เริ่มต้น (30 วันย้อนหลัง)
+            const today = new Date();
+            const thirtyDaysAgo = new Date(today);
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+            if (historyStartDate) historyStartDate.value = thirtyDaysAgo.toISOString().split('T')[0];
+            if (historyEndDate) historyEndDate.value = today.toISOString().split('T')[0];
+
+            // Setup Health History Search
+            setupHealthHistorySearch();
+
+            function setupHealthHistorySearch() {
+                // Date Presets
+                document.querySelectorAll('.preset-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        // Remove active from all presets
+                        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                        // Add active to clicked preset
+                        this.classList.add('active');
+                        
+                        const preset = this.dataset.preset;
+                        const today = new Date();
+                        let startDate = null;
+                        let endDate = today.toISOString().split('T')[0];
+                        
+                        switch(preset) {
+                            case 'today':
+                                startDate = endDate;
+                                break;
+                            case 'week':
+                                const weekAgo = new Date(today);
+                                weekAgo.setDate(today.getDate() - 7);
+                                startDate = weekAgo.toISOString().split('T')[0];
+                                break;
+                            case 'month':
+                                const monthAgo = new Date(today);
+                                monthAgo.setDate(today.getDate() - 30);
+                                startDate = monthAgo.toISOString().split('T')[0];
+                                break;
+                            case 'all':
+                                startDate = null;
+                                endDate = null;
+                                break;
+                        }
+                        
+                        if (historyStartDate) historyStartDate.value = startDate || '';
+                        if (historyEndDate) historyEndDate.value = endDate || '';
+                        
+                        // Auto search when preset is selected
+                        if (preset !== 'all') {
+                            setTimeout(() => searchHealthHistory(), 300);
+                        }
+                    });
+                });
+
+                // Search button
+                if (searchHistoryBtn) {
+                    searchHistoryBtn.addEventListener('click', searchHealthHistory);
+                }
+
+                // Quick search button (in input)
+                const quickSearchBtn = document.getElementById('quickSearchBtn');
+                if (quickSearchBtn) {
+                    quickSearchBtn.addEventListener('click', searchHealthHistory);
+                }
+
+                // Reset button
+                if (resetHistoryBtn) {
+                    resetHistoryBtn.addEventListener('click', function() {
+                        // Reset inputs
+                        if (historySearchInput) historySearchInput.value = '';
+                        if (historyStartDate && historyEndDate) {
+                            const today = new Date();
+                            const thirtyDaysAgo = new Date(today);
+                            thirtyDaysAgo.setDate(today.getDate() - 30);
+                            historyStartDate.value = thirtyDaysAgo.toISOString().split('T')[0];
+                            historyEndDate.value = today.toISOString().split('T')[0];
+                        }
+                        
+                        // Reset presets
+                        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                        document.querySelector('.preset-btn[data-preset="month"]')?.classList.add('active');
+                        
+                        // Reset results
+                        if (historySearchResult) {
+                            historySearchResult.innerHTML = `
+                                <div class="empty-state">
+                                    <i class="fas fa-search-location empty-icon"></i>
+                                    <p class="hint-text">ใส่คำค้นหรือเลือกช่วงวันที่เพื่อค้นหา BMI และประวัติการกิน</p>
+                                    <p class="hint-subtext">ลองค้นหาด้วยคำว่า "bmi", "ผอม", "ข้าว" หรือเลือกวันที่</p>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+
+                // Enter key to search
+                if (historySearchInput) {
+                    historySearchInput.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            searchHealthHistory();
+                        }
+                    });
+                }
+
+                // Auto search when dates change
+                if (historyStartDate) {
+                    historyStartDate.addEventListener('change', function() {
+                        if (this.value && historyEndDate?.value) {
+                            setTimeout(() => searchHealthHistory(), 500);
+                        }
+                    });
+                }
+                if (historyEndDate) {
+                    historyEndDate.addEventListener('change', function() {
+                        if (this.value && historyStartDate?.value) {
+                            setTimeout(() => searchHealthHistory(), 500);
+                        }
+                    });
+                }
+            }
+
+            // ค้นหาข้ามหลายแหล่ง (BMI + ประวัติการกิน)
+            function searchHealthHistory() {
+                if (!historySearchResult) return;
+
+                const keyword = (historySearchInput?.value || '').trim().toLowerCase();
+                const startDate = historyStartDate?.value;
+                const endDate = historyEndDate?.value;
+
+                historySearchResult.innerHTML = '<p class="loading-text">กำลังค้นหา...</p>';
+
+                let bmiUrl = `http://localhost:8080/api/bmi/history/${username}`;
+                let foodUrl = `http://localhost:8080/api/tracking/all/${username}`;
+
+                // ถ้ามีช่วงวันที่ให้ใช้ endpoint แบบ range
+                if (startDate && endDate) {
+                    bmiUrl = `http://localhost:8080/api/bmi/history/${username}/range?startDate=${startDate}&endDate=${endDate}`;
+                    foodUrl = `http://localhost:8080/api/tracking/range/${username}?startDate=${startDate}&endDate=${endDate}`;
+                }
+
+                Promise.all([
+                    fetch(bmiUrl).then(res => res.json()).catch(() => ({ dataPoints: [] })),
+                    fetch(foodUrl).then(res => res.json()).catch(() => [])
+                ]).then(([bmiData, foodData]) => {
+                    const bmiPoints = bmiData?.dataPoints || [];
+                    const foodHistory = Array.isArray(foodData) ? foodData : [];
+
+                    const filteredBmi = filterBmiByKeyword(bmiPoints, keyword);
+                    const filteredFood = filterFoodHistory(foodHistory, keyword);
+
+                    renderHistorySearchResult(filteredBmi, filteredFood);
+                }).catch(error => {
+                    console.error('Error searching health history:', error);
+                    historySearchResult.innerHTML = '<p class="error-text">ไม่สามารถค้นหาได้ กรุณาลองใหม่</p>';
+                });
+            }
+
+            function filterBmiByKeyword(items, keyword) {
+                if (!keyword) return items;
+                return items.filter(item => {
+                    const text = `${item.date || ''} ${item.timestamp || ''} ${item.category || ''}`.toLowerCase();
+                    const bmiStr = (item.bmi || '').toString();
+                    const weightStr = (item.weight || '').toString();
+                    const heightStr = (item.height || '').toString();
+                    return text.includes(keyword) || bmiStr.includes(keyword) || weightStr.includes(keyword) || heightStr.includes(keyword);
+                });
+            }
+
+            function filterFoodHistory(items, keyword) {
+                if (!keyword) return items;
+                return items.filter(item => {
+                    const text = `${item.foodName || ''} ${item.dateKey || ''} ${item.timestamp || ''}`.toLowerCase();
+                    const kcalStr = (item.kcal || '').toString();
+                    const fatStr = (item.fat || '').toString();
+                    const sugarStr = (item.sugar || '').toString();
+                    const sodiumStr = (item.sodium || '').toString();
+                    return text.includes(keyword) ||
+                        kcalStr.includes(keyword) ||
+                        fatStr.includes(keyword) ||
+                        sugarStr.includes(keyword) ||
+                        sodiumStr.includes(keyword);
+                });
+            }
+
+            function renderHistorySearchResult(bmiItems, foodItems) {
+                if (!historySearchResult) return;
+
+                if ((!bmiItems || bmiItems.length === 0) && (!foodItems || foodItems.length === 0)) {
+                    historySearchResult.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox empty-icon"></i>
+                            <p class="hint-text">ไม่พบผลลัพธ์</p>
+                            <p class="hint-subtext">ลองเปลี่ยนคำค้นหรือเลือกช่วงวันที่อื่น</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const bmiListHtml = bmiItems && bmiItems.length > 0
+                    ? bmiItems.map(item => {
+                        const time = (item.timestamp || '').split(' ')[1] || '';
+                        const categoryColors = {
+                            'ผอมเกินไป': '#2196F3',
+                            'ปกติ': '#4CAF50',
+                            'ท้วม': '#FF9800',
+                            'อ้วน': '#F44336'
+                        };
+                        const color = categoryColors[item.category] || '#666';
+                        return `
+                            <div class="history-search-item history-search-item-bmi">
+                                <div class="history-item-icon" style="background: ${color}20; color: ${color};">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="history-item-content">
+                                    <div class="history-search-title">
+                                        <span class="bmi-value">BMI ${item.bmi?.toFixed ? item.bmi.toFixed(2) : item.bmi || '--'}</span>
+                                        <span class="bmi-badge" style="background: ${color}20; color: ${color};">${item.category || ''}</span>
+                                    </div>
+                                    <div class="history-search-meta">
+                                        <i class="fas fa-calendar"></i> ${item.date || ''} ${time}
+                                        <span class="meta-separator">•</span>
+                                        <i class="fas fa-weight"></i> ${item.weight || '--'} kg
+                                        <span class="meta-separator">•</span>
+                                        <i class="fas fa-ruler-vertical"></i> ${item.height || '--'} cm
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')
+                    : '<div class="empty-section"><i class="fas fa-info-circle"></i> ไม่พบบันทึก BMI</div>';
+
+                const foodListHtml = foodItems && foodItems.length > 0
+                    ? foodItems.map(item => {
+                        const time = item.timestamp ? new Date(item.timestamp) : null;
+                        const timeStr = time ? `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}` : '';
+                        return `
+                            <div class="history-search-item history-search-item-food">
+                                <div class="history-item-icon" style="background: #FFF3E0; color: #FF9800;">
+                                    <i class="fas fa-utensils"></i>
+                                </div>
+                                <div class="history-item-content">
+                                    <div class="history-search-title">${item.foodName || 'เมนู'}</div>
+                                    <div class="history-search-meta">
+                                        <i class="fas fa-calendar"></i> ${item.dateKey || ''} ${timeStr}
+                                        <span class="meta-separator">•</span>
+                                        <span class="nutrition-badge kcal"><i class="fas fa-fire"></i> ${item.kcal?.toFixed ? item.kcal.toFixed(0) : item.kcal || 0} kcal</span>
+                                        <span class="nutrition-badge fat"><i class="fas fa-bacon"></i> ${item.fat?.toFixed ? item.fat.toFixed(1) : item.fat || 0}g</span>
+                                        <span class="nutrition-badge sugar"><i class="fas fa-candy-cane"></i> ${item.sugar?.toFixed ? item.sugar.toFixed(1) : item.sugar || 0}g</span>
+                                        <span class="nutrition-badge sodium"><i class="fas fa-salt"></i> ${item.sodium?.toFixed ? item.sodium.toFixed(0) : item.sodium || 0}mg</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')
+                    : '<div class="empty-section"><i class="fas fa-info-circle"></i> ไม่พบบันทึกการกิน</div>';
+
+                historySearchResult.innerHTML = `
+                    <div class="history-search-section">
+                        <div class="history-search-header">
+                            <i class="fas fa-chart-line"></i>
+                            <span>BMI</span>
+                            <span class="result-count">${bmiItems?.length || 0} รายการ</span>
+                        </div>
+                        <div class="history-search-list">${bmiListHtml}</div>
+                    </div>
+                    <div class="history-search-section">
+                        <div class="history-search-header">
+                            <i class="fas fa-utensils"></i>
+                            <span>ประวัติการกิน</span>
+                            <span class="result-count">${foodItems?.length || 0} รายการ</span>
+                        </div>
+                        <div class="history-search-list">${foodListHtml}</div>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+
+</html>
+
