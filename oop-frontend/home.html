@@ -68,7 +68,13 @@
                     <h4>ค้นหาประวัติ</h4>
                     <p>BMI + การกิน</p>
                 </a>
+                <a href="tracking-history.html" class="action-card tracking-action-card">
+                    <div class="action-icon">📝</div>
+                    <h4>ประวัติการกิน</h4>
+                    <p>กินเยอะจัง?</p>
+                </a>
             </div>
+            <div class="tracking-card" id="tracking-section"> <div class="tracking-header"></div>
 
             <!-- Tracking Section -->
             <div class="tracking-card">
@@ -85,25 +91,40 @@
                 </div>
                 <div class="tracking-summary" id="trackingSummary">
                     <div class="summary-stats">
-                        <div class="stat-item">
+                        <div class="stat-item stat-cal">
+                            <div class="stat-icon">🔥</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="totalKcal">0</span>
+                                <span class="stat-unit">kcal</span>
+                            </div>
                             <span class="stat-label">แคลอรี่</span>
-                            <span class="stat-value" id="totalKcal">0</span>
-                            <span class="stat-unit">kcal</span>
                         </div>
-                        <div class="stat-item">
+                    
+                        <div class="stat-item stat-fat">
+                            <div class="stat-icon">🥓</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="totalFat">0</span>
+                                <span class="stat-unit">g</span>
+                            </div>
                             <span class="stat-label">ไขมัน</span>
-                            <span class="stat-value" id="totalFat">0</span>
-                            <span class="stat-unit">g</span>
                         </div>
-                        <div class="stat-item">
+                    
+                        <div class="stat-item stat-sugar">
+                            <div class="stat-icon">🍭</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="totalSugar">0</span>
+                                <span class="stat-unit">g</span>
+                            </div>
                             <span class="stat-label">น้ำตาล</span>
-                            <span class="stat-value" id="totalSugar">0</span>
-                            <span class="stat-unit">g</span>
                         </div>
-                        <div class="stat-item">
+                    
+                        <div class="stat-item stat-sodium">
+                            <div class="stat-icon">🧂</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="totalSodium">0</span>
+                                <span class="stat-unit">mg</span>
+                            </div>
                             <span class="stat-label">โซเดียม</span>
-                            <span class="stat-value" id="totalSodium">0</span>
-                            <span class="stat-unit">mg</span>
                         </div>
                     </div>
                 </div>
@@ -1496,8 +1517,7 @@
                         if (data.status === 'success') {
                             alert(`เพิ่ม "${foodName}" ลงในตะกร้าแล้ว!`);
                             
-                            // บันทึก tracking ผ่าน API
-                            addToTrackingAPI(username, foodName);
+                            // ไม่บันทึก tracking ตอนนี้ จะบันทึกเมื่อกดปุ่ม "รวม" ในตะกร้า
                             
                             // Track achievement
                             localStorage.setItem(`food_added_${username}`, 'true');

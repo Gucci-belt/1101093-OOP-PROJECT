@@ -31,5 +31,19 @@ public class FoodService {
     public Food getFoodByName(String name) {
         return foodRepository.findByName(name);
     }
+
+    /**
+     * เพิ่มอาหารใหม่
+     */
+    public boolean addFood(Food food) {
+        return foodRepository.addFood(food);
+    }
+
+    /**
+     * ลบอาหารตามชื่อ
+     */
+    public boolean deleteFood(String name) {
+        return foodRepository.deleteFood(name);
+    }
 }
 

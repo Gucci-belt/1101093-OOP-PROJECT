@@ -158,4 +158,29 @@ public class FoodRepository {
         }
         return null; // ไม่เจอ
     }
+
+    /**
+     * เพิ่มอาหารใหม่ลง database
+     */
+    public boolean addFood(Food food) {
+        // เช็คว่ามีชื่อซ้ำหรือไม่
+        if (findByName(food.getName()) != null) {
+            return false; // มีชื่อซ้ำ
+        }
+        foodDatabase.add(food);
+        return true;
+    }
+
+    /**
+     * ลบอาหารออกจาก database ตามชื่อ
+     */
+    public boolean deleteFood(String name) {
+        for (int i = 0; i < foodDatabase.size(); i++) {
+            if (foodDatabase.get(i).getName().equals(name)) {
+                foodDatabase.remove(i);
+                return true;
+            }
+        }
+        return false; // ไม่เจอ
+    }
 }

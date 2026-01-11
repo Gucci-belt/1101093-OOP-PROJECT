@@ -1,5 +1,6 @@
 package com.login_oop.oop_backend.controllers;
 
+import com.login_oop.oop_backend.dto.FoodRequest;
 import com.login_oop.oop_backend.filtering.FilterFactory;
 import com.login_oop.oop_backend.filtering.FoodSpecification;
 import com.login_oop.oop_backend.models.Food;
@@ -7,8 +8,11 @@ import com.login_oop.oop_backend.services.FoodFilterService;
 import com.login_oop.oop_backend.services.FoodService;
 import com.login_oop.oop_backend.sorting.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -218,5 +222,56 @@ public class FoodController {
             default:
                 return null;
         }
+    }
+
+    /**
+     * API สำหรับเพิ่มอาหารใหม่
+     * เรียกผ่าน POST /api/foods/add
+     */
+    @PostMapping("/api/foods/add")
+    public Map<String, String> addFood(@RequestBody(required = false) FoodRequest request) {
+        // เช็คว่ามี request body หรือเปล่า
+        if (request == null) {
+            return Map.of("status", "failed", "message", "Request body is missing");
+        }
+        
+        // เช็คข้อมูล
+        if (request.getName() == null || request.getName().trim().isEmpty()) {
+            return Map.of("status", "failed", "message", "ชื่อเมนูต้องไม่ว่าง");
+        }
+        
+        if (request.getKcal() < 0 || request.getFat() < 0 || request.getSugar() < 0 || request.getSodium() < 0) {
+            return Map.of("status", "failed", "message", "ค่าสารอาหารไม่สามารถเป็นจำนวนลบได้");
+        }
+        
+        // สร้าง Food object
+        Food newFood = new Food(
+            request.getName().trim(),
+            request.getKcal(),
+            request.getFat(),
+            request.getSugar(),
+            request.getSodium()
+        );
+        
+        // เพิ่มอาหารผ่าน service
+        boolean success = foodService.addFood(newFood);
+        if (success) {
+            return Map.of("status", "success", "message", "เพิ่มเมนูอาหารเรียบร้อย");
+        }
+        return Map.of("status", "failed", "message", "มีเมนูชื่อนี้อยู่แล้ว");
+    }
+
+    /**
+     * API สำหรับลบอาหาร
+     * เรียกผ่าน DELETE /api/foods/{name}
+     */
+    @DeleteMapping("/api/foods/{name}")
+    public Map<String, String> deleteFood(@PathVariable String name) {
+        // ลบอาหารผ่าน service
+        boolean success = foodService.deleteFood(name);
+        if (success) {
+            return Map.of("status", "success", "message", "ลบเมนูอาหารเรียบร้อย");
+        }
+        return Map.of("status", "failed", "message", "ไม่พบเมนูที่ต้องการลบ");
     }
 }

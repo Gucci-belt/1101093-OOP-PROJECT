@@ -136,34 +136,29 @@
                         }
                         document.getElementById('calorieTarget').textContent = target;
                         
-                        // Get today's calories from cart API (คำนวณใหม่ทุกครั้งจากตะกร้าปัจจุบัน)
-                        fetch(`http://localhost:8080/api/cart/${username}`)
+                        // Get today's calories from tracking API (ข้อมูลที่บันทึกแล้ว)
+                        fetch(`http://localhost:8080/api/tracking/today/${username}`)
                             .then(response => {
                                 if (!response.ok) {
-                                    throw new Error('Failed to fetch cart');
+                                    throw new Error('Failed to fetch tracking');
                                 }
                                 return response.json();
                             })
-                            .then(cart => {
+                            .then(trackingData => {
                                 let consumed = 0;
                                 
-                                // คำนวณแคลอรี่จากตะกร้าปัจจุบันทั้งหมด (ไม่ใช้ localStorage)
-                                if (Array.isArray(cart) && cart.length > 0) {
-                                    consumed = cart.reduce((total, item) => {
+                                // คำนวณแคลอรี่จาก tracking data ของวันนี้
+                                if (Array.isArray(trackingData) && trackingData.length > 0) {
+                                    consumed = trackingData.reduce((total, item) => {
                                         const kcal = parseFloat(item.kcal) || 0;
                                         return total + kcal;
                                     }, 0);
                                 }
                                 
-                                // อัปเดต localStorage เพื่อเก็บข้อมูล (แต่ไม่ใช้ในการคำนวณ)
-                                const today = new Date().toDateString();
-                                const todayKey = `calories_${username}_${today}`;
-                                localStorage.setItem(todayKey, consumed.toString());
-                                
                                 updateCalorieDisplay(consumed, target);
                             })
                             .catch(error => {
-                                console.error('Error fetching cart:', error);
+                                console.error('Error fetching tracking:', error);
                                 // ถ้า API ไม่ทำงาน ให้ใช้ 0
                                 updateCalorieDisplay(0, target);
                             });

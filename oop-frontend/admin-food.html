@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการเมนูอาหาร - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Admin Dashboard Layout -->
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">🥗 Admin Panel</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="profile.html" class="sidebar-link">
+                    <i class="fas fa-home"></i>
+                    <span>หน้าหลัก</span>
+                </a>
+                <a href="admin-food.html" class="sidebar-link active">
+                    <i class="fas fa-utensils"></i>
+                    <span>จัดการเมนูอาหาร</span>
+                </a>
+                <a href="home.html" class="sidebar-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>กลับหน้า User</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Header -->
+            <header class="admin-header">
+                <h1 class="admin-page-title">จัดการเมนูอาหาร</h1>
+                <button class="btn btn-primary" id="addFoodBtn">
+                    <i class="fas fa-plus"></i>
+                    เพิ่มเมนูอาหาร
+                </button>
+            </header>
+
+            <!-- Content Area -->
+            <div class="admin-content">
+                <!-- Food Table -->
+                <div class="admin-card">
+                    <div class="table-container">
+                        <table class="admin-table" id="foodTable">
+                            <thead>
+                                <tr>
+                                    <th>รูปภาพ</th>
+                                    <th>ชื่อเมนู</th>
+                                    <th>แคลอรี่ (kcal)</th>
+                                    <th>ไขมัน (g)</th>
+                                    <th>น้ำตาล (g)</th>
+                                    <th>โซเดียม (mg)</th>
+                                    <th>การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="foodTableBody">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 40px;">
+                                        <p style="color: var(--text-light);">กำลังโหลดข้อมูล...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal: Add Food -->
+    <div class="modal" id="addFoodModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">เพิ่มเมนูอาหาร</h2>
+                <button class="modal-close" id="closeModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addFoodForm">
+                    <div class="form-group">
+                        <label for="foodName" class="form-label">ชื่อเมนู *</label>
+                        <input type="text" id="foodName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="foodKcal" class="form-label">แคลอรี่ (kcal) *</label>
+                        <input type="number" id="foodKcal" class="form-input" step="0.1" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="foodFat" class="form-label">ไขมัน (g) *</label>
+                        <input type="number" id="foodFat" class="form-input" step="0.1" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="foodSugar" class="form-label">น้ำตาล (g) *</label>
+                        <input type="number" id="foodSugar" class="form-input" step="0.1" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="foodSodium" class="form-label">โซเดียม (mg) *</label>
+                        <input type="number" id="foodSodium" class="form-input" step="0.1" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="foodImageUrl" class="form-label">URL รูปภาพ</label>
+                        <input type="url" id="foodImageUrl" class="form-input" placeholder="https://example.com/image.jpg">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancelBtn">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="modal-backdrop"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ตรวจสอบว่าผู้ใช้เป็น admin หรือไม่
+            const userRole = localStorage.getItem('currentUserRole');
+            const username = localStorage.getItem('currentUser');
+            
+            if (!username) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            if (userRole !== 'Admin') {
+                alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
+                window.location.href = 'home.html';
+                return;
+            }
+
+            // DOM Elements
+            const addFoodBtn = document.getElementById('addFoodBtn');
+            const addFoodModal = document.getElementById('addFoodModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const addFoodForm = document.getElementById('addFoodForm');
+            const foodTableBody = document.getElementById('foodTableBody');
+            const modalBackdrop = document.querySelector('.modal-backdrop');
+
+            // Event Listeners
+            addFoodBtn.addEventListener('click', () => {
+                addFoodModal.classList.add('show');
+            });
+
+            closeModalBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+            modalBackdrop.addEventListener('click', closeModal);
+
+            addFoodForm.addEventListener('submit', handleAddFood);
+
+            function closeModal() {
+                addFoodModal.classList.remove('show');
+                addFoodForm.reset();
+            }
+
+            // Load foods on page load
+            loadFoods();
+
+            // ฟังก์ชันโหลดรายการอาหาร
+            function loadFoods() {
+                foodTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><p style="color: var(--text-light);">กำลังโหลดข้อมูล...</p></td></tr>';
+
+                fetch('http://localhost:8080/api/foods')
+                    .then(response => response.json())
+                    .then(foods => {
+                        if (foods.length === 0) {
+                            foodTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><p style="color: var(--text-light);">ไม่มีข้อมูลอาหาร</p></td></tr>';
+                            return;
+                        }
+
+                        foodTableBody.innerHTML = foods.map(food => {
+                            const imagePath = `images/${food.name.toLowerCase().replace(/\s+/g, '-')}.jpg`;
+                            return `
+                                <tr>
+                                    <td>
+                                        <img src="${imagePath}" alt="${food.name}" 
+                                             class="food-table-image" 
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <div class="food-image-placeholder" style="display: none;">
+                                            <i class="fas fa-utensils"></i>
+                                        </div>
+                                    </td>
+                                    <td><strong>${food.name}</strong></td>
+                                    <td>${food.kcal.toFixed(0)}</td>
+                                    <td>${food.fat.toFixed(1)}</td>
+                                    <td>${food.sugar.toFixed(1)}</td>
+                                    <td>${food.sodium.toFixed(0)}</td>
+                                    <td>
+                                        <button class="btn-delete" onclick="deleteFood('${food.name}')">
+                                            <i class="fas fa-trash"></i>
+                                            ลบ
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('');
+                    })
+                    .catch(error => {
+                        console.error('Error loading foods:', error);
+                        foodTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: red;">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>';
+                    });
+            }
+
+            // ฟังก์ชันเพิ่มอาหาร
+            function handleAddFood(e) {
+                e.preventDefault();
+
+                const foodData = {
+                    name: document.getElementById('foodName').value.trim(),
+                    kcal: parseFloat(document.getElementById('foodKcal').value),
+                    fat: parseFloat(document.getElementById('foodFat').value),
+                    sugar: parseFloat(document.getElementById('foodSugar').value),
+                    sodium: parseFloat(document.getElementById('foodSodium').value),
+                    imageUrl: document.getElementById('foodImageUrl').value.trim()
+                };
+
+                // Validation
+                if (!foodData.name) {
+                    alert('กรุณากรอกชื่อเมนู');
+                    return;
+                }
+
+                if (foodData.kcal < 0 || foodData.fat < 0 || foodData.sugar < 0 || foodData.sodium < 0) {
+                    alert('ค่าสารอาหารไม่สามารถเป็นจำนวนลบได้');
+                    return;
+                }
+
+                addFood(foodData);
+            }
+
+            function addFood(foodData) {
+                fetch('http://localhost:8080/api/foods/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(foodData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('เพิ่มเมนูอาหารสำเร็จ');
+                        closeModal();
+                        loadFoods(); // โหลดข้อมูลใหม่
+                    } else {
+                        alert('เกิดข้อผิดพลาด: ' + (data.message || 'ไม่สามารถเพิ่มเมนูได้'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding food:', error);
+                    alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ (Backend ปิดอยู่?)');
+                });
+            }
+
+            // ฟังก์ชันลบอาหาร (ต้องประกาศเป็น global function เพื่อให้ onclick เรียกได้)
+            window.deleteFood = function(foodName) {
+                if (!confirm(`คุณต้องการลบเมนู "${foodName}" หรือไม่?`)) {
+                    return;
+                }
+
+                fetch(`http://localhost:8080/api/foods/${encodeURIComponent(foodName)}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('ลบเมนูอาหารสำเร็จ');
+                        loadFoods(); // โหลดข้อมูลใหม่
+                    } else {
+                        alert('เกิดข้อผิดพลาด: ' + (data.message || 'ไม่สามารถลบเมนูได้'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting food:', error);
+                    alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ (Backend ปิดอยู่?)');
+                });
+            };
+        });
+    </script>
+</body>
+</html>

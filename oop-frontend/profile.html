@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,14 +8,15 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body>
     <div class="mobile-screen">
-        
+
         <header class="header">
             <span class="header-title">โปรไฟล์</span>
             <a href="profile.html" class="profile-icon"></a>
         </header>
-        
+
         <div class="content">
             <h2 class="page-title">ข้อมูลของคุณ</h2>
 
@@ -22,14 +24,14 @@
                 <label for="edit-weight">น้ำหนัก (kg)</label>
                 <input type="text" id="edit-weight">
             </div>
-            
+
             <div class="form-group">
                 <label for="edit-height">ส่วนสูง (cm)</label>
                 <input type="text" id="edit-height">
             </div>
 
             <button id="recalcBtn" class="btn">บันทึกและคำนวณใหม่</button>
-            
+
             <div class="bmi-result-box" id="profile-bmi-box">
                 <strong>น้ำหนัก:</strong> <span id="profile-weight">--</span> kg
                 <br>
@@ -39,11 +41,24 @@
                 <br>
                 <small>(ควรกิน <span id="profile-calories">----</span> แคลอรี่)</small>
             </div>
-            
-            <a href="bmi-history.html" class="btn btn-secondary" style="margin-bottom: 20px; width: 100%;">
+
+            <a href="bmi-history.html" class="btn btn-history" style="margin-bottom: 20px; width: 100%;">
                 <i class="fas fa-chart-line"></i> ดูประวัติ BMI และกราฟ
             </a>
-            
+
+            <!-- Admin Section (แสดงเฉพาะ Admin) -->
+            <div id="adminSection" style="display: none; margin-bottom: 20px;">
+                <div style="border-top: 2px solid var(--border-light); padding-top: 20px; margin-top: 20px;">
+                    <h3 style="color: var(--primary-green); margin-bottom: 15px; font-size: 1.2rem;">
+                        <i class="fas fa-user-shield"></i> ส่วนจัดการระบบ (Admin)
+                    </h3>
+                    <a href="admin-food.html" class="btn"
+                        style="background: var(--gradient-green); color: white; width: 100%; margin-bottom: 10px;">
+                        <i class="fas fa-utensils"></i> จัดการเมนูอาหาร
+                    </a>
+                </div>
+            </div>
+
             <table class="bmi-table">
                 <thead>
                     <tr>
@@ -69,7 +84,7 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // 1. หาชื่อผู้ใช้ปัจจุบัน
             const username = localStorage.getItem('currentUser');
             if (!username) {
@@ -88,12 +103,19 @@
             const profileCalories = document.getElementById('profile-calories');
             const bmiTableBody = document.getElementById('bmi-table-body');
             const logoutBtn = document.getElementById('logoutBtn');
+            const adminSection = document.getElementById('adminSection');
+
+            // เช็คว่าเป็น Admin หรือไม่
+            const userRole = localStorage.getItem('currentUserRole');
+            if (userRole === 'Admin' && adminSection) {
+                adminSection.style.display = 'block';
+            }
 
             // 3. โหลดข้อมูลครั้งแรก
             loadProfileData();
 
             // 4. ผูก Event ให้ปุ่มคำนวณใหม่
-            recalcBtn.addEventListener('click', function() {
+            recalcBtn.addEventListener('click', function () {
                 const newWeight = parseFloat(editWeight.value);
                 const newHeight = parseFloat(editHeight.value);
 
@@ -110,79 +132,79 @@
                             height: newHeight
                         })
                     })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.status === 'success') {
-                            // อัปเดตหน้าจอทันทีหลังจากได้ข้อมูล
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.status === 'success') {
+                                // อัปเดตหน้าจอทันทีหลังจากได้ข้อมูล
+                                updateProfileDisplay({
+                                    weight: newWeight,
+                                    height: newHeight,
+                                    bmi: data.bmi,
+                                    calories: data.calories,
+                                    category: data.category,
+                                    categoryRange: data.categoryRange
+                                });
+
+                                // บันทึก BMI History
+                                recordBMIHistory(username, newWeight, newHeight);
+
+                                // รีโหลดข้อมูลจาก API เพื่อให้แน่ใจว่าข้อมูลถูกต้อง
+                                setTimeout(() => {
+                                    loadProfileData();
+                                }, 100);
+
+                                alert('บันทึกข้อมูลใหม่แล้ว!');
+                                // Update streak
+                                localStorage.setItem(`lastUpdate_${username}`, new Date().toISOString());
+                            } else {
+                                alert('เกิดข้อผิดพลาด: ' + (data.message || 'ไม่สามารถคำนวณได้'));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error calculating BMI:', error);
+                            let errorMessage = 'ไม่สามารถเชื่อมต่อกับ server ได้';
+                            if (error.message) {
+                                errorMessage = error.message;
+                            }
+                            alert('เกิดข้อผิดพลาด: ' + errorMessage + '\n\nกรุณาตรวจสอบว่า Backend Server กำลังรันอยู่ที่ http://localhost:8080');
+
+                            // แสดงข้อมูลในช่องสีเหลี่ยมแบบชั่วคราวจากการคำนวณฝั่ง client
+                            const calculatedBmi = (newWeight / ((newHeight / 100) ** 2)).toFixed(1);
+                            const calories = Math.round(newWeight * 24);
+                            let category = '';
+                            let categoryRange = '';
+
+                            if (calculatedBmi < 18.5) {
+                                category = 'น้ำหนักน้อย';
+                                categoryRange = 'น้อยกว่า 18.5';
+                            } else if (calculatedBmi < 23.0) {
+                                category = 'ปกติ';
+                                categoryRange = '18.5 - 22.9';
+                            } else if (calculatedBmi < 25.0) {
+                                category = 'น้ำหนักเกิน';
+                                categoryRange = '23.0 - 24.9';
+                            } else if (calculatedBmi < 30.0) {
+                                category = 'อ้วน';
+                                categoryRange = '25.0 - 29.9';
+                            } else {
+                                category = 'อ้วนมาก';
+                                categoryRange = '30.0 ขึ้นไป';
+                            }
+
                             updateProfileDisplay({
                                 weight: newWeight,
                                 height: newHeight,
-                                bmi: data.bmi,
-                                calories: data.calories,
-                                category: data.category,
-                                categoryRange: data.categoryRange
+                                bmi: calculatedBmi,
+                                calories: calories,
+                                category: category,
+                                categoryRange: categoryRange
                             });
-                            
-                            // บันทึก BMI History
-                            recordBMIHistory(username, newWeight, newHeight);
-                            
-                            // รีโหลดข้อมูลจาก API เพื่อให้แน่ใจว่าข้อมูลถูกต้อง
-                            setTimeout(() => {
-                                loadProfileData();
-                            }, 100);
-                            
-                            alert('บันทึกข้อมูลใหม่แล้ว!');
-                            // Update streak
-                            localStorage.setItem(`lastUpdate_${username}`, new Date().toISOString());
-                        } else {
-                            alert('เกิดข้อผิดพลาด: ' + (data.message || 'ไม่สามารถคำนวณได้'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error calculating BMI:', error);
-                        let errorMessage = 'ไม่สามารถเชื่อมต่อกับ server ได้';
-                        if (error.message) {
-                            errorMessage = error.message;
-                        }
-                        alert('เกิดข้อผิดพลาด: ' + errorMessage + '\n\nกรุณาตรวจสอบว่า Backend Server กำลังรันอยู่ที่ http://localhost:8080');
-                        
-                        // แสดงข้อมูลในช่องสีเหลี่ยมแบบชั่วคราวจากการคำนวณฝั่ง client
-                        const calculatedBmi = (newWeight / ((newHeight / 100) ** 2)).toFixed(1);
-                        const calories = Math.round(newWeight * 24);
-                        let category = '';
-                        let categoryRange = '';
-                        
-                        if (calculatedBmi < 18.5) {
-                            category = 'น้ำหนักน้อย';
-                            categoryRange = 'น้อยกว่า 18.5';
-                        } else if (calculatedBmi < 23.0) {
-                            category = 'ปกติ';
-                            categoryRange = '18.5 - 22.9';
-                        } else if (calculatedBmi < 25.0) {
-                            category = 'น้ำหนักเกิน';
-                            categoryRange = '23.0 - 24.9';
-                        } else if (calculatedBmi < 30.0) {
-                            category = 'อ้วน';
-                            categoryRange = '25.0 - 29.9';
-                        } else {
-                            category = 'อ้วนมาก';
-                            categoryRange = '30.0 ขึ้นไป';
-                        }
-                        
-                        updateProfileDisplay({
-                            weight: newWeight,
-                            height: newHeight,
-                            bmi: calculatedBmi,
-                            calories: calories,
-                            category: category,
-                            categoryRange: categoryRange
                         });
-                    });
                 } else {
                     alert('กรุณากรอกข้อมูลให้ถูกต้อง');
                 }
@@ -231,23 +253,23 @@
                         height: height
                     })
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        console.log('บันทึก BMI History สำเร็จ:', data);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error recording BMI history:', error);
-                    // ไม่แสดง error ให้ user เพราะไม่ใช่ฟีเจอร์หลัก
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            console.log('บันทึก BMI History สำเร็จ:', data);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error recording BMI history:', error);
+                        // ไม่แสดง error ให้ user เพราะไม่ใช่ฟีเจอร์หลัก
+                    });
             }
 
             // 7. ฟังก์ชันโหลดข้อมูล BMI จาก API
             function loadProfileData() {
                 // โหลดข้อมูลน้ำหนักและส่วนสูงก่อน
                 loadUserData();
-                
+
                 // เรียก API เพื่อดึงข้อมูล BMI
                 fetch(`http://localhost:8080/api/bmi/${username}`)
                     .then(response => {
@@ -261,7 +283,7 @@
                             // ใช้ข้อมูลจาก API โดยตรง
                             const weight = parseFloat(data.weight) || parseFloat(editWeight.value) || 0;
                             const height = parseFloat(data.height) || parseFloat(editHeight.value) || 0;
-                            
+
                             // อัปเดตส่วนแสดงผล
                             updateProfileDisplay({
                                 weight: weight,
@@ -271,7 +293,7 @@
                                 category: data.category,
                                 categoryRange: data.categoryRange
                             });
-                            
+
                             // อัปเดต input fields
                             if (weight > 0) {
                                 editWeight.value = weight;
@@ -326,7 +348,7 @@
                     profileHeight.textContent = data.height;
                     editHeight.value = data.height; // อัปเดต input field ด้วย
                 }
-                
+
                 // แสดง BMI และแคลอรี่
                 if (data.bmi) {
                     profileBmi.textContent = data.bmi;
@@ -334,12 +356,12 @@
                 if (data.calories) {
                     profileCalories.textContent = data.calories;
                 }
-                
+
                 // อัปเดตตาราง (ใช้ข้อมูลจาก API)
                 if (data.category && data.categoryRange) {
                     bmiTableBody.innerHTML = `<tr><td>${data.category}</td><td>${data.categoryRange}</td></tr>`;
                 }
-                
+
                 // ตรวจสอบว่า bmi-result-box แสดงข้อมูลอยู่หรือไม่
                 const bmiBox = document.getElementById('profile-bmi-box');
                 if (bmiBox && data.bmi) {
@@ -362,12 +384,13 @@
             }
 
             // 8. ล้างข้อมูลเมื่อออกจากระบบ
-            logoutBtn.addEventListener('click', function() {
+            logoutBtn.addEventListener('click', function () {
                 localStorage.removeItem('currentUser');
                 localStorage.removeItem('currentUserRole');
-                localStorage.removeItem('cart'); 
+                localStorage.removeItem('cart');
             });
         });
     </script>
 </body>
+
 </html>

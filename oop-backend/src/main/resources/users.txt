@@ -11,3 +11,4 @@ oop,1234,Member
 testuser,password123,Member
 user,password123,Member
 Nick,1234,Member
+admin nick,nickgoon,Admin

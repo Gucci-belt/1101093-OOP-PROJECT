@@ -79,11 +79,75 @@
                     document.getElementById('total-fat').textContent = totalFat.toFixed(1);   
                     document.getElementById('total-sugar').textContent = totalSugar.toFixed(1);
                     document.getElementById('total-sodium').textContent = totalSodium.toFixed(0);
+
+                    // 5. บันทึก tracking ทุกรายการในตะกร้า
+                    saveAllToTracking(cart, username);
                 })
                 .catch(error => {
                     console.error('Error loading cart:', error);
                     alert('ไม่สามารถโหลดตะกร้าได้ (Backend ปิดอยู่?)');
                 });
+
+            // ฟังก์ชันบันทึก tracking ทุกรายการในตะกร้า
+            function saveAllToTracking(cart, username) {
+                if (cart.length === 0) {
+                    return; // ถ้าตะกร้าว่าง ไม่ต้องบันทึก
+                }
+
+                // ใช้ Promise.all เพื่อบันทึกทั้งหมดพร้อมกัน
+                const trackingPromises = cart.map(item => {
+                    return fetch('http://localhost:8080/api/tracking/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username: username,
+                            foodName: item.name
+                        })
+                    })
+                    .then(response => response.json())
+                    .catch(error => {
+                        console.error('Error adding tracking for', item.name, ':', error);
+                        return { status: 'failed', message: error.message };
+                    });
+                });
+
+                Promise.all(trackingPromises)
+                    .then(results => {
+                        const successCount = results.filter(r => r.status === 'success').length;
+                        console.log(`บันทึก tracking สำเร็จ ${successCount}/${cart.length} รายการ`);
+                        
+                        // หลังจากบันทึก tracking สำเร็จแล้ว ให้ล้างตะกร้า
+                        clearCart(username);
+                    })
+                    .catch(error => {
+                        console.error('Error saving tracking:', error);
+                    });
+            }
+
+            // ฟังก์ชันล้างตะกร้า
+            function clearCart(username) {
+                fetch(`http://localhost:8080/api/cart/clear/${username}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        console.log('ล้างตะกร้าเรียบร้อยแล้ว');
+                        // Trigger cart update event เพื่อให้หน้าอื่นๆ อัปเดต
+                        const updateEvent = new Event('cartUpdated');
+                        window.dispatchEvent(updateEvent);
+                        localStorage.setItem(`cart_updated_${username}_${Date.now()}`, 'true');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error clearing cart:', error);
+                });
+            }
         });
     </script>
 </body>
